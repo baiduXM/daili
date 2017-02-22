@@ -1,0 +1,61 @@
+
+.logcost-panel{
+    width: 92%;
+    background: #ffffff;
+    padding: 2%;
+    margin: 2%;
+}
+.logcost-panel .starttime{
+    width: 160px;
+    font-size: 16px;
+    border-radius: 5px;
+    box-shadow: 0 0 2px #9b9292;
+    margin: 2px;
+}
+.logcost-panel table{
+    width:100%;
+}
+.logcost-panel th{
+    background: rgba(232, 237, 242, 0.89);
+}
+.logcost-panel th,.logcost-panel td{
+    padding: 5px;
+    border-right: 1px solid #dfd9d9;
+    border-bottom: 1px solid #dfd9d9;
+    width: 14%;
+}
+.logcost-panel .text-left{
+    padding-left: 10px;
+    text-align: left;
+}
+.logcost-panel .text-right{
+    padding-right: 10px;
+    text-align: right;
+}
+.logcost-panel .text-center{
+    text-align: center;
+    display: block;
+}
+.logcost-panel .table-panel{
+    overflow: hidden;
+    border: 1px solid #dfd9d9;
+    margin: 1%;
+    padding: 0;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #dadada;
+}
+.logcost-panel table .last{
+    border-right: 0px solid #dfd9d9;
+}
+.logcost-panel .table-title{
+    font-size: 16px;
+    border-bottom: 1px solid #dfd9d9;
+    padding: 5px;
+    background: rgba(232, 237, 242, 0.89);
+    font-weight: bold;
+}
+.logcost-panel .table-foot{
+    font-size: 16px;
+    border-bottom: 1px solid #dfd9d9;
+    padding: 5px;
+}

@@ -1,0 +1,121 @@
+@charset "utf-8";
+/* CSS reset */
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td { 
+	margin:0;
+	padding:0;
+}
+html,body {
+	margin:0;
+	padding:0;
+}
+html {
+	font: 500 14px 'roboto';
+	color: #333;
+	background-color: #fafafa;
+  	overflow:hidden;
+}
+ol,ul {
+	list-style:none;
+}
+h1,h2,h3,h4,h5,h6 {
+	font-size:100%;
+	font-weight:normal;
+}
+/* General Demo Style */
+body{
+	font-family: Constantia, Palatino, "Palatino Linotype", "Palatino LT STD", Georgia, serif;
+	background: #000;
+	font-weight: 400;
+	font-size: 15px;
+	color: #aa3e03;
+	overflow-y: hidden;
+	overflow-x: hidden;
+}
+.ie7 body{
+	overflow:hidden;
+}
+a{
+	color: #333;
+	text-decoration: none;
+}
+#login{
+  width: 374px;
+  height: 310px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -187px;
+  margin-top: -210px;
+  background-image: url('../Images/login/login.png');
+  background-repeat: no-repeat;
+}
+#login h1{
+  margin: 60px 73px;
+  font-family: Helvetica;
+  color: #000;
+  font-weight:bold;
+  font-size: 24px;
+  background-color: transparent;
+}
+.use_pas{
+  padding: 50px 0px 20px;
+  top: -40px;
+  left: 40px;
+  position: relative;
+  background-repeat: no-repeat;
+  background-image: url('../Images/login/input.png');
+}
+.use_pas input{
+  width: 200px;
+  height: 40px;
+  left: 54px;
+  font-size: 17px;
+  border: none;
+  background: none;
+  outline: none;
+  position: absolute;
+  opacity: 0.7;
+  top: 0px;
+}
+.submit{
+  padding: 50px 0px 20px;
+  top: -40px;
+  left: 40px;
+  text-align: center;
+  position: relative;
+  background-repeat: no-repeat;
+  background-image: url('../Images/login/input.png');
+}
+.submit input{
+  width: 276px;
+  height: 36px;
+  top: 3px;
+  left: 3px;
+  font-size: 17px;
+  font-weight: bold;
+  border: none;
+  background: none;
+  background-color: gainsboro;
+  outline: none;
+  position: absolute;
+  opacity: 0.7;
+}
+.submit :hover{
+  background-color: white;
+}
+.u_log{
+  position: absolute;
+  height: 23px;
+  left: -30px;
+  width: 21px;
+  margin: -40px 45px auto;
+  background-image: url('../Images/login/u_log.png');
+}
+.p_log{
+  position: absolute;
+  height: 22px;
+  left: -30px;
+  width: 21px;
+  margin: -40px 45px auto;
+  background-image: url('../Images/login/p_log.png');
+}

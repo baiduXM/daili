@@ -1,0 +1,11 @@
+ErrorDocument 404 /404.php
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule ^Apps$ /Interface.php [QSA]
+RewriteRule ^model$ /Interface.php [QSA]
+RewriteRule ^gbpen$ /Interface.php [QSA]
+RewriteRule ^agent$ /Interface.php [QSA]
+RewriteCond %{REQUEST_URI} ^/tpl/
+RewriteRule ^ tpl/index.html [QSA]
+#RewriteRule ^phpinfo.htm$ /phpinfo.php
+</IfModule>

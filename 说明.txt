@@ -1,0 +1,7 @@
+模板规则
+{$String} //输出变量$String
+{echo fun($String)} //输出执行函数fun并传入变量$String
+<!--{loop $Key $Value}-->//循环开始，$Key表示键值，$Value表示数组值
+<!--{/loop}-->//循环结束
+{if $A=$B}//判断开始
+{/if}//判断结束

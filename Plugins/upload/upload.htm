@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>图像上传</title>
+<script type="text/javascript" src="/Javascripts/jquery.min.js"></script>
+<script type="text/javascript" src="/Javascripts/AjaxUpload.js"></script>
+<style type="text/css">
+<!--
+body {
+	margin: 0px;
+	padding: 0px;
+}
+-->
+</style>
+<script type="text/javascript">
+$(document).ready(function(){
+	new AjaxUpload('#button', {
+		action: '/upload.php',
+		name: 'picture',
+		responseType:'json', 
+		onSubmit : function(file , ext){
+			if (!(ext&&/^(jpg|png|jpeg|gif)$/.test(ext))){
+				alert('很抱歉, 只允许jpg/png/gif文件上传!');
+				return false;				
+			}
+		},
+		onComplete : function(file,r){
+			if(r.code=='success'){
+				ImagePreview('#ImagePreview',r.savepath, '160','120');
+			}
+			else {
+				alert(r.message);
+			}				
+		}		
+	});
+		   
+});
+function ImagePreview(e, src, width, height){
+	var html= '<a href="'+src+'" target="_blank" title="点击查看图像实际大小!"><img src="'+src+'" width="'+width+'" height="'+height+'" border="0"></a>';
+	$(e).html(html);
+}
+</script>
+
+</head>
+
+<body>
+
+<form id="form1" name="form1" method="post" action="">
+<table width="200" border="1">
+	<tr>
+		<td>
+		<div id="ImagePreview"></div>
+		<input type="button" name="button" id="button" value="按钮" /></td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+	</tr>
+</table>
+</form>
+
+
+</body>
+</html>
