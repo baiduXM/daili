@@ -2,7 +2,10 @@ tpl/
 ImagerOut/
 token/
 uploads/
-Data/Config/
+Data/Config/Config.php
 Data/FileCache/
 
+#phpstorm编辑器
 .idea/*
+#netbeans编辑器
+nbproject/
