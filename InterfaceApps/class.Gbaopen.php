@@ -689,7 +689,7 @@ class Gbaopen extends InterfaceVIEWS {
                     $result['msg'] = '容量空间选择错误';
                     return $result;
                 }
-                
+
                 if ($agentinfo['Level'] == 3) {
                     if ($boss_agent_bal['Balance'] < $price) {
                         $result['err'] = 1003;
@@ -788,7 +788,9 @@ class Gbaopen extends InterfaceVIEWS {
                 $order_data = array("OrderID"=>$orderID,"OrderAmount" => $price, "CustomersID" => $cus_id, "CreateTime" => date('Y-m-d H:i:s', time()), "StillTime" =>1, "CPhone" => $cuspro["CPhone"], "PK_model" => $cuspro["PK_model"], "PC_model" => $cuspro["PC_model"], "Mobile_model" => $cuspro["Mobile_model"],"Capacity"=>$cuspro["Capacity"]);
                 $ordermodule = new OrderModule();
                 $ordermodule->InsertArray($order_data);
-                $logcost_data = array("ip" => $_SERVER["REMOTE_ADDR"], "cost" => (0-$price), "type" => 2, "description" => "网站续费", "adddate" => date('Y-m-d H:i:s', time()), "CustomersID" => $cus_id,"AgentID"=>$agent_id,"CostID"=>$costID,"Balance"=>$balance_money,"OrderID"=>$orderID);
+                $logcost_data = array("ip" => $_SERVER["REMOTE_ADDR"], "cost" => (0-$price), "type" => 2,
+                    "description" => "网站续费", "adddate" => date('Y-m-d H:i:s', time()), "CustomersID" => $cus_id,
+                    "AgentID"=>$agent_id,"CostID"=>$costID,"Balance"=>$balance_money,"OrderID"=>$orderID);
                 $logcost = new LogcostModule();
                 $logcost->InsertArray($logcost_data);
                 $this->LogsFunction->LogsCusRecord(115, 5, $cus_id, '续费同步成功');
@@ -856,7 +858,7 @@ class Gbaopen extends InterfaceVIEWS {
                         }
                     }
                 } elseif ($level == 1) {
-                    
+
                 } else {
                     $result['err'] = 1001;
                     $result['msg'] = '此用户资料不存在';
@@ -1601,7 +1603,7 @@ class Gbaopen extends InterfaceVIEWS {
 //                    $result['msg'] = '容量空间选择错误';
 //                    return $result;
 //                }
-                
+
                 //时间处理给成默认值年限1年
 //                if ($post['stilltime'])
 //                    $stilltime = intval($post['stilltime'])>0?intval($post['stilltime']):1;
@@ -1628,7 +1630,7 @@ class Gbaopen extends InterfaceVIEWS {
                     }
                 }
                 $price=$price-$couprice;
-                
+
                 //价格计算开始，根据等级得到扣款的代理商账户
                 if ($level == 3) {
                     $costAccount = $balance->GetOneInfoByAgentID($agentinfo['BossAgentID']);
@@ -2436,11 +2438,15 @@ class Gbaopen extends InterfaceVIEWS {
         exit;
     }
 
-    /* 权限判定函数，
+    /**
+     * 权限判定函数，
      * 一个参数获取当前拥有的权限，
      * 两个参数判断是否拥有这个权限
+     *
+     * @param $power
+     * @param bool $type
+     * @return array|bool
      */
-
     private function Assess($power, $type = false) {
         if ($type) {
             $re = isset($this->function_config[$type]) ? $power & $this->function_config[$type] ? true : false : false;
@@ -2454,13 +2460,6 @@ class Gbaopen extends InterfaceVIEWS {
         }
         return $re;
     }
-
-    public function test() {
-        $a = array('sdafsdfsdf');
-        echo implode('and', $a);
-        exit;
-    }
-    
     /**
      * 计算费用
      */
@@ -2575,6 +2574,12 @@ class Gbaopen extends InterfaceVIEWS {
             return $result;
         }
     }
+
+    /**
+     * 站点转移
+     *
+     * @return array
+     */
     public function SiteMove(){
         set_time_limit(0);
         $result = array('err' => 0, 'data' => '', 'msg' => '');
@@ -2840,7 +2845,7 @@ class Gbaopen extends InterfaceVIEWS {
                     $update_self['CostAll'] = $update_self['CostAll'] + $price;
                     $balance_money=$update_self['Balance'];
                 }
-                
+
                 $IsOk = $this->ToGbaoPenEditInfo(array_replace($cuspro_info, array("Capacity"=>$morecapacity)));
                 if ($IsOk['err'] != 1000) {
                     $result['err'] = 1002;
@@ -2909,10 +2914,14 @@ class Gbaopen extends InterfaceVIEWS {
     public function Gshow(){
         $result = array('err' => 0, 'data' => '', 'msg' => '');
         $post=$this->_POST;
+        $money = $post["money"];
+        $agent_id = (int) $_SESSION ['AgentID'];
         $cus_id=$post["num"];
         $gshow=new GshowModule();
+        $logcost = new LogcostModule();
+        $balance = new BalanceModule();
         $gshowinfo=$gshow->GetOneByWhere(array(), " where CustomersID = ".$post["num"]);
-        if($gshowinfo){
+        if($gshowinfo){ //===数据库有记录
             $madify_info=$gshowinfo;
             $nowtime=strtotime($gshowinfo["EndTime"])>time()?strtotime($gshowinfo["EndTime"]):time();
             $madify_info["EndTime"]=(date('Y', $nowtime) + $post["year"]) . '-' . date('m-d H:i:s',$nowtime);
@@ -2925,13 +2934,29 @@ class Gbaopen extends InterfaceVIEWS {
                     $result["err"]=1;
                     $result["msg"]="微传单同步数据失败";
                 }else{
+                    // TODO:扣款操作
+                    // 判断余额是否充足
+
+
+                    // 扣除余额
+
+
+                    // 添加消费日志
+                    $logcost_data = array("ip" => $_SERVER["REMOTE_ADDR"], "cost" => (0-$money), "type" => 5,
+                        "description" => "开通微传单", "adddate" => date('Y-m-d H:i:s', time()), "CustomersID" => $cus_id,
+                        "AgentID"=>$agent_id,"CostID"=>$costID,"Balance"=>$balance_money,"OrderID"=>'');
+
+                    $logcost->InsertArray($logcost_data);
+                    $this->LogsFunction->LogsCusRecord(115, 5, $cus_id, '续费同步成功');
+
+
                     $result["msg"]="微传单操作成功";
                 }
             }else{
                 $result["err"]=2;
                 $result["msg"]="微传单数据更新失败";
             }
-        }else{
+        }else{ //===无记录
             $cust=new CustomersModule();
             $cust_info=$cust->GetOneByWhere(array(), " where CustomersID = ".$post["num"]);
             $ins_info=array();
@@ -2949,6 +2974,7 @@ class Gbaopen extends InterfaceVIEWS {
                     $result["msg"]="微传单同步数据失败";
                     $this->LogsFunction->LogsCusRecord(123, 6, $cus_id, $result['msg']);
                 }else{
+                    // TODO:扣款操作
                     $result["msg"]="微传单操作成功";
                     $this->LogsFunction->LogsCusRecord(123, 1, $cus_id, $result['msg']);
                 }

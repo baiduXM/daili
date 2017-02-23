@@ -1069,20 +1069,28 @@ jQuery(document).ready(function() {
                             <p>\n\
                                 <span class="content-l">年限:</span>\n\
                                 <input class="Input years" type="number" min="1" value="1"/>\n\
+                                ￥<span class="years-money">1000.00</span>\n\
                             </p>\n\
-                    </div>';
+                    </div>\n\
+                    <script type="text/javascript">\n\
+                        $(".userdata-content .years").change(function(){\n\
+                            $(".userdata-content .years-money").text($(this).val() +"000.00");\n\
+                        });\n\
+                </script>';
                 }else{
                     html = '<div class="userdata-content"><p style="font-size:20px;">是否续费该客户微传单？</p>\
                         <input type="hidden" class="Input" value="' + cus + '">\n\
                             <p>\n\
                                 <span class="content-l">年限:</span>\n\
                                 <input class="Input years" type="number" min="1" value="1"/>\n\
+                                ￥<span class="years-money">1000.00</span>\n\
                             </p>\n\
                             <p>\n\
                                 <span class="content-l">续费至:</span>\n\
                                 <input class="Input date" name="date" type="text" value="" disabled="true"/>\n\
                             </p>\n\
-                    </div><script type="text/javascript">\n\
+                    </div>\n\
+                    <script type="text/javascript">\n\
                     var jsUserdata = function (){\n\
                         theTime=(new Date()).Format("yyyy-MM-dd hh:mm:ss");\n\
                         this.radioCho;\n\
@@ -1094,6 +1102,8 @@ jQuery(document).ready(function() {
                             $(".userdata-content .years").change(function(){\n\
                                 _this.year = $(this).val();\n\
                                 _this.reset();\n\
+                                $(".userdata-content .years-money").text(_this.year +"000.00");\n\
+                                $(".userdata-content [name=\'money\']").val(_this.year +"000.00");\n\
                             });\n\
                         };\n\
                         this.reset = function(){\n\
@@ -1104,7 +1114,8 @@ jQuery(document).ready(function() {
                             $(".userdata-content input[name=\'date\']").val(newyear);\n\
                         }\n\
                         this.init = function(){\n\
-                            this.change();this.reset();\n\
+                            this.change();\n\
+                            this.reset();\n\
                             $(".userdata-content .years").change();\n\
                         },\n\
                         this.init();\n\
@@ -1351,9 +1362,10 @@ jQuery(document).ready(function() {
                 }
             });
             $(".dialog-content a.dia-ok").removeClass('morecapacity');
-        } else if ($(this).hasClass("g-show")) {
+        } else if ($(this).hasClass("g-show")) { //===微传单提交
             var data={};
             data["year"]=$('.userdata-content .years').val();
+            data["money"]=$('.userdata-content .years-money').text();
             data["num"]=number;
             Msg(1, '<span>正在处理，请稍等...</span><span class="flower-loader" style="opacity: 1;"></span>');
             $.post("Apps?module=Gbaopen&action=Gshow", data, function(result) {
