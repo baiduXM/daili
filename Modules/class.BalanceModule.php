@@ -59,18 +59,38 @@ class BalanceModule
         return $DB->GetOne('select ' . $select . ' from ' . $this->TableName . ' where ' . $this->AgentID . '=' . $agentID);
     }
 
+    /**
+     * 插入数据
+     *
+     * @param array $Array
+     * @param bool $TureOrFalse
+     * @return int
+     */
     public function InsertArray($Array = array(), $TureOrFalse = false)
     {
         $DB = new DB ();
         return $DB->insertArray($this->TableName, $Array, $TureOrFalse);
     }
 
+    /**
+     * 根据AgentID更新数据
+     *
+     * @param array $Array  更新的字段数组
+     * @param int $AgentID  代理商ID
+     * @return int
+     */
     public function UpdateArrayByAgentID($Array = array(), $AgentID = 0)
     {
         $DB = new DB ();
         return $DB->UpdateArray($this->TableName, $Array, array($this->AgentID => $AgentID));
     }
 
+    /**
+     * 根据AgentID删除数据
+     *
+     * @param $AgentID
+     * @return int
+     */
     public function DeleteInfoByAgentID($AgentID)
     {
         $DB = new DB ();
@@ -78,6 +98,12 @@ class BalanceModule
         return $DB->Delete($Sql);
     }
 
+    /**
+     * 根据AgentID获取一条数据
+     *
+     * @param $AgentID
+     * @return array
+     */
     public function GetOneInfoByAgentID($AgentID)
     {
         $DB = new DB ();
@@ -114,12 +140,5 @@ class BalanceModule
     }
 
 
-    /**
-     *  余额是否充足
-     */
-    public function isEnough()
-    {
-
-    }
 
 }

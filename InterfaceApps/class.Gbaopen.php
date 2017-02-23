@@ -2674,6 +2674,7 @@ class Gbaopen extends InterfaceVIEWS
         if ($custpro->UpdateArray($info, $CustmoersID)) {
             $cuspro_info = $custpro->GetOneByWhere(array(), " where CustomersID=" . $CustmoersID);
             $TuUrl = GBAOPEN_DOMAIN . 'api/webremove';
+            $ToString = '';
             $ToString .= 'username=' . $cuspro_info["G_name"];
             $ToString .= '&ftp_address=' . $info ['G_Ftp_Address'];
             $ToString .= '&ftp_port=' . $info ['G_Ftp_Duankou'];
@@ -2980,27 +2981,16 @@ class Gbaopen extends InterfaceVIEWS
             $ret = $gshow->UpdateArray($madify_info, array("CustomersID" => $post["num"]));
             if ($ret) {
                 $ret = $this->toGshow($madify_info);
-                if ($ret["code"] != 200) {
+//                var_dump($ret);
+//                exit;
+//                dd($ret.'+++');
+                if ($ret["code"] != 200) {//===?200是什么意思
                     $gshow->UpdateArray($gshowinfo, array("CustomersID" => $post["num"]));
                     $result["err"] = 1;
                     $result["msg"] = "微传单同步数据失败";
                 } else {
                     // TODO:扣款操作
-                    // 判断余额是否充足
-
-
-                    // 扣除余额
-
-
-                    // 添加消费日志
-                    $logcost_data = array("ip" => $_SERVER["REMOTE_ADDR"], "cost" => (0 - $money), "type" => 5,
-                        "description" => "开通微传单", "adddate" => date('Y-m-d H:i:s', time()), "CustomersID" => $cus_id,
-                        "AgentID" => $agent_id, "CostID" => $costID, "Balance" => $balance_money, "OrderID" => '');
-
-                    $logcost->InsertArray($logcost_data);
-                    $this->LogsFunction->LogsCusRecord(115, 5, $cus_id, '续费同步成功');
-
-
+                    $this->consume($money, 5, $cus_id, $agent_id);
                     $result["msg"] = "微传单操作成功";
                 }
             } else {
@@ -3026,6 +3016,7 @@ class Gbaopen extends InterfaceVIEWS
                     $this->LogsFunction->LogsCusRecord(123, 6, $cus_id, $result['msg']);
                 } else {
                     // TODO:扣款操作
+                    $this->consume($money, 6, $cus_id, $agent_id);
                     $result["msg"] = "微传单操作成功";
                     $this->LogsFunction->LogsCusRecord(123, 1, $cus_id, $result['msg']);
                 }
@@ -3038,6 +3029,12 @@ class Gbaopen extends InterfaceVIEWS
         return $result;
     }
 
+    /**
+     * ？
+     *
+     * @param $data
+     * @return int|mixed
+     */
     private function toGshow($data)
     {
         if (!$data) {
@@ -3084,5 +3081,80 @@ class Gbaopen extends InterfaceVIEWS
         $ReturnString = request_by_other($TuUrl, $ToString);
         $ReturnArray = json_decode($ReturnString, true);
         return $ReturnArray;
+    }
+
+    /**
+     * ===消费扣款===
+     * 判断余额是否充足
+     * 添加消费日志
+     * 扣除余额、更新月消费额和总消费额
+     *
+     * @param $money    消费金额
+     * @param $type 5-开通微传单,6-续费微传单
+     * @param $cus_id   客户ID
+     * @param $agentID  操作人员（客服agentid）
+     * @param $costID   支付代理商（代理agentid）
+     * @return string
+     */
+    public function consume($money, $type = 5, $cus_id = 0, $agentID = 0)
+    {
+        $result = array('err' => 0, 'data' => '', 'msg' => '');
+        $Balance = new BalanceModule();
+        $Logcost = new LogcostModule();
+        $agentBalance = $Balance->GetBalance($agentID);
+        // 判断余额是否充足
+        if ($agentBalance < $money) {
+            $result['err'] = '1';
+            $result['msg'] = '余额不足';
+            return $result;
+        }
+        $nowTime = date('Y-m-d H:i:s', time());
+        $updateBalance = $agentBalance - $money;
+        // 添加消费日志
+        $logcostData['ip'] = $_SERVER["REMOTE_ADDR"];
+        $logcostData['cost'] = (0 - $money);
+        $logcostData['type'] = $type;
+        if ($type = 5) {
+            $logcostData['description'] = '开通微传单';
+        } else {
+            $logcostData['description'] = '续费微传单'; // type = 6
+        }
+        $logcostData['adddate'] = $nowTime;
+        $logcostData['Balance'] = $updateBalance;
+        $logcostData['CustomersID'] = $cus_id;
+        $logcostData['AgentID'] = $agentID;
+        if ($_SESSION['Level'] < 3) {
+            $logcostData['CostID'] = $agentID;
+        } else {
+            $Account = new AccountModule();
+            $AccountData = $Account->GetOneInfoByKeyID($agentID);
+            $logcostData['CostID'] = $AccountData['BossAgentID'];
+        }
+        $logcostData['OrderID'] = '';
+        $resLogcost = $Logcost->InsertArray($logcostData);
+
+        // 更新余额、月消费额、总消费额
+        $selectSql = array('sum(cost) AS cost');
+        $whereSql = 'where AgentID = ' . $agentID . ' AND DATE_FORMAT(adddate, \'%Y%m\') = DATE_FORMAT(CURDATE(), \'%Y%m\')';
+        $monCost = $Logcost->GetOneByWhere($selectSql, $whereSql); // 当月消费
+        $selectSql = array('sum(cost) AS cost');
+        $whereSql = 'where AgentID = ' . $agentID;
+        $allCost = $Logcost->GetOneByWhere($selectSql, $whereSql); // 总消费
+
+        $balanceData['Balance'] = $updateBalance;
+        $balanceData['CostMon'] = $monCost['cost'];
+        $balanceData['CostAll'] = $allCost['cost'];
+        $balanceData['UpdateTime'] = $nowTime;
+        $resBalance = $Balance->UpdateArrayByAgentID($balanceData, $agentID);
+
+
+        if ($resLogcost && $resBalance) {
+            $result['err'] = '0';
+            $result['msg'] = '消费扣款成功';
+        } else {
+            $result['err'] = '2';
+            $result['msg'] = '消费扣款失败';
+        }
+        return $result;
     }
 }
