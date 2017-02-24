@@ -3043,7 +3043,7 @@ class Gbaopen extends InterfaceVIEWS
         if (!$cust_info) {
             return 0;
         }
-        $TuUrl = 'http://' . WEICD_DOMAIN . '/index.php?c=user&a=dlregister';
+        $TuUrl = WEICD_DOMAIN . 'index.php?c=user&a=dlregister';
         $ToString = '';
         $ToString .= 'uname=' . $cust_info ['CompanyName'];
 

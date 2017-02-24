@@ -5,6 +5,7 @@ define('FENGXIN_MD5KEY', '@sdSW$5&125*');
 define('GBAOPEN_DOMAIN','http://unify.example.com/'); // 统一平台地址 http://ht.5067.org/
 define('DAILI_DOMAIN','http://daili.example.com/'); // 代理平台 http://dl2.5067.org/
 define('GUANWANG_DOMAIN','http://www.gbp.com/'); // 官网地址 http://www.gbpen.com/
+define('WEICD_DOMAIN','http://weicd.example.com/'); // 微传单 http://cd.5067.org/
 //对外图片访问地址
 define('IMG_DOMAIN','http://daili.example.com/'); // http://dl2.5067.org/
 //对外图片保存路径
