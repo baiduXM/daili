@@ -7,9 +7,11 @@
  * Function: G宝盆各种客户操作
  * Time: 09:37
  */
-class Gbaopen extends InterfaceVIEWS {
+class Gbaopen extends InterfaceVIEWS
+{
 
-    public function __Public() {
+    public function __Public()
+    {
         IsLogin(true);
         //控制器
         $this->MyModule = 'Gbaopen';
@@ -28,7 +30,8 @@ class Gbaopen extends InterfaceVIEWS {
     }
 
     //客户列表页面初始化
-    public function CusInit() {
+    public function CusInit()
+    {
         $result = array('err' => 0, 'data' => '', 'msg' => '');
         $agent_id = $_SESSION ['AgentID'];
         $power = $_SESSION ['Power'];
@@ -83,16 +86,17 @@ class Gbaopen extends InterfaceVIEWS {
     }
 
     //获取客户案例数据
-    public function GetCases() {
+    public function GetCases()
+    {
         $result = array('err' => 0, 'data' => '', 'msg' => '');
         $cuspro = new CustProModule;
-        $cus_id = (int) $this->_GET['num'];
-        $power = (int) $_SESSION['Power'];
+        $cus_id = (int)$this->_GET['num'];
+        $power = (int)$_SESSION['Power'];
         if ($cus_id && $this->Assess($power, $this->case)) {
             $casedata = $cuspro->GetOneByWhere(array('CaseImagePC', 'CaseImageMobile', 'CPhone'), ' where CustomersID=' . $cus_id);
             $casedataPC = $casedata['CaseImagePC'];
             $casedataMobile = $casedata['CaseImageMobile'];
-            $case['type'] = (int) $casedata['CPhone'];
+            $case['type'] = (int)$casedata['CPhone'];
             $case['pc'] = $case['mobile'] = array();
             if ($casedataPC) {
                 $casedata = explode(',', $casedataPC);
@@ -163,15 +167,16 @@ class Gbaopen extends InterfaceVIEWS {
     }
 
     //推荐案例
-    public function ComExc() {
+    public function ComExc()
+    {
         $result = array('err' => 0, 'data' => '', 'msg' => '');
-        $power = (int) $_SESSION['Power'];
+        $power = (int)$_SESSION['Power'];
         if ($this->Assess($power, $this->case)) {
             $file1 = 'simgfile';
             $file2 = 'imgfile';
             $area = new AreaModule;
             $cuspro = new CustProModule;
-            $cus_id = (int) $this->_POST['num'];
+            $cus_id = (int)$this->_POST['num'];
             $area_id = $this->_POST['areaID'];
             $time = time() . getstr();
             /* 搜集需要删除的图片地址 */
@@ -297,7 +302,7 @@ class Gbaopen extends InterfaceVIEWS {
                 else
                     $cuspro->UpdateArray(array('CaseImageMobile' => 0), $cus_id);
             }
-        }else {
+        } else {
             $result["err"] = 1003;
             $result["msg"] = '非法操作';
         }
@@ -305,12 +310,13 @@ class Gbaopen extends InterfaceVIEWS {
     }
 
     //G宝盆修改续费转移操作数据生成
-    public function Operation() {
+    public function Operation()
+    {
         $result = array('err' => 1000, 'data' => '', 'msg' => '错误的指令--数据获取');
-        $cus_id = (int) $this->_GET['cus'];
+        $cus_id = (int)$this->_GET['cus'];
         if ($this->_GET['type'] && $cus_id) {
             $agent_id = $_SESSION ['AgentID'];
-            $level = (int) $_SESSION ['Level'];
+            $level = (int)$_SESSION ['Level'];
             $power = $_SESSION ['Power'];
             $cusmodel = new CustomersModule;
             $cus = $cusmodel->GetOneByWhere('where CustomersID=' . $cus_id);
@@ -351,7 +357,7 @@ class Gbaopen extends InterfaceVIEWS {
                 case 'renew':
                     if ($this->Assess($power, $this->renew)) {
                         $cuspromodel = new CustProModule;
-                        $lists = array('CPhone', 'PK_model', 'PC_model', 'Mobile_model', 'PC_EndTime', 'Mobile_EndTime','Capacity');
+                        $lists = array('CPhone', 'PK_model', 'PC_model', 'Mobile_model', 'PC_EndTime', 'Mobile_EndTime', 'Capacity');
                         $cuspro = $cuspromodel->GetOneByWhere($lists, 'where CustomersID=' . $cus_id);
                         if ($cuspro) {
                             $model = new ModelModule;
@@ -369,7 +375,7 @@ class Gbaopen extends InterfaceVIEWS {
                                         $exist = true;
                                         if (($cuspro['PC_model'] == $price['PCNum']) && ($cuspro['Mobile_model'] == $price['PhoneNum']))
                                             $data['state'] = 2;
-                                    }else {
+                                    } else {
                                         $exist = FALSE;
                                     }
                                     $pc_price = $model->GetOneByWhere(array('Price', 'Youhui'), 'where NO=\'' . $cuspro['PC_model'] . '\'');
@@ -435,7 +441,7 @@ class Gbaopen extends InterfaceVIEWS {
                     if ($this->Assess($power, $this->process)) {
                         $custpromodel = new CustProModule();
                         $custpro = $custpromodel->GetOneByWhere('where CustomersID=' . $cus_id);
-                        $data = array("FuwuqiID"=>$custpro["FuwuqiID"]);
+                        $data = array("FuwuqiID" => $custpro["FuwuqiID"]);
                         $result['data'] = $data;
                     } else {
                         $result['err'] = 1002;
@@ -470,7 +476,7 @@ class Gbaopen extends InterfaceVIEWS {
                             }
                         }
                         $result['data'] = $data;
-                    }else {
+                    } else {
                         $result['err'] = 1002;
                         $result['msg'] = '非法请求--转移';
                         $this->LogsFunction->LogsCusRecord(115, 3, $cus_id, $result['msg']);
@@ -546,12 +552,13 @@ class Gbaopen extends InterfaceVIEWS {
     }
 
     //G宝盆续费操作
-    public function Renew() {
+    public function Renew()
+    {
         $result = array('err' => 0, 'data' => '', 'msg' => '');
-        $agent_id = (int) $_SESSION ['AgentID'];
-        $level = (int) $_SESSION ['Level'];
-        $power = (int) $_SESSION ['Power'];
-        $cus_id = (int) $this->_POST['num'];
+        $agent_id = (int)$_SESSION ['AgentID'];
+        $level = (int)$_SESSION ['Level'];
+        $power = (int)$_SESSION ['Power'];
+        $cus_id = (int)$this->_POST['num'];
         $addyear = intval($this->_POST['yearnum']);
         $capacity = intval($this->_POST['capacity']);
         if ($cus_id && $this->Assess($power, $this->renew) && $addyear > 0) {
@@ -675,21 +682,21 @@ class Gbaopen extends InterfaceVIEWS {
 //                        return $result;
 //                        break;
 //                }
-                $price=0;
+                $price = 0;
                 if ($capacity == 300) {
-                    $price+=500;
-                } elseif($capacity == 500){
-                    $price+=800;
-                }elseif($capacity == 1000){
-                    $price+=1500;
-                }elseif($capacity == 100){
-                    $price+=300;
-                }else{
+                    $price += 500;
+                } elseif ($capacity == 500) {
+                    $price += 800;
+                } elseif ($capacity == 1000) {
+                    $price += 1500;
+                } elseif ($capacity == 100) {
+                    $price += 300;
+                } else {
                     $result['err'] = 1003;
                     $result['msg'] = '容量空间选择错误';
                     return $result;
                 }
-                
+
                 if ($agentinfo['Level'] == 3) {
                     if ($boss_agent_bal['Balance'] < $price) {
                         $result['err'] = 1003;
@@ -716,7 +723,7 @@ class Gbaopen extends InterfaceVIEWS {
                     }
                     $update_self['CostMon'] = $update_self['CostMon'] + $price;
                     $update_self['CostAll'] = $update_self['CostAll'] + $price;
-                    $balance_money=$update_boss['Balance'];
+                    $balance_money = $update_boss['Balance'];
                 } else {
                     if ($boss_agent_bal['Balance'] < $price) {
                         $result['err'] = 1003;
@@ -733,22 +740,22 @@ class Gbaopen extends InterfaceVIEWS {
                     $update_self['Balance'] = $boss_agent_bal['Balance'] - $price;
                     $update_self['CostMon'] = $update_self['CostMon'] + $price;
                     $update_self['CostAll'] = $update_self['CostAll'] + $price;
-                    $balance_money=$update_self['Balance'];
+                    $balance_money = $update_self['Balance'];
                 }
                 //PC续费处理
                 $cuspro_time = array('UpdateTime' => date('Y-m-d H:i:s', time()));
                 if ($type == 1 or $type == 3 or $type == 4) {
-                    $nowyear = (strtotime($cuspro['PC_EndTime'])>time())?strtotime($cuspro['PC_EndTime']):time();
+                    $nowyear = (strtotime($cuspro['PC_EndTime']) > time()) ? strtotime($cuspro['PC_EndTime']) : time();
                     $newyear = (date('Y', $nowyear) + $addyear) . '-' . date('m-d H:i:s', $nowyear);
                     $cuspro_time['PC_EndTime'] = $newyear;
                 }
                 if ($type == 2 or $type == 3 or $type == 4) {
-                    $nowyear =  (strtotime($cuspro['Mobile_EndTime'])>time())?strtotime($cuspro['Mobile_EndTime']):time();
+                    $nowyear = (strtotime($cuspro['Mobile_EndTime']) > time()) ? strtotime($cuspro['Mobile_EndTime']) : time();
                     $newyear = (date('Y', $nowyear) + $addyear) . '-' . date('m-d H:i:s', $nowyear);
                     $cuspro_time['Mobile_EndTime'] = $newyear;
                 }
-                $modify_cuspro_info=$cuspro_time;
-                $modify_cuspro_info["Capacity"]=$capacity*1024*1024;
+                $modify_cuspro_info = $cuspro_time;
+                $modify_cuspro_info["Capacity"] = $capacity * 1024 * 1024;
                 $IsOk = $this->ToGbaoPenEditInfo(array_replace($cuspro, $modify_cuspro_info));
                 if ($IsOk['err'] != 1000) {
                     $result['err'] = 1002;
@@ -783,12 +790,14 @@ class Gbaopen extends InterfaceVIEWS {
                     $this->LogsFunction->LogsCusRecord(115, 0, $cus_id, $result['msg']);
                     return $result;
                 }
-                $CustProModule=new CustProModule();
-                $orderID= time().rand(1000,9999);
-                $order_data = array("OrderID"=>$orderID,"OrderAmount" => $price, "CustomersID" => $cus_id, "CreateTime" => date('Y-m-d H:i:s', time()), "StillTime" =>1, "CPhone" => $cuspro["CPhone"], "PK_model" => $cuspro["PK_model"], "PC_model" => $cuspro["PC_model"], "Mobile_model" => $cuspro["Mobile_model"],"Capacity"=>$cuspro["Capacity"]);
+                $CustProModule = new CustProModule();
+                $orderID = time() . rand(1000, 9999);
+                $order_data = array("OrderID" => $orderID, "OrderAmount" => $price, "CustomersID" => $cus_id, "CreateTime" => date('Y-m-d H:i:s', time()), "StillTime" => 1, "CPhone" => $cuspro["CPhone"], "PK_model" => $cuspro["PK_model"], "PC_model" => $cuspro["PC_model"], "Mobile_model" => $cuspro["Mobile_model"], "Capacity" => $cuspro["Capacity"]);
                 $ordermodule = new OrderModule();
                 $ordermodule->InsertArray($order_data);
-                $logcost_data = array("ip" => $_SERVER["REMOTE_ADDR"], "cost" => (0-$price), "type" => 2, "description" => "网站续费", "adddate" => date('Y-m-d H:i:s', time()), "CustomersID" => $cus_id,"AgentID"=>$agent_id,"CostID"=>$costID,"Balance"=>$balance_money,"OrderID"=>$orderID);
+                $logcost_data = array("ip" => $_SERVER["REMOTE_ADDR"], "cost" => (0 - $price), "type" => 2,
+                    "description" => "网站续费", "adddate" => date('Y-m-d H:i:s', time()), "CustomersID" => $cus_id,
+                    "AgentID" => $agent_id, "CostID" => $costID, "Balance" => $balance_money, "OrderID" => $orderID);
                 $logcost = new LogcostModule();
                 $logcost->InsertArray($logcost_data);
                 $this->LogsFunction->LogsCusRecord(115, 5, $cus_id, '续费同步成功');
@@ -824,12 +833,13 @@ class Gbaopen extends InterfaceVIEWS {
     }
 
     //客户信息修改
-    public function Modify() {
+    public function Modify()
+    {
         $result = array('err' => 0, 'data' => '', 'msg' => '');
-        $agent_id = (int) $_SESSION ['AgentID'];
-        $power = (int) $_SESSION ['Power'];
-        $level = (int) $_SESSION ['Level'];
-        $cus_id = (int) $this->_POST['num'];
+        $agent_id = (int)$_SESSION ['AgentID'];
+        $power = (int)$_SESSION ['Power'];
+        $level = (int)$_SESSION ['Level'];
+        $cus_id = (int)$this->_POST['num'];
         if ($cus_id && $this->Assess($power, $this->modify)) {
             $data['CompanyName'] = $this->_POST['companyname'];
             $data['CustomersName'] = $this->_POST['name'];
@@ -856,7 +866,7 @@ class Gbaopen extends InterfaceVIEWS {
                         }
                     }
                 } elseif ($level == 1) {
-                    
+
                 } else {
                     $result['err'] = 1001;
                     $result['msg'] = '此用户资料不存在';
@@ -885,13 +895,14 @@ class Gbaopen extends InterfaceVIEWS {
     }
 
     //客户转移
-    public function Custransfer() {
+    public function Custransfer()
+    {
         $result = array('err' => 0, 'data' => '', 'msg' => '');
-        $agent_id = (int) $_SESSION ['AgentID'];
-        $power = (int) $_SESSION ['Power'];
-        $level = (int) $_SESSION ['Level'];
-        $cus_id = (int) $this->_POST['num'];
-        $exc = (int) $this->_POST['id'];
+        $agent_id = (int)$_SESSION ['AgentID'];
+        $power = (int)$_SESSION ['Power'];
+        $level = (int)$_SESSION ['Level'];
+        $cus_id = (int)$this->_POST['num'];
+        $exc = (int)$this->_POST['id'];
         if ($cus_id && $exc && $this->Assess($power, $this->transfer)) {
             $accountModel = new AccountModule;
             $exc_msg = $accountModel->GetOneInfoByKeyID($exc);
@@ -990,13 +1001,14 @@ class Gbaopen extends InterfaceVIEWS {
     }
 
     //客户网站信息修改处理
-    public function Processing() {
+    public function Processing()
+    {
         $result = array('err' => 0, 'data' => '', 'msg' => '');
-        $agent_id = (int) $_SESSION ['AgentID'];
-        $level = (int) $_SESSION ['Level'];
-        $power = (int) $_SESSION ['Power'];
+        $agent_id = (int)$_SESSION ['AgentID'];
+        $level = (int)$_SESSION ['Level'];
+        $power = (int)$_SESSION ['Power'];
         $post = $this->_POST;
-        $cus_id = (int) $post['num'];
+        $cus_id = (int)$post['num'];
         if ($cus_id && $this->Assess($power, $this->process)) {
             $cuspromodel = new CustProModule;
             if ($level == 3)
@@ -1357,13 +1369,14 @@ class Gbaopen extends InterfaceVIEWS {
     }
 
     //客户开通G宝盆
-    public function NewCus() {
+    public function NewCus()
+    {
         $result = array('err' => 0, 'data' => '', 'msg' => '');
-        $agent_id = (int) $_SESSION ['AgentID'];
+        $agent_id = (int)$_SESSION ['AgentID'];
         $power = $_SESSION ['Power'];
         $level = $_SESSION ['Level'];
         $post = $this->_POST;
-        $post['cus'] = (int) $post['cus'];
+        $post['cus'] = (int)$post['cus'];
         $agent = new AccountModule;
         $balance = new BalanceModule;
         $CustProModule = new CustProModule;
@@ -1601,7 +1614,7 @@ class Gbaopen extends InterfaceVIEWS {
 //                    $result['msg'] = '容量空间选择错误';
 //                    return $result;
 //                }
-                
+
                 //时间处理给成默认值年限1年
 //                if ($post['stilltime'])
 //                    $stilltime = intval($post['stilltime'])>0?intval($post['stilltime']):1;
@@ -1618,22 +1631,22 @@ class Gbaopen extends InterfaceVIEWS {
 
                 //优惠码处理
                 $coupons = $post['coupons'];
-                $couprice=0;
+                $couprice = 0;
                 if ($coupons) {
                     $couponsprice = file_get_contents(DAILI_DOMAIN . '?module=ApiModel&action=GetCoupons&code=' . $coupons);
                     if ($couponsprice > 0) {
                         $Data['Coupons'] = $coupons;
                         $Data['CouponsPrice'] = $couponsprice;
-                        $couprice=$couponsprice;
+                        $couprice = $couponsprice;
                     }
                 }
-                $price=$price-$couprice;
-                
+                $price = $price - $couprice;
+
                 //价格计算开始，根据等级得到扣款的代理商账户
                 if ($level == 3) {
                     $costAccount = $balance->GetOneInfoByAgentID($agentinfo['BossAgentID']);
                     $agentAccount = $balance->GetOneInfoByAgentID($agent_id);
-                    $CostID=$agentinfo['BossAgentID'];
+                    $CostID = $agentinfo['BossAgentID'];
                     unset($agentAccount['ID']);
                     unset($costAccount['ID']);
                     if ($costAccount['Balance'] < $price) {
@@ -1661,10 +1674,10 @@ class Gbaopen extends InterfaceVIEWS {
                     }
                     $update_self['CostMon'] = $update_cost['CostMon'] + $price;
                     $update_self['CostAll'] = $update_cost['CostAll'] + $price;
-                    $balance_money=$update_boss['Balance'];
+                    $balance_money = $update_boss['Balance'];
                 } else {
                     $costAccount = $balance->GetOneInfoByAgentID($agent_id);
-                    $CostID=$agent_id;
+                    $CostID = $agent_id;
                     unset($costAccount['ID']);
                     if ($costAccount['Balance'] < $price) {
                         $result['err'] = 1003;
@@ -1682,7 +1695,7 @@ class Gbaopen extends InterfaceVIEWS {
                     $update_self['Balance'] = $costAccount['Balance'] - $price;
                     $update_self['CostMon'] = $update_cost['CostMon'] + $price;
                     $update_self['CostAll'] = $update_cost['CostAll'] + $price;
-                    $balance_money=$update_self['Balance'];
+                    $balance_money = $update_self['Balance'];
                 }
 
 //                $balance=new BalanceModule();
@@ -1816,11 +1829,11 @@ class Gbaopen extends InterfaceVIEWS {
                     $coupons ? file_get_contents(DAILI_DOMAIN . '?module=ApiModel&action=GetCoupons&code=' . $coupons . '&use=1') : '';
                     $result['msg'] = '创建客户及开通G宝盆成功';
                     $this->LogsFunction->LogsCusRecord(113, 5, $Data['CustomersID'], $result['msg']);
-                    $orderID= time().rand(1000,9999);
-                    $order_data = array("orderID"=>$orderID,"OrderAmount" => $price, "CustomersID" => $Data['CustomersID'], "CreateTime" => date('Y-m-d H:i:s', time()), "StillTime" => $stilltime, "CPhone" => $Data["CPhone"], "PK_model" => $Data["PK_model"], "PC_model" => $Data["PC_model"], "Mobile_model" => $Data["Mobile_model"],"Capacity"=>$Data["Capacity"]);
+                    $orderID = time() . rand(1000, 9999);
+                    $order_data = array("orderID" => $orderID, "OrderAmount" => $price, "CustomersID" => $Data['CustomersID'], "CreateTime" => date('Y-m-d H:i:s', time()), "StillTime" => $stilltime, "CPhone" => $Data["CPhone"], "PK_model" => $Data["PK_model"], "PC_model" => $Data["PC_model"], "Mobile_model" => $Data["Mobile_model"], "Capacity" => $Data["Capacity"]);
                     $ordermodule = new OrderModule();
                     $ordermodule->InsertArray($order_data);
-                    $logcost_data = array("ip" => $_SERVER["REMOTE_ADDR"], "cost" => (0-$price), "type" => 1, "description" => ($crtdata ['Experience']==1?"创建体验客户及开通G宝盆":"创建客户及开通G宝盆"), "adddate" => date('Y-m-d H:i:s', time()), "CustomersID" => $Data['CustomersID'],"AgentID"=>$agent_id,"CostID"=>$CostID,"Balance"=>$balance_money,"OrderID"=>$orderID);
+                    $logcost_data = array("ip" => $_SERVER["REMOTE_ADDR"], "cost" => (0 - $price), "type" => 1, "description" => ($crtdata ['Experience'] == 1 ? "创建体验客户及开通G宝盆" : "创建客户及开通G宝盆"), "adddate" => date('Y-m-d H:i:s', time()), "CustomersID" => $Data['CustomersID'], "AgentID" => $agent_id, "CostID" => $CostID, "Balance" => $balance_money, "OrderID" => $orderID);
                     $logcost = new LogcostModule();
                     $logcost->InsertArray($logcost_data);
                 } else {
@@ -1832,7 +1845,7 @@ class Gbaopen extends InterfaceVIEWS {
                     $result['err'] = 1001;
                     $this->LogsFunction->LogsCusRecord(113, 0, $Data['CustomersID'], $result['msg']);
                 }
-            }else {
+            } else {
                 $result = array('err' => 1005, 'data' => '', 'msg' => '错误的信息提交');
                 $this->LogsFunction->LogsCusRecord(113, 0, $CustomersID, '非法类型选择操作');
             }
@@ -1845,7 +1858,8 @@ class Gbaopen extends InterfaceVIEWS {
     }
 
     //客户信息创建
-    protected function CreateCus($crtdata, $agent_id, $CustomersModule, $returnID = false) {
+    protected function CreateCus($crtdata, $agent_id, $CustomersModule, $returnID = false)
+    {
         $crtdata ['AgentID'] = $agent_id;
         $crtdata ['AddTime'] = date('Y-m-d H:i:s', strtotime("-2 seconds", strtotime($crtdata ['UpdateTime'])));
         $email_ptn = "/^([0-9A-Za-z\\-_\\.]+)@([0-9a-z]+\\.[a-z]{2,3}(\\.[a-z]{2})?)$/i";
@@ -1874,7 +1888,8 @@ class Gbaopen extends InterfaceVIEWS {
 
     /* G宝盆开通和修改接口 */
 
-    protected function ToGbaoPenEditInfo($CustomersProject = 0) {
+    protected function ToGbaoPenEditInfo($CustomersProject = 0)
+    {
         if (!$CustomersProject) {
             return 0;
         }
@@ -1923,7 +1938,7 @@ class Gbaopen extends InterfaceVIEWS {
         $ToString .= '&mobile_endtime=' . $CustProInfo ['Mobile_EndTime'];
         $ToString .= '&switch_cus_name=' . $CustProInfo ['Link_Cus'];
         $ToString .= '&status=' . $CustProInfo ['status'];
-        if(isset($_POST["password"])&&!empty($_POST["password"])){
+        if (isset($_POST["password"]) && !empty($_POST["password"])) {
             $ToString .= '&password=' . $_POST["password"];
         }
         /*
@@ -1957,7 +1972,8 @@ class Gbaopen extends InterfaceVIEWS {
     }
 
     //检查模板是否存在,存在则返回价格
-    protected function GetModleIDByName($name, $ispackage = false) {
+    protected function GetModleIDByName($name, $ispackage = false)
+    {
         if ($ispackage) {
             if (!$name) {
                 return -1;
@@ -1979,7 +1995,8 @@ class Gbaopen extends InterfaceVIEWS {
     }
 
     //G宝盆客户列表--数据提供
-    public function GetCus() {
+    public function GetCus()
+    {
         $result = array('err' => 0, 'data' => '', 'msg' => '');
         $type = $this->_GET['type'];
         $data['cus'] = $this->GetCusByType($type, floor($this->_GET['page']), floor($this->_GET['num']));
@@ -1988,7 +2005,8 @@ class Gbaopen extends InterfaceVIEWS {
     }
 
     //G宝盆客户数量--数据提供
-    public function GetCusNum() {
+    public function GetCusNum()
+    {
         $result = array('err' => 0, 'data' => '', 'msg' => '');
         $type = $this->_GET['type'];
         $result['data'] = $this->GetCusNumByType($type);
@@ -1996,7 +2014,8 @@ class Gbaopen extends InterfaceVIEWS {
     }
 
     //根据类型获取想要的客户列表的数量
-    protected function GetCusNumByType($type = 0) {
+    protected function GetCusNumByType($type = 0)
+    {
         $agent_id = $_SESSION ['AgentID'];
         $level = $_SESSION ['Level'];
         $DB = new DB;
@@ -2014,29 +2033,29 @@ class Gbaopen extends InterfaceVIEWS {
                     if ($level == 1) {
                         if ($search_cuspro)
                             $select = 'select count(1) as Num from ' . $sel1 . ' as d inner join '
-                                    . '(select CustomersID from tb_customers_project where ' . $search_cuspro . ') c on d.CustomersID = c.CustomersID ';
+                                . '(select CustomersID from tb_customers_project where ' . $search_cuspro . ') c on d.CustomersID = c.CustomersID ';
                         else
                             $select = 'select count(1) as Num from tb_customers where ' . $search_cus;
                         $data = $DB->Select($select);
-                    }elseif ($level == 2) {
+                    } elseif ($level == 2) {
                         if ($search_cuspro)
                             $select = 'select count(1) as Num from (select a.CustomersID from '
-                                    . '(select AgentID from tb_account where BossAgentID=' . $agent_id . ' or AgentID=' . $agent_id . ') as b inner join '
-                                    . '' . $sel1 . ' a on a.AgentID = b.AgentID and a.Status>0) as d inner join '
-                                    . '(select CustomersID from tb_customers_project where ' . $search_cuspro . ') c on d.CustomersID = c.CustomersID ';
+                                . '(select AgentID from tb_account where BossAgentID=' . $agent_id . ' or AgentID=' . $agent_id . ') as b inner join '
+                                . '' . $sel1 . ' a on a.AgentID = b.AgentID and a.Status>0) as d inner join '
+                                . '(select CustomersID from tb_customers_project where ' . $search_cuspro . ') c on d.CustomersID = c.CustomersID ';
                         else
                             $select = 'select count(1) as Num from tb_account b inner join '
-                                    . '' . $sel1 . ' a on a.AgentID = b.AgentID and a.Status>0 and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ')';
+                                . '' . $sel1 . ' a on a.AgentID = b.AgentID and a.Status>0 and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ')';
                         $data = $DB->Select($select);
-                    }elseif ($level == 3) {
+                    } elseif ($level == 3) {
                         if ($search_cuspro) {
                             $search_cus = $search_cus ? ' and ' . $search_cus : '';
                             $select = 'select count(1) as Num from (select CustomersID from tb_customers where AgentID=' . $agent_id . $search_cus . ' and Status>0) as d inner join '
-                                    . '(select CustomersID from tb_customers_project where ' . $search_cuspro . ') c on d.CustomersID = c.CustomersID';
+                                . '(select CustomersID from tb_customers_project where ' . $search_cuspro . ') c on d.CustomersID = c.CustomersID';
                         } else
                             $select = 'select count(1) as Num from tb_customers where AgentID=' . $agent_id . ' and Status>0 and (' . $search_cus . ')';
                         $data = $DB->Select($select);
-                    }else {
+                    } else {
                         return false;
                     }
                 } else
@@ -2051,7 +2070,7 @@ class Gbaopen extends InterfaceVIEWS {
                     $select = 'select count(1) as Num from tb_account b inner join tb_customers a on a.AgentID = b.AgentID and a.Status>0 and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ')';
                     $data = $DB->Select($select);
                 } elseif ($level == 3) {
-                    $select = 'select count(1) as Num from tb_customers a where AgentID=' . $agent_id.' and a.Status>0 ';
+                    $select = 'select count(1) as Num from tb_customers a where AgentID=' . $agent_id . ' and a.Status>0 ';
                     $data = $DB->Select($select);
                 } else {
                     return false;
@@ -2114,13 +2133,13 @@ class Gbaopen extends InterfaceVIEWS {
                     $select = 'select count(1) as Num from tb_customers_project c inner join tb_account b on c.AgentID = b.AgentID inner join tb_customers a on c.CustomersID=a.CustomersID and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ') and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '")) and a.GOpen = 1 and a.Status>0 ';
                     $data = $DB->Select($select);
                 } elseif ($level == 3) {
-                    $select = 'select count(1) as Num from tb_customers_project c inner join tb_customers a on c.CustomersID=a.CustomersID where ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '")) and c.AgentID=' . $agent_id.' and a.GOpen = 1 and a.Status>0 ';
+                    $select = 'select count(1) as Num from tb_customers_project c inner join tb_customers a on c.CustomersID=a.CustomersID where ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '")) and c.AgentID=' . $agent_id . ' and a.GOpen = 1 and a.Status>0 ';
                     $data = $DB->Select($select);
                 } else {
                     return false;
                 }
                 break;
-                case 5:
+            case 5:
                 //根据权限来获取客户信息量--快过期
                 if ($level == 1) {
                     $select = 'select count(1) as Num from tb_customers a where a.Status=0 ';
@@ -2137,7 +2156,8 @@ class Gbaopen extends InterfaceVIEWS {
     }
 
     //根据类型获取想要的客户列表
-    protected function GetCusByType($type = 0, $page = 1, $num = 5) {
+    protected function GetCusByType($type = 0, $page = 1, $num = 5)
+    {
         $agent_id = $_SESSION ['AgentID'];
         $level = $_SESSION ['Level'];
         $usernames = array();
@@ -2167,19 +2187,19 @@ class Gbaopen extends InterfaceVIEWS {
                     //根据权限来获取客户信息量
                     if ($level == 1) {
                         $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID from '
-                                . '(select a.CustomersID,a.CompanyName,a.CustomersName,b.UserName,a.Status from tb_account b inner join ' . $sel1 . ' a on a.AgentID = b.AgentID) as d '
-                                . $sel2 . ' c on d.CustomersID = c.CustomersID ' . $limit;
+                            . '(select a.CustomersID,a.CompanyName,a.CustomersName,b.UserName,a.Status from tb_account b inner join ' . $sel1 . ' a on a.AgentID = b.AgentID) as d '
+                            . $sel2 . ' c on d.CustomersID = c.CustomersID ' . $limit;
                         $cus = $DB->Select($select);
                     } elseif ($level == 2) {
                         $select = 'select d.CustomersID,d.CompanyName,d.UserName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID from '
-                                . '(select a.CustomersID,a.CompanyName,a.CustomersName,b.UserName,a.Status from '
-                                . '(select AgentID,UserName from tb_account where BossAgentID=' . $agent_id . ' or AgentID=' . $agent_id . ') as b inner join ' . $sel1 . ' a on a.AgentID = b.AgentID and a.Status>0) as d '
-                                . $sel2 . ' c on d.CustomersID = c.CustomersID ' . $order . $limit;
+                            . '(select a.CustomersID,a.CompanyName,a.CustomersName,b.UserName,a.Status from '
+                            . '(select AgentID,UserName from tb_account where BossAgentID=' . $agent_id . ' or AgentID=' . $agent_id . ') as b inner join ' . $sel1 . ' a on a.AgentID = b.AgentID and a.Status>0) as d '
+                            . $sel2 . ' c on d.CustomersID = c.CustomersID ' . $order . $limit;
                         $cus = $DB->Select($select);
                     } elseif ($level == 3) {
                         $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID from '
-                                . '(select CustomersID,CompanyName,Status from tb_customers where Status>0 and AgentID=' . $agent_id . $search_cus . ') as d '
-                                . $sel2 . ' c on d.CustomersID = c.CustomersID' . $order . $limit;
+                            . '(select CustomersID,CompanyName,Status from tb_customers where Status>0 and AgentID=' . $agent_id . $search_cus . ') as d '
+                            . $sel2 . ' c on d.CustomersID = c.CustomersID' . $order . $limit;
                         $cus = $DB->Select($select);
                     } else {
                         return false;
@@ -2207,18 +2227,18 @@ class Gbaopen extends InterfaceVIEWS {
                 //根据权限来获取客户信息量
                 if ($level == 1) {
                     $select = 'select d.CustomersID,d.CompanyName,d.UserName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID from '
-                            . '(select a.CustomersID,a.CompanyName,b.UserName,a.Status from tb_account b inner join tb_customers a on b.AgentID = a.AgentID and a.Status>0 ' . $limit . ') as d '
-                            . 'left join tb_customers_project c on d.CustomersID = c.CustomersID';
+                        . '(select a.CustomersID,a.CompanyName,b.UserName,a.Status from tb_account b inner join tb_customers a on b.AgentID = a.AgentID and a.Status>0 ' . $limit . ') as d '
+                        . 'left join tb_customers_project c on d.CustomersID = c.CustomersID';
                     $cus = $DB->Select($select);
                 } elseif ($level == 2) {
                     $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID from '
-                            . '(select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ') and b.AgentID = a.AgentID  and a.Status>0 ' . $limit . ') as d '
-                            . 'left join tb_customers_project c on d.CustomersID = c.CustomersID' . $order;
+                        . '(select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ') and b.AgentID = a.AgentID  and a.Status>0 ' . $limit . ') as d '
+                        . 'left join tb_customers_project c on d.CustomersID = c.CustomersID' . $order;
                     $cus = $DB->Select($select);
                 } elseif ($level == 3) {
                     $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID from '
-                            . '(select CustomersID,CompanyName,Status from tb_customers where AgentID=' . $agent_id.' and Status>0 ' . $limit . ') as d '
-                            . 'left join tb_customers_project c on d.CustomersID = c.CustomersID' . $order;
+                        . '(select CustomersID,CompanyName,Status from tb_customers where AgentID=' . $agent_id . ' and Status>0 ' . $limit . ') as d '
+                        . 'left join tb_customers_project c on d.CustomersID = c.CustomersID' . $order;
                     $cus = $DB->Select($select);
                 } else {
                     return false;
@@ -2244,17 +2264,17 @@ class Gbaopen extends InterfaceVIEWS {
                 //根据权限来获取客户信息量
                 if ($level == 1) {
                     $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID from '
-                            . '(select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on b.AgentID = a.AgentID and a.GOpen = 1 and a.Status>0 ) as d '
-                            . 'inner join tb_customers_project c on d.CustomersID = c.CustomersID' . $order . $limit;
+                        . '(select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on b.AgentID = a.AgentID and a.GOpen = 1 and a.Status>0 ) as d '
+                        . 'inner join tb_customers_project c on d.CustomersID = c.CustomersID' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 2) {
                     $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID from '
-                            . '(select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on b.AgentID = a.AgentID and a.GOpen = 1 and a.Status>0  and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ')' . ') as d '
-                            . 'inner join tb_customers_project c on d.CustomersID = c.CustomersID' . $order . $limit;
+                        . '(select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on b.AgentID = a.AgentID and a.GOpen = 1 and a.Status>0  and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ')' . ') as d '
+                        . 'inner join tb_customers_project c on d.CustomersID = c.CustomersID' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 3) {
                     $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID from tb_customers d '
-                            . 'inner join tb_customers_project c on d.CustomersID = c.CustomersID and d.GOpen = 1 and d.Status>0  and d.AgentID=' . $agent_id . $order . $limit;
+                        . 'inner join tb_customers_project c on d.CustomersID = c.CustomersID and d.GOpen = 1 and d.Status>0  and d.AgentID=' . $agent_id . $order . $limit;
                     $cus = $DB->Select($select);
                 } else {
                     return false;
@@ -2309,17 +2329,17 @@ class Gbaopen extends InterfaceVIEWS {
                 //根据权限来获取客户信息量
                 if ($level == 1) {
                     $select = 'select d.CustomersID,a.CompanyName,a.Status,d.UserName,d.G_name,d.Cases,d.CPhone,d.PC_StartTime,d.PC_EndTime,d.Mobile_StartTime,d.Mobile_EndTime,a.AgentID from '
-                            . '(select b.UserName,c.CustomersID,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime from tb_account b inner join tb_customers_project c on c.AgentID = b.AgentID and (c.PC_EndTime<"' . $now . '" or c.Mobile_EndTime<"' . $now . '")) as d '
-                            . 'inner join tb_customers a on d.CustomersID=a.CustomersID and a.GOpen = 1 and a.Status>0 ' . $order . $limit;
+                        . '(select b.UserName,c.CustomersID,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime from tb_account b inner join tb_customers_project c on c.AgentID = b.AgentID and (c.PC_EndTime<"' . $now . '" or c.Mobile_EndTime<"' . $now . '")) as d '
+                        . 'inner join tb_customers a on d.CustomersID=a.CustomersID and a.GOpen = 1 and a.Status>0 ' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 2) {
                     $select = 'select d.CustomersID,a.CompanyName,a.Status,d.UserName,d.G_name,d.Cases,d.CPhone,d.PC_StartTime,d.PC_EndTime,d.Mobile_StartTime,d.Mobile_EndTime,a.AgentID from '
-                            . '(select c.CustomersID,b.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime from tb_account b inner join tb_customers_project c on c.AgentID = b.AgentID and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ') and (c.PC_EndTime<"' . $now . '" or c.Mobile_EndTime<"' . $now . '")) d '
-                            . 'inner join tb_customers a on a.CustomersID=d.CustomersID and a.Status>0 ' . $order . $limit;
+                        . '(select c.CustomersID,b.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime from tb_account b inner join tb_customers_project c on c.AgentID = b.AgentID and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ') and (c.PC_EndTime<"' . $now . '" or c.Mobile_EndTime<"' . $now . '")) d '
+                        . 'inner join tb_customers a on a.CustomersID=d.CustomersID and a.Status>0 ' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 3) {
                     $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID from '
-                            . 'tb_customers_project c inner join tb_customers d on c.CustomersID=d.CustomersID and d.Status>0  and c.AgentID = ' . $agent_id . ' and (c.PC_EndTime<"' . $now . '" or c.Mobile_EndTime<"' . $now . '")' . $order . $limit;
+                        . 'tb_customers_project c inner join tb_customers d on c.CustomersID=d.CustomersID and d.Status>0  and c.AgentID = ' . $agent_id . ' and (c.PC_EndTime<"' . $now . '" or c.Mobile_EndTime<"' . $now . '")' . $order . $limit;
                     $cus = $DB->Select($select);
                 } else {
                     return false;
@@ -2347,13 +2367,13 @@ class Gbaopen extends InterfaceVIEWS {
                 //根据权限来获取客户信息量
                 if ($level == 1) {
                     $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID from tb_customers_project c '
-                            . 'inner join (select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on a.AgentID = b.AgentID and a.GOpen = 1 and a.Status>0 ) d '
-                            . 'on c.CustomersID=d.CustomersID and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '"))' . $order . $limit;
+                        . 'inner join (select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on a.AgentID = b.AgentID and a.GOpen = 1 and a.Status>0 ) d '
+                        . 'on c.CustomersID=d.CustomersID and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '"))' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 2) {
                     $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID from tb_customers_project c '
-                            . 'inner join (select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on a.AgentID = b.AgentID and a.GOpen = 1 and a.Status>0  and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ')) d '
-                            . 'on c.CustomersID=d.CustomersID and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '"))' . $order . $limit;
+                        . 'inner join (select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on a.AgentID = b.AgentID and a.GOpen = 1 and a.Status>0  and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ')) d '
+                        . 'on c.CustomersID=d.CustomersID and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '"))' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 3) {
                     $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID from tb_customers_project c inner join tb_customers d on c.CustomersID=d.CustomersID and d.Status>0  and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '")) and c.AgentID=' . $agent_id . $order . $limit;
@@ -2383,8 +2403,8 @@ class Gbaopen extends InterfaceVIEWS {
                 //根据权限来获取客户信息量
                 if ($level == 1) {
                     $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID from '
-                            . '(select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on b.AgentID = a.AgentID and a.Status=0 ) as d '
-                            . 'inner join tb_customers_project c on d.CustomersID = c.CustomersID' . $order . $limit;
+                        . '(select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on b.AgentID = a.AgentID and a.Status=0 ) as d '
+                        . 'inner join tb_customers_project c on d.CustomersID = c.CustomersID' . $order . $limit;
                     $cus = $DB->Select($select);
                 } else {
                     return false;
@@ -2414,7 +2434,8 @@ class Gbaopen extends InterfaceVIEWS {
     }
 
     //更改客户状态---(未启用，需要重新编写设计)
-    public function ChangeStatus() {
+    public function ChangeStatus()
+    {
         $CustProModule = new CustProModule();
         $CustomersID = $this->_GET['ID'];
         $Status = intval($this->_GET['Status']);
@@ -2436,12 +2457,17 @@ class Gbaopen extends InterfaceVIEWS {
         exit;
     }
 
-    /* 权限判定函数，
+    /**
+     * 权限判定函数，
      * 一个参数获取当前拥有的权限，
      * 两个参数判断是否拥有这个权限
+     *
+     * @param $power
+     * @param bool $type
+     * @return array|bool
      */
-
-    private function Assess($power, $type = false) {
+    private function Assess($power, $type = false)
+    {
         if ($type) {
             $re = isset($this->function_config[$type]) ? $power & $this->function_config[$type] ? true : false : false;
         } else {
@@ -2455,29 +2481,24 @@ class Gbaopen extends InterfaceVIEWS {
         return $re;
     }
 
-    public function test() {
-        $a = array('sdafsdfsdf');
-        echo implode('and', $a);
-        exit;
-    }
-    
     /**
      * 计算费用
      */
-    public function getcost($data=array()){
-        if(count($data)>0){
-            $post=$data;
-        }else{
-            $post=$this->_POST;
+    public function getcost($data = array())
+    {
+        if (count($data) > 0) {
+            $post = $data;
+        } else {
+            $post = $this->_POST;
         }
-        $price=0;
-        if($post["Experience"]==1){
-            $price=0;
-            $result["price"]=$price;
+        $price = 0;
+        if ($post["Experience"] == 1) {
+            $price = 0;
+            $result["price"] = $price;
             return $result;
-        }else{
-            $package=new ModelPackageModule();
-            $model=new ModelModule();
+        } else {
+            $package = new ModelPackageModule();
+            $model = new ModelModule();
             switch ($post['CPhone']) {
                 case 4:
                     $price = $package->GetOneByWhere(array('Youhui', 'PCNum', 'PhoneNum'), 'where PackagesNum=\'' . $post['PK_model'] . '\'');
@@ -2546,7 +2567,7 @@ class Gbaopen extends InterfaceVIEWS {
                     return $result;
                     break;
             }
-            $result["model_price"]=$price;
+            $result["model_price"] = $price;
 //            if ($post["Capacity"] == 300) {
 //                $price+=500;
 //                $result["capacity_price"]=500;
@@ -2563,97 +2584,105 @@ class Gbaopen extends InterfaceVIEWS {
 //                $result['msg'] = '容量空间选择错误';
 //                return $result;
 //            }
-            $coupons=$post["coupons"];
-            $couprice=0;
+            $coupons = $post["coupons"];
+            $couprice = 0;
             if ($coupons) {
                 $couponsprice = file_get_contents(DAILI_DOMAIN . '?module=ApiModel&action=GetCoupons&code=' . $coupons);
                 if ($couponsprice > 0) {
-                    $couprice=$couponsprice;
+                    $couprice = $couponsprice;
                 }
             }
-            $result["price"]=$price*$post["stilltime"]-$couprice;
+            $result["price"] = $price * $post["stilltime"] - $couprice;
             return $result;
         }
     }
-    public function SiteMove(){
+
+    /**
+     * 站点转移
+     *
+     * @return array
+     */
+    public function SiteMove()
+    {
         set_time_limit(0);
         $result = array('err' => 0, 'data' => '', 'msg' => '');
-        $post=$this->_POST;
-        $CustmoersID=$post["num"];
-        $level=$_SESSION["Level"];
-        $agent_id=$_SESSION["AgentID"];
-        $customer=new CustomersModule();
-        $customerInfo=$customer->GetOneInfoByKeyID($CustmoersID);
-        if($level!=1){
-            if($level==2){
-                $account=new AccountModule();
-                $account_lists=$account->GetListsByWhere(array("AgentID","BossAgentID"), " where BossAgentID=".$agent_id);
-                $childAgentIDs=array();
-                foreach($account_lists as $v){
-                    $childAgentIDs[]=$v["AgentID"];
+        $post = $this->_POST;
+        $CustmoersID = $post["num"];
+        $level = $_SESSION["Level"];
+        $agent_id = $_SESSION["AgentID"];
+        $customer = new CustomersModule();
+        $customerInfo = $customer->GetOneInfoByKeyID($CustmoersID);
+        if ($level != 1) {
+            if ($level == 2) {
+                $account = new AccountModule();
+                $account_lists = $account->GetListsByWhere(array("AgentID", "BossAgentID"), " where BossAgentID=" . $agent_id);
+                $childAgentIDs = array();
+                foreach ($account_lists as $v) {
+                    $childAgentIDs[] = $v["AgentID"];
                 }
-                $childAgentIDs[]=$agent_id;
-                if(!in_array($customerInfo["AgentID"], $childAgentIDs)){
+                $childAgentIDs[] = $agent_id;
+                if (!in_array($customerInfo["AgentID"], $childAgentIDs)) {
                     $result['err'] = 1003;
                     $result['msg'] = '没有该用户';
                     return $result;
                 }
-            }else if($level==3){
-                if($customerInfo["AgentID"]!= $agent_id){
+            } else if ($level == 3) {
+                if ($customerInfo["AgentID"] != $agent_id) {
                     $result['err'] = 1003;
                     $result['msg'] = '没有该用户';
                     return $result;
                 }
             }
         }
-        $info=array();
-        if($post["FTP"]==0){
-            $info["FuwuqiID"]="";
-            $info["G_Ftp_Address"]=$post["address"];
-            $info["G_Ftp_User"]=$post["user"];
-            $info["G_Ftp_Pwd"]=$post["pwd"];
-            $info["G_Ftp_FwAdress"]=$post["ftp_url"];
-            $info["G_Ftp_Duankou"]=$post["port"];
-            $info["G_Ftp_Mulu"]=$post["dir"];
-            $info["FTP"]=2;
-        }else{
-            $info["FuwuqiID"]=$post["FuwuqiID"];
-            $fuwuqi=new FuwuqiModule();
-            $fuwuqi_info=$fuwuqi->GetOneInfoByKeyID($info["FuwuqiID"]);
-            if($fuwuqi_info){
-                $info["G_Ftp_Address"]=$fuwuqi_info["FTP"];
-                $info["G_Ftp_User"]=$fuwuqi_info["FTPName"];
-                $info["G_Ftp_Pwd"]=$fuwuqi_info["FTPPassword"];
-                $info["G_Ftp_FwAdress"]=$fuwuqi_info["FwAdress"];
-                $info["G_Ftp_Duankou"]=$fuwuqi_info["FTPDuankou"];
-                $info["G_Ftp_Mulu"]=$fuwuqi_info["FTPMulu"];
-                $info["FTP"]=1;
-            }else{
+        $info = array();
+        if ($post["FTP"] == 0) {
+            $info["FuwuqiID"] = "";
+            $info["G_Ftp_Address"] = $post["address"];
+            $info["G_Ftp_User"] = $post["user"];
+            $info["G_Ftp_Pwd"] = $post["pwd"];
+            $info["G_Ftp_FwAdress"] = $post["ftp_url"];
+            $info["G_Ftp_Duankou"] = $post["port"];
+            $info["G_Ftp_Mulu"] = $post["dir"];
+            $info["FTP"] = 2;
+        } else {
+            $info["FuwuqiID"] = $post["FuwuqiID"];
+            $fuwuqi = new FuwuqiModule();
+            $fuwuqi_info = $fuwuqi->GetOneInfoByKeyID($info["FuwuqiID"]);
+            if ($fuwuqi_info) {
+                $info["G_Ftp_Address"] = $fuwuqi_info["FTP"];
+                $info["G_Ftp_User"] = $fuwuqi_info["FTPName"];
+                $info["G_Ftp_Pwd"] = $fuwuqi_info["FTPPassword"];
+                $info["G_Ftp_FwAdress"] = $fuwuqi_info["FwAdress"];
+                $info["G_Ftp_Duankou"] = $fuwuqi_info["FTPDuankou"];
+                $info["G_Ftp_Mulu"] = $fuwuqi_info["FTPMulu"];
+                $info["FTP"] = 1;
+            } else {
                 $result['err'] = 1003;
                 $result['msg'] = '未找到该服务器';
                 $this->LogsFunction->LogsCusRecord(121, 3, $CustmoersID, $result['msg']);
                 return $result;
             }
         }
-        $custpro=new CustProModule();
-        $cuspro_old=$cuspro_info=$custpro->GetOneByWhere(array(), " where CustomersID=".$CustmoersID);
-        if(strpos($cuspro_old["Mobile_domain"], '.5067.org')!==false){
-            $info["Mobile_domain"]=  preg_replace("/^http:\/\/c/", 'http://m.'.$cuspro_info["G_name"], $info ['G_Ftp_FwAdress']);
+        $custpro = new CustProModule();
+        $cuspro_old = $cuspro_info = $custpro->GetOneByWhere(array(), " where CustomersID=" . $CustmoersID);
+        if (strpos($cuspro_old["Mobile_domain"], '.5067.org') !== false) {
+            $info["Mobile_domain"] = preg_replace("/^http:\/\/c/", 'http://m.' . $cuspro_info["G_name"], $info ['G_Ftp_FwAdress']);
         }
-        if(strpos($cuspro_old["PC_domain"], '.5067.org')!==false){
-            $info["PC_domain"]=  preg_replace("/^http:\/\/c/", 'http://'.$cuspro_info["G_name"], $info ['G_Ftp_FwAdress']);
+        if (strpos($cuspro_old["PC_domain"], '.5067.org') !== false) {
+            $info["PC_domain"] = preg_replace("/^http:\/\/c/", 'http://' . $cuspro_info["G_name"], $info ['G_Ftp_FwAdress']);
         }
-        if($custpro->UpdateArray($info,$CustmoersID)){
-            $cuspro_info=$custpro->GetOneByWhere(array(), " where CustomersID=".$CustmoersID);
+        if ($custpro->UpdateArray($info, $CustmoersID)) {
+            $cuspro_info = $custpro->GetOneByWhere(array(), " where CustomersID=" . $CustmoersID);
             $TuUrl = GBAOPEN_DOMAIN . 'api/webremove';
+            $ToString = '';
             $ToString .= 'username=' . $cuspro_info["G_name"];
             $ToString .= '&ftp_address=' . $info ['G_Ftp_Address'];
             $ToString .= '&ftp_port=' . $info ['G_Ftp_Duankou'];
             $ToString .= '&ftp_user=' . $info ['G_Ftp_User'];
             $ToString .= '&ftp_pwd=' . $info ['G_Ftp_Pwd'];
             $ToString .= '&ftp_dir=' . $info ['G_Ftp_Mulu'];
-            $ToString .= '&ftp_flag=' . ($info ['FuwuqiID']>0?"1":"0");
-            $ToString .= '&ftp_url=' . ($info ['FuwuqiID']>0?  preg_replace("/^http:\/\/c/", "http://".$cuspro_info["G_name"], $info ['G_Ftp_FwAdress']):$info ['G_Ftp_FwAdress']);
+            $ToString .= '&ftp_flag=' . ($info ['FuwuqiID'] > 0 ? "1" : "0");
+            $ToString .= '&ftp_url=' . ($info ['FuwuqiID'] > 0 ? preg_replace("/^http:\/\/c/", "http://" . $cuspro_info["G_name"], $info ['G_Ftp_FwAdress']) : $info ['G_Ftp_FwAdress']);
             //随机文件名开始生成
             $randomLock = getstr();
             $password = md5($randomLock);
@@ -2665,7 +2694,7 @@ class Gbaopen extends InterfaceVIEWS {
             //生成dll文件
             $myfile = @fopen('./token/' . $password . '.dll', "w+");
             if (!$myfile) {
-                $custpro->UpdateArray($cuspro_old,$CustmoersID);
+                $custpro->UpdateArray($cuspro_old, $CustmoersID);
                 $result['err'] = 1003;
                 $result['msg'] = '网站迁移失败';
                 $this->LogsFunction->LogsCusRecord(121, 0, $CustmoersID, $result['msg']);
@@ -2689,95 +2718,119 @@ class Gbaopen extends InterfaceVIEWS {
             $result['data']['name'] = $customerInfo['CompanyName'];
             $this->LogsFunction->LogsCusRecord(121, 1, $CustmoersID, $result['msg']);
             return $result;
-        }else{
+        } else {
             $result['err'] = 1003;
             $result['msg'] = '网站迁移失败';
             $this->LogsFunction->LogsCusRecord(121, 0, $CustmoersID, $result['msg']);
             return $result;
         }
     }
+
     /**
      * 获取服务器列表
      */
-    public function getFuwuqi() {
-        $fuwuqi=new FuwuqiModule();
-        $fuwuqiinfo = $fuwuqi->GetListsByWhere(array('ID','FuwuqiName','CName'),' order by ID asc');
+    public function getFuwuqi()
+    {
+        $fuwuqi = new FuwuqiModule();
+        $fuwuqiinfo = $fuwuqi->GetListsByWhere(array('ID', 'FuwuqiName', 'CName'), ' order by ID asc');
         return json_encode($fuwuqiinfo);
     }
+
     /**
      * 获取扩容计费信息
      */
-    public function getCusCapacityInfo(){
-        $post=  $this->_POST;
-        $cuspro=new CustProModule();
-        $cuspro_info=$cuspro->GetOneByWhere(array(), " where CustomersID=".$post["num"]);
-        if($cuspro_info){
-            $l_time=($cuspro_info["PC_EndTime"]>$cuspro_info["Mobile_EndTime"]?$cuspro_info["PC_EndTime"]:$cuspro_info["Mobile_EndTime"]);
-            $s_time=($cuspro_info["PC_StartTime"]<$cuspro_info["Mobile_StartTime"]?$cuspro_info["PC_StartTime"]:$cuspro_info["Mobile_StartTime"]);
-            $now_time=date("Y-m-d H:i:s",time());
-            $now=time();
-            if($now_time<$s_time){
-                $now_time=$s_time;
-                $now=strtotime($s_time);
+    public function getCusCapacityInfo()
+    {
+        $post = $this->_POST;
+        $cuspro = new CustProModule();
+        $cuspro_info = $cuspro->GetOneByWhere(array(), " where CustomersID=" . $post["num"]);
+        if ($cuspro_info) {
+            $l_time = ($cuspro_info["PC_EndTime"] > $cuspro_info["Mobile_EndTime"] ? $cuspro_info["PC_EndTime"] : $cuspro_info["Mobile_EndTime"]);
+            $s_time = ($cuspro_info["PC_StartTime"] < $cuspro_info["Mobile_StartTime"] ? $cuspro_info["PC_StartTime"] : $cuspro_info["Mobile_StartTime"]);
+            $now_time = date("Y-m-d H:i:s", time());
+            $now = time();
+            if ($now_time < $s_time) {
+                $now_time = $s_time;
+                $now = strtotime($s_time);
             }
-            if($l_time>$now_time){
-                $months=ceil((strtotime($l_time)-$now)/60/60/24/30);
-                return array("err"=>0,"months"=>$months,"capacity"=>$cuspro_info["Capacity"]);
-            }else{
-                return array("err"=>0,"months"=>0,"capacity"=>$cuspro_info["Capacity"]);
+            if ($l_time > $now_time) {
+                $months = ceil((strtotime($l_time) - $now) / 60 / 60 / 24 / 30);
+                return array("err" => 0, "months" => $months, "capacity" => $cuspro_info["Capacity"]);
+            } else {
+                return array("err" => 0, "months" => 0, "capacity" => $cuspro_info["Capacity"]);
             }
-        }else{
-            return array("err"=>1001,"msg"=>"为找到该用户或该用户未开通");
+        } else {
+            return array("err" => 1001, "msg" => "为找到该用户或该用户未开通");
         }
     }
+
     /**
      * 扩容
      */
-    public function morecapacity() {
+    public function morecapacity()
+    {
         $result = array('err' => 0, 'data' => '', 'msg' => '');
-        $post=  $this->_POST;
-        $cus_id=$post["num"];
-        $morecapacity=$post["morecapacity"]*1024*1024;
-        $agent_id = (int) $_SESSION ['AgentID'];
-        $level = (int) $_SESSION ['Level'];
-        $cuspro=new CustProModule();
-        $cuspro_info=$cuspro->GetOneByWhere(array(), " where CustomersID=".$cus_id);
-        if($cuspro_info){
-            $l_time=($cuspro_info["PC_EndTime"]>$cuspro_info["Mobile_EndTime"]?$cuspro_info["PC_EndTime"]:$cuspro_info["Mobile_EndTime"]);
-            $s_time=($cuspro_info["PC_StartTime"]<$cuspro_info["Mobile_StartTime"]?$cuspro_info["PC_StartTime"]:$cuspro_info["Mobile_StartTime"]);
-            $now_time=date("Y-m-d H:i:s",time());
-            $now=time();
-            if($now_time<$s_time){
-                $now_time=$s_time;
-                $now=strtotime($s_time);
+        $post = $this->_POST;
+        $cus_id = $post["num"];
+        $morecapacity = $post["morecapacity"] * 1024 * 1024;
+        $agent_id = (int)$_SESSION ['AgentID'];
+        $level = (int)$_SESSION ['Level'];
+        $cuspro = new CustProModule();
+        $cuspro_info = $cuspro->GetOneByWhere(array(), " where CustomersID=" . $cus_id);
+        if ($cuspro_info) {
+            $l_time = ($cuspro_info["PC_EndTime"] > $cuspro_info["Mobile_EndTime"] ? $cuspro_info["PC_EndTime"] : $cuspro_info["Mobile_EndTime"]);
+            $s_time = ($cuspro_info["PC_StartTime"] < $cuspro_info["Mobile_StartTime"] ? $cuspro_info["PC_StartTime"] : $cuspro_info["Mobile_StartTime"]);
+            $now_time = date("Y-m-d H:i:s", time());
+            $now = time();
+            if ($now_time < $s_time) {
+                $now_time = $s_time;
+                $now = strtotime($s_time);
             }
-            if($l_time>$now_time){
-                $months=ceil((strtotime($l_time)-$now)/60/60/24/30);
-            }else{
-                $months=0;
+            if ($l_time > $now_time) {
+                $months = ceil((strtotime($l_time) - $now) / 60 / 60 / 24 / 30);
+            } else {
+                $months = 0;
             }
-            if($cuspro_info["Capacity"]<=$morecapacity){
-                switch ($cuspro_info["Capacity"]){
-                    case 100*1024*1024:$old_price=300;break;
-                    case 300*1024*1024:$old_price=500;break;
-                    case 500*1024*1024:$old_price=800;break;
-                    case 1000*1024*1024:$old_price=1500;break;
-                    default :$old_price=0;break;
+            if ($cuspro_info["Capacity"] <= $morecapacity) {
+                switch ($cuspro_info["Capacity"]) {
+                    case 100 * 1024 * 1024:
+                        $old_price = 300;
+                        break;
+                    case 300 * 1024 * 1024:
+                        $old_price = 500;
+                        break;
+                    case 500 * 1024 * 1024:
+                        $old_price = 800;
+                        break;
+                    case 1000 * 1024 * 1024:
+                        $old_price = 1500;
+                        break;
+                    default :
+                        $old_price = 0;
+                        break;
                 }
 
-                switch ($morecapacity){
-                    case 100*1024*1024:$new_price=300;break;
-                    case 300*1024*1024:$new_price=500;break;
-                    case 500*1024*1024:$new_price=800;break;
-                    case 1000*1024*1024:$new_price=1500;break;
+                switch ($morecapacity) {
+                    case 100 * 1024 * 1024:
+                        $new_price = 300;
+                        break;
+                    case 300 * 1024 * 1024:
+                        $new_price = 500;
+                        break;
+                    case 500 * 1024 * 1024:
+                        $new_price = 800;
+                        break;
+                    case 1000 * 1024 * 1024:
+                        $new_price = 1500;
+                        break;
                     default :
-                        $result['err']=1003;
-                        $result['msg']='非法请求';
+                        $result['err'] = 1003;
+                        $result['msg'] = '非法请求';
                         return $result;
                 }
-                $price=number_format(($new_price-$old_price)*$months/12,0);
-                $balance=new BalanceModule();
-                $agent=new AccountModule();
+                $price = number_format(($new_price - $old_price) * $months / 12, 0);
+                $balance = new BalanceModule();
+                $agent = new AccountModule();
                 $agentinfo = $agent->GetOneInfoByKeyID($cuspro_info["AgentID"]);
                 if ($agentinfo["Level"] == 3) {
                     $costID = $agentinfo['BossAgentID'];
@@ -2821,7 +2874,7 @@ class Gbaopen extends InterfaceVIEWS {
                     }
                     $update_self['CostMon'] = $update_self['CostMon'] + $price;
                     $update_self['CostAll'] = $update_self['CostAll'] + $price;
-                    $balance_money=$update_boss['Balance'];
+                    $balance_money = $update_boss['Balance'];
                 } else {
                     if ($boss_agent_bal['Balance'] < $price) {
                         $result['err'] = 1003;
@@ -2838,10 +2891,10 @@ class Gbaopen extends InterfaceVIEWS {
                     $update_self['Balance'] = $boss_agent_bal['Balance'] - $price;
                     $update_self['CostMon'] = $update_self['CostMon'] + $price;
                     $update_self['CostAll'] = $update_self['CostAll'] + $price;
-                    $balance_money=$update_self['Balance'];
+                    $balance_money = $update_self['Balance'];
                 }
-                
-                $IsOk = $this->ToGbaoPenEditInfo(array_replace($cuspro_info, array("Capacity"=>$morecapacity)));
+
+                $IsOk = $this->ToGbaoPenEditInfo(array_replace($cuspro_info, array("Capacity" => $morecapacity)));
                 if ($IsOk['err'] != 1000) {
                     $result['err'] = 1002;
                     $result['msg'] = '数据同步失败，请重试';
@@ -2866,7 +2919,7 @@ class Gbaopen extends InterfaceVIEWS {
                         return $result;
                     }
                 }
-                if (!$cuspro->UpdateArray(array("Capacity"=>$morecapacity), $cus_id)) {
+                if (!$cuspro->UpdateArray(array("Capacity" => $morecapacity), $cus_id)) {
                     $this->ToGbaoPenEditInfo($cuspro_info);
                     $balance->UpdateArrayByAgentID($agent_bal, $costID);
                     $agentinfo['Level'] == 3 ? $balance->UpdateArrayByAgentID($boss_agent_bal, $costID) : '';
@@ -2875,101 +2928,123 @@ class Gbaopen extends InterfaceVIEWS {
                     $this->LogsFunction->LogsCusRecord(122, 0, $cus_id, $result['msg']);
                     return $result;
                 }
-                $logcost_data = array("ip" => $_SERVER["REMOTE_ADDR"], "cost" => (0-$price), "type" => 4, "description" => "网站扩容", "adddate" => date('Y-m-d H:i:s', time()), "CustomersID" => $cus_id,"AgentID"=>$agent_id,"CostID"=>$costID,"Balance"=>$balance_money,"OrderID"=>'');
+                $logcost_data = array("ip" => $_SERVER["REMOTE_ADDR"], "cost" => (0 - $price), "type" => 4, "description" => "网站扩容", "adddate" => date('Y-m-d H:i:s', time()), "CustomersID" => $cus_id, "AgentID" => $agent_id, "CostID" => $costID, "Balance" => $balance_money, "OrderID" => '');
                 $logcost = new LogcostModule();
                 $logcost->InsertArray($logcost_data);
                 $this->LogsFunction->LogsCusRecord(122, 5, $cus_id, '扩容同步成功');
-                $cusmodel=new CustomersModule();
+                $cusmodel = new CustomersModule();
                 $cus = $cusmodel->GetOneByWhere(array('CompanyName'), 'where CustomersID=' . $cus_id);
                 $result['data']['name'] = $cus['CompanyName'];
-            }else{
-                $result['err']=1002;
-                $result['msg']='非法请求';
+            } else {
+                $result['err'] = 1002;
+                $result['msg'] = '非法请求';
             }
-        }else{
-            $result['err']=1001;
-            $result['msg']='为找到该用户或该用户未开通';
+        } else {
+            $result['err'] = 1001;
+            $result['msg'] = '为找到该用户或该用户未开通';
         }
         return $result;
     }
+
     /**
      *获取微传单是否开启情况
      */
-    public function getGshow(){
+    public function getGshow()
+    {
         $result = array('err' => 0, 'data' => '', 'msg' => '');
-        $post=$this->_POST;
-        $gshow=new GshowModule();
-        $gshowinfo=$gshow->GetOneByWhere(array(), " where CustomersID = ".$post["num"]);
-        $result["data"]=$gshowinfo;
+        $post = $this->_POST;
+        $gshow = new GshowModule();
+        $gshowinfo = $gshow->GetOneByWhere(array(), " where CustomersID = " . $post["num"]);
+        $result["data"] = $gshowinfo;
         return $result;
     }
+
     /**
      *设置开启微传单
      */
-    public function Gshow(){
+    public function Gshow()
+    {
         $result = array('err' => 0, 'data' => '', 'msg' => '');
-        $post=$this->_POST;
-        $cus_id=$post["num"];
-        $gshow=new GshowModule();
-        $gshowinfo=$gshow->GetOneByWhere(array(), " where CustomersID = ".$post["num"]);
-        if($gshowinfo){
-            $madify_info=$gshowinfo;
-            $nowtime=strtotime($gshowinfo["EndTime"])>time()?strtotime($gshowinfo["EndTime"]):time();
-            $madify_info["EndTime"]=(date('Y', $nowtime) + $post["year"]) . '-' . date('m-d H:i:s',$nowtime);
-            $madify_info["UpdateTime"]=date('Y-m-d H:i:s',time());
-            $ret=$gshow->UpdateArray($madify_info, array("CustomersID"=>$post["num"]));
-            if($ret){
-                $ret=$this->toGshow($madify_info);
-                if($ret["code"]!=200){
-                    $gshow->UpdateArray($gshowinfo, array("CustomersID"=>$post["num"]));
-                    $result["err"]=1;
-                    $result["msg"]="微传单同步数据失败";
-                }else{
-                    $result["msg"]="微传单操作成功";
+        $post = $this->_POST;
+        $money = $post["money"];
+        $agent_id = (int)$_SESSION ['AgentID'];
+        $cus_id = $post["num"];
+        $gshow = new GshowModule();
+        $logcost = new LogcostModule();
+        $balance = new BalanceModule();
+        $gshowinfo = $gshow->GetOneByWhere(array(), " where CustomersID = " . $post["num"]);
+        if ($gshowinfo) { //===数据库有记录
+            $madify_info = $gshowinfo;
+            $nowtime = strtotime($gshowinfo["EndTime"]) > time() ? strtotime($gshowinfo["EndTime"]) : time();
+            $madify_info["EndTime"] = (date('Y', $nowtime) + $post["year"]) . '-' . date('m-d H:i:s', $nowtime);
+            $madify_info["UpdateTime"] = date('Y-m-d H:i:s', time());
+            $ret = $gshow->UpdateArray($madify_info, array("CustomersID" => $post["num"]));
+            if ($ret) {
+//                $ret['code'] = 200;//$this->toGshow($madify_info);
+                $ret = $this->toGshow($madify_info);
+                if ($ret["code"] != 200) {//===?200是什么意思
+                    $gshow->UpdateArray($gshowinfo, array("CustomersID" => $post["num"]));
+                    $result["err"] = 1;
+                    $result["msg"] = "微传单同步数据失败";
+                } else {
+                    // TODO:扣款操作
+                    $this->consume($money, 6, $cus_id, $agent_id);
+                    $result["msg"] = "微传单操作成功";
                 }
-            }else{
-                $result["err"]=2;
-                $result["msg"]="微传单数据更新失败";
+            } else {
+                $result["err"] = 2;
+                $result["msg"] = "微传单数据更新失败";
             }
-        }else{
-            $cust=new CustomersModule();
-            $cust_info=$cust->GetOneByWhere(array(), " where CustomersID = ".$post["num"]);
-            $ins_info=array();
-            $ins_info["EndTime"]=(date('Y', time()) + $post["year"]) . '-' . date('m-d H:i:s', time());
-            $ins_info["UpdateTime"]=date('Y-m-d H:i:s',time());
-            $ins_info["StartTime"]=date('Y-m-d H:i:s',time());
-            $ins_info["Email"]=$cust_info["Email"];
-            $ins_info["CustomersID"]=$post["num"];
-            $ret=$gshow->InsertArray($ins_info);
-            if($ret){
-                $ret=$this->toGshow($ins_info);
-                if($ret["code"]!=200){
-                    $gshow->DeleteInfo(' where CustomersID='.$post["num"]);
-                    $result["err"]=1;
-                    $result["msg"]="微传单同步数据失败";
-                    $this->LogsFunction->LogsCusRecord(123, 6, $cus_id, $result['msg']);
-                }else{
-                    $result["msg"]="微传单操作成功";
+        } else { //===无记录
+            $cust = new CustomersModule();
+            $cust_info = $cust->GetOneByWhere(array(), " where CustomersID = " . $post["num"]);
+            $ins_info = array();
+            $ins_info["EndTime"] = (date('Y', time()) + $post["year"]) . '-' . date('m-d H:i:s', time());
+            $ins_info["UpdateTime"] = date('Y-m-d H:i:s', time());
+            $ins_info["StartTime"] = date('Y-m-d H:i:s', time());
+            $ins_info["Email"] = $cust_info["Email"];
+            $ins_info["CustomersID"] = $post["num"];
+            $ret = $gshow->InsertArray($ins_info);
+            if ($ret) {
+                $ret = $this->toGshow($madify_info);
+                if ($ret["code"] != 200) {
+                    $gshow->DeleteInfo(' where CustomersID=' . $post["num"]);
+                    $result["err"] = 1;
+                    $result["msg"] = "微传单同步数据失败";
+                    $this->LogsFunction->LogsCusRecord(123, 5, $cus_id, $result['msg']);
+                } else {
+                    // TODO:扣款操作
+                    $this->consume($money, 6, $cus_id, $agent_id);
+                    $result["msg"] = "微传单操作成功";
                     $this->LogsFunction->LogsCusRecord(123, 1, $cus_id, $result['msg']);
                 }
-            }else{
-                $result["err"]=2;
-                $result["msg"]="微传单数据更新失败";
+            } else {
+                $result["err"] = 2;
+                $result["msg"] = "微传单数据更新失败";
                 $this->LogsFunction->LogsCusRecord(123, 0, $cus_id, $result['msg']);
             }
         }
         return $result;
     }
-    private function toGshow($data){
+
+    /**
+     * ？
+     *
+     * @param $data
+     * @return int|mixed
+     */
+    private function toGshow($data)
+    {
         if (!$data) {
             return 0;
         }
-        $cust=new CustomersModule();
-        $cust_info=$cust->GetOneByWhere(array(), " where CustomersID = ".$data["CustomersID"]);
+        $cust = new CustomersModule();
+        $cust_info = $cust->GetOneByWhere(array(), " where CustomersID = " . $data["CustomersID"]);
         if (!$cust_info) {
             return 0;
         }
         $TuUrl = 'http://cd.5067.org/index.php?c=user&a=dlregister';
+        $ToString = '';
         $ToString .= 'uname=' . $cust_info ['CompanyName'];
 
         $ToString .= '&email_varchar=' . $data ['Email'];
@@ -3004,5 +3079,82 @@ class Gbaopen extends InterfaceVIEWS {
         $ReturnString = request_by_other($TuUrl, $ToString);
         $ReturnArray = json_decode($ReturnString, true);
         return $ReturnArray;
+    }
+
+    /**
+     * ===消费扣款===
+     * 判断余额是否充足
+     * 添加消费日志
+     * 扣除余额、更新月消费额和总消费额
+     *
+     * @param $money    消费金额
+     * @param $type 5-开通微传单,6-续费微传单
+     * @param $cus_id   客户ID
+     * @param $agentID  操作人员（客服agentid）
+     * @param $costID   支付代理商（代理agentid）
+     * @return string
+     */
+    public function consume($money, $type = 5, $cus_id = 0, $agentID = 0)
+    {
+        $result = array('err' => 0, 'data' => '', 'msg' => '');
+        $Balance = new BalanceModule();
+        $Logcost = new LogcostModule();
+        $money = (int)$money;
+        $agentBalance = $Balance->GetBalance($agentID);
+        $agentBalance = $agentBalance['Balance'];
+        // 判断余额是否充足
+        if ($agentBalance < $money) {
+            $result['err'] = '1';
+            $result['msg'] = '余额不足';
+            return $result;
+        }
+        $nowTime = date('Y-m-d H:i:s', time());
+        $updateBalance = $agentBalance - (int)$money;
+        // 添加消费日志
+        $logcostData['ip'] = $_SERVER["REMOTE_ADDR"];
+        $logcostData['cost'] = (0 - $money);
+        $logcostData['type'] = $type;
+        if ($type == 5) {
+            $logcostData['description'] = '开通微传单';
+        } else {
+            $logcostData['description'] = '续费微传单'; // type = 6
+        }
+        $logcostData['adddate'] = $nowTime;
+        $logcostData['Balance'] = $updateBalance;
+        $logcostData['CustomersID'] = $cus_id;
+        $logcostData['AgentID'] = $agentID;
+        if ($_SESSION['Level'] < 3) {
+            $logcostData['CostID'] = $agentID;
+        } else {
+            $Account = new AccountModule();
+            $AccountData = $Account->GetOneInfoByKeyID($agentID);
+            $logcostData['CostID'] = $AccountData['BossAgentID'];
+        }
+        $logcostData['OrderID'] = '';
+        $resLogcost = $Logcost->InsertArray($logcostData);
+
+        // 更新余额、月消费额、总消费额
+        $selectSql = array('sum(cost) AS cost');
+        $whereSql = 'where AgentID = ' . $agentID . ' AND DATE_FORMAT(adddate, \'%Y%m\') = DATE_FORMAT(CURDATE(), \'%Y%m\') AND cost < 0';
+        $monCost = $Logcost->GetOneByWhere($selectSql, $whereSql); // 月消费
+        $selectSql = array('sum(cost) AS cost');
+        $whereSql = 'where AgentID = ' . $agentID . ' AND cost < 0';
+        $allCost = $Logcost->GetOneByWhere($selectSql, $whereSql); // 总消费
+
+        $balanceData['Balance'] = $updateBalance;
+        $balanceData['CostMon'] = $monCost['cost'];
+        $balanceData['CostAll'] = $allCost['cost'];
+        $balanceData['UpdateTime'] = $nowTime;
+        $resBalance = $Balance->UpdateArrayByAgentID($balanceData, $agentID);
+
+
+        if ($resLogcost && $resBalance) {
+            $result['err'] = '0';
+            $result['msg'] = '消费扣款成功';
+        } else {
+            $result['err'] = '2';
+            $result['msg'] = '消费扣款失败';
+        }
+        return $result;
     }
 }
