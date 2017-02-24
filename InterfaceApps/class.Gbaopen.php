@@ -2980,17 +2980,15 @@ class Gbaopen extends InterfaceVIEWS
             $madify_info["UpdateTime"] = date('Y-m-d H:i:s', time());
             $ret = $gshow->UpdateArray($madify_info, array("CustomersID" => $post["num"]));
             if ($ret) {
+//                $ret['code'] = 200;//$this->toGshow($madify_info);
                 $ret = $this->toGshow($madify_info);
-//                var_dump($ret);
-//                exit;
-//                dd($ret.'+++');
                 if ($ret["code"] != 200) {//===?200是什么意思
                     $gshow->UpdateArray($gshowinfo, array("CustomersID" => $post["num"]));
                     $result["err"] = 1;
                     $result["msg"] = "微传单同步数据失败";
                 } else {
                     // TODO:扣款操作
-                    $this->consume($money, 5, $cus_id, $agent_id);
+                    $this->consume($money, 6, $cus_id, $agent_id);
                     $result["msg"] = "微传单操作成功";
                 }
             } else {
@@ -3008,12 +3006,12 @@ class Gbaopen extends InterfaceVIEWS
             $ins_info["CustomersID"] = $post["num"];
             $ret = $gshow->InsertArray($ins_info);
             if ($ret) {
-                $ret = $this->toGshow($ins_info);
+                $ret = $this->toGshow($madify_info);
                 if ($ret["code"] != 200) {
                     $gshow->DeleteInfo(' where CustomersID=' . $post["num"]);
                     $result["err"] = 1;
                     $result["msg"] = "微传单同步数据失败";
-                    $this->LogsFunction->LogsCusRecord(123, 6, $cus_id, $result['msg']);
+                    $this->LogsFunction->LogsCusRecord(123, 5, $cus_id, $result['msg']);
                 } else {
                     // TODO:扣款操作
                     $this->consume($money, 6, $cus_id, $agent_id);
@@ -3101,7 +3099,9 @@ class Gbaopen extends InterfaceVIEWS
         $result = array('err' => 0, 'data' => '', 'msg' => '');
         $Balance = new BalanceModule();
         $Logcost = new LogcostModule();
+        $money = (int)$money;
         $agentBalance = $Balance->GetBalance($agentID);
+        $agentBalance = $agentBalance['Balance'];
         // 判断余额是否充足
         if ($agentBalance < $money) {
             $result['err'] = '1';
@@ -3109,12 +3109,12 @@ class Gbaopen extends InterfaceVIEWS
             return $result;
         }
         $nowTime = date('Y-m-d H:i:s', time());
-        $updateBalance = $agentBalance - $money;
+        $updateBalance = $agentBalance - (int)$money;
         // 添加消费日志
         $logcostData['ip'] = $_SERVER["REMOTE_ADDR"];
         $logcostData['cost'] = (0 - $money);
         $logcostData['type'] = $type;
-        if ($type = 5) {
+        if ($type == 5) {
             $logcostData['description'] = '开通微传单';
         } else {
             $logcostData['description'] = '续费微传单'; // type = 6
@@ -3135,10 +3135,10 @@ class Gbaopen extends InterfaceVIEWS
 
         // 更新余额、月消费额、总消费额
         $selectSql = array('sum(cost) AS cost');
-        $whereSql = 'where AgentID = ' . $agentID . ' AND DATE_FORMAT(adddate, \'%Y%m\') = DATE_FORMAT(CURDATE(), \'%Y%m\')';
-        $monCost = $Logcost->GetOneByWhere($selectSql, $whereSql); // 当月消费
+        $whereSql = 'where AgentID = ' . $agentID . ' AND DATE_FORMAT(adddate, \'%Y%m\') = DATE_FORMAT(CURDATE(), \'%Y%m\') AND cost < 0';
+        $monCost = $Logcost->GetOneByWhere($selectSql, $whereSql); // 月消费
         $selectSql = array('sum(cost) AS cost');
-        $whereSql = 'where AgentID = ' . $agentID;
+        $whereSql = 'where AgentID = ' . $agentID . ' AND cost < 0';
         $allCost = $Logcost->GetOneByWhere($selectSql, $whereSql); // 总消费
 
         $balanceData['Balance'] = $updateBalance;
