@@ -3006,7 +3006,9 @@ class Gbaopen extends InterfaceVIEWS
             $ins_info["CustomersID"] = $post["num"];
             $ret = $gshow->InsertArray($ins_info);
             if ($ret) {
-                $ret = $this->toGshow($madify_info);
+                $ret = $this->toGshow($ins_info);
+//                var_dump($ret);
+//                exit;
                 if ($ret["code"] != 200) {
                     $gshow->DeleteInfo(' where CustomersID=' . $post["num"]);
                     $result["err"] = 1;
