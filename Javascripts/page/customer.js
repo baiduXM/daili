@@ -5,6 +5,7 @@ jQuery(document).ready(function() {
         colorData = {white: ['white', '白色'], grey: ['grey', '灰色'], black: ['black', '黑色'], blue: ['blue', '蓝色'], green: ['green', '绿色'], yellow: ['yellow', '黄色'], orange: ['orange', '橙色'], pink: ['pink', '粉色'], red: ['red', '红色'], purple: ['purple', '紫色'], brown: ['#804000', '棕色'], colorful: ['', '彩色']};
     /*翻页*/
     var pagelist = function() {
+		/*test*/
         this.allListNum = 1;    						/*总共的客户数量*/
         this.page = $(".pagebox a.num");					/*页码集合*/
         this.pageMax = 1;                                                       /*页码可达到的最大值*/
@@ -391,7 +392,7 @@ jQuery(document).ready(function() {
                     }else if (v2 == 'transfer')
                         operation[0] += '<a href="javascript:;" class="custransfer"> 客户转接 </a>';
                     else if (v2 == 'manage'){
-                        operation[0] += '<a href="javascript:;" class="g-show"> 微传单 </a>';
+                        operation[0] += '<a href="javascript:;" class="g-show"> E推 </a>';
                         operation[0] += '<a href="javascript:;" class="g-manage"> 管理 </a>';
                     }else if (v2 == 'create')
                         operation[1] = '<a href="javascript:;" class="g-create"> 开通 </a>';
@@ -1064,7 +1065,7 @@ jQuery(document).ready(function() {
             async:false,
             success:function(data){
                 if(data.data==false){
-                    html = '<div class="userdata-content"><p style="font-size:20px;">是否开通该客户微传单？</p>\
+                    html = '<div class="userdata-content"><p style="font-size:20px;">是否开通该客户E推？</p>\
                         <input type="hidden" class="Input" value="' + cus + '">\n\
                             <p>\n\
                                 <span class="content-l">年限:</span>\n\
@@ -1078,7 +1079,7 @@ jQuery(document).ready(function() {
                         });\n\
                 </script>';
                 }else{
-                    html = '<div class="userdata-content"><p style="font-size:20px;">是否续费该客户微传单？</p>\
+                    html = '<div class="userdata-content"><p style="font-size:20px;">是否续费该客户E推？</p>\
                         <input type="hidden" class="Input" value="' + cus + '">\n\
                             <p>\n\
                                 <span class="content-l">年限:</span>\n\
@@ -1134,7 +1135,7 @@ jQuery(document).ready(function() {
         $(".userdata-content input[name='morecapacity']").unbind();
         $(".userdata-content input[name='morecapacity']").change(function(){
             var new_single_money=$(".userdata-content input[name='morecapacity']:checked").data("money");
-            $(".userdata-content .price").val(((new_single_money-old_single_money)*months/12).toFixed(0)+"元");
+            $(".userdata-content .price").val((new_single_money-old_single_money).toFixed(0)+"元");
         });
     }
     /*扩容模块*/
@@ -1362,7 +1363,7 @@ jQuery(document).ready(function() {
                 }
             });
             $(".dialog-content a.dia-ok").removeClass('morecapacity');
-        } else if ($(this).hasClass("g-show")) { //===微传单提交
+        } else if ($(this).hasClass("g-show")) { //===E推提交
             var data={};
             data["year"]=$('.userdata-content .years').val();
             data["money"]=$('.userdata-content .years-money').text();
