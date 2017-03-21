@@ -1048,9 +1048,10 @@ class Gbaopen extends InterfaceVIEWS
                 $Data['Mobile_StartTime'] = date('Y-m-d H:i:s', $Data['Mobile_StartTime']);
                 $Data['Mobile_EndTime'] = date('Y-m-d H:i:s', $Data['Mobile_EndTime']);
             }
-            //中英关联
-            $linkcus = $post['othercus'] ? $post['othercus'] : 0;
+            //中英关联			
+            $linkcus = $post['othercus'] ? $post['othercus'] : 0;			
             $Data['Link_Cus'] = $linkcus ? $cuspromodel->GetOneByWhere('where G_name=\'' . $linkcus . '\'') ? $linkcus : 0 : 0;
+//			file_put_contents('link.txt','date is '.$Data['Link_Cus']);
             //模板号域名处理
             $Model = new ModelModule();
             $Data['CPhone'] = $post['pc_mobile'];
@@ -1323,6 +1324,7 @@ class Gbaopen extends InterfaceVIEWS
 //                $update_self['CostAll'] = $update_self['CostAll'] + $price;
 //            }
             $Data['UpdateTime'] = date('Y-m-d H:i:s', time());
+//			file_put_contents('tongyi.txt',$Data['Link_Cus']);
             $IsOk = $this->ToGbaoPenEditInfo(array_replace($cuspro, $Data));
             if ($IsOk['err'] != 1000) {
                 $result['err'] = 1001;
@@ -1348,6 +1350,7 @@ class Gbaopen extends InterfaceVIEWS
 //                    return $result;
 //                }
 //            }
+//			file_put_contents('linkcus.txt',$Data['Link_Cus']);
             $cuspromodel->UpdateArray($Data, $cus_id);
             $result['data']['name'] = '您选择的客户';
             $result['msg'] = '修改成功';
@@ -2985,7 +2988,7 @@ class Gbaopen extends InterfaceVIEWS
                 if ($ret["code"] != 200) {//===?200是什么意思
                     $gshow->UpdateArray($gshowinfo, array("CustomersID" => $post["num"]));
                     $result["err"] = 1;
-                    $result["msg"] = "微传单同步数据失败";
+                    $result["msg"] = "微传单同步数据$madify_info失败";
                 } else {
                     // TODO:扣款操作
                     $this->consume($money, 6, $cus_id, $agent_id);
@@ -3007,8 +3010,6 @@ class Gbaopen extends InterfaceVIEWS
             $ret = $gshow->InsertArray($ins_info);
             if ($ret) {
                 $ret = $this->toGshow($ins_info);
-//                var_dump($ret);
-//                exit;
                 if ($ret["code"] != 200) {
                     $gshow->DeleteInfo(' where CustomersID=' . $post["num"]);
                     $result["err"] = 1;
