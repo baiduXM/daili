@@ -1155,6 +1155,8 @@ jQuery(document).ready(function () {
         popup(html);
     });
     function morecapacity(months, oldcapacity) {
+		console.log("month:"+months);
+		console.log("oldcapacity:"+oldcapacity);
         var old_single_money = ($(".userdata-content input[name='morecapacity'][value='" + oldcapacity + "']").data("money") ? $(".userdata-content input[name='morecapacity'][value='" + oldcapacity + "']").data("money") : 0);
         $(".userdata-content input[name='morecapacity'][value='" + oldcapacity + "']").prop("checked", true);
         $(".userdata-content input[name='morecapacity'][value='" + oldcapacity + "']").parent("span").prevAll().hide();
@@ -1162,6 +1164,8 @@ jQuery(document).ready(function () {
         $(".userdata-content input[name='morecapacity']").change(function () {
             var new_single_money = $(".userdata-content input[name='morecapacity']:checked").data("money");
             $(".userdata-content .price").val((new_single_money - old_single_money).toFixed(0) + "元");
+			console.log("new_single_money:"+new_single_money);
+			console.log("old_single_money:"+old_single_money);
         });
     }
 
