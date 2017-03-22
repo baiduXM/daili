@@ -1,30 +1,57 @@
-jQuery(document).ready(function() {
+jQuery(document).ready(function () {
     var dataInit,
         /*颜色初始化*/
         colorInit = ['white', 'grey', 'black', 'blue', 'green', 'yellow', 'orange', 'pink', 'red', 'purple', 'brown', 'colorful'],
-        colorData = {white: ['white', '白色'], grey: ['grey', '灰色'], black: ['black', '黑色'], blue: ['blue', '蓝色'], green: ['green', '绿色'], yellow: ['yellow', '黄色'], orange: ['orange', '橙色'], pink: ['pink', '粉色'], red: ['red', '红色'], purple: ['purple', '紫色'], brown: ['#804000', '棕色'], colorful: ['', '彩色']};
+        colorData = {
+            white: ['white', '白色'],
+            grey: ['grey', '灰色'],
+            black: ['black', '黑色'],
+            blue: ['blue', '蓝色'],
+            green: ['green', '绿色'],
+            yellow: ['yellow', '黄色'],
+            orange: ['orange', '橙色'],
+            pink: ['pink', '粉色'],
+            red: ['red', '红色'],
+            purple: ['purple', '紫色'],
+            brown: ['#804000', '棕色'],
+            colorful: ['', '彩色']
+        };
     /*翻页*/
-    var pagelist = function() {
-		/*test*/
-        this.allListNum = 1;    						/*总共的客户数量*/
-        this.page = $(".pagebox a.num");					/*页码集合*/
-        this.pageMax = 1;                                                       /*页码可达到的最大值*/
-        this.checkPage = 1;							/*当前选择的页码*/
-        this.showPageLast = 1;  						/*当前已显示出来的最后一个页码*/
-        this.listNum = [];							/*每页数量显示的集合*/
-        this.showPageNum = 5;							/*最多显示的页码数量*/
-        this.type;								/*判断不同页面的使用*/
-        this.listID = 0;							/*控制页面加载的内容*/
-        this.search = "";							/*搜索内容存储*/
-        this.pageMsg = $(".pagebox .pagemsg");                                  /*当前页面和总页面显示*/
-        this.timeLoad = 0;                                                      /*加载前的时间*/
-        this.timeWait = 1000;                                                   /*加载最短持续时间*/
-        this.timeSave;                                                          /*计时器*/
-        this.response;                                                          /*请求*/
+    var pagelist = function () {
+        /*总共的客户数量*/
+        this.allListNum = 1;
+        /*页码集合*/
+        this.page = $(".pagebox a.num");
+        /*页码可达到的最大值*/
+        this.pageMax = 1;
+        /*当前选择的页码*/
+        this.checkPage = 1;
+        /*当前已显示出来的最后一个页码*/
+        this.showPageLast = 1;
+        /*每页数量显示的集合*/
+        this.listNum = [];
+        /*最多显示的页码数量*/
+        this.showPageNum = 5;
+        /*判断不同页面的使用*/
+        this.type;
+        /*控制页面加载的内容*/
+        this.listID = 0;
+        /*搜索内容存储*/
+        this.search = "";
+        /*当前页面和总页面显示*/
+        this.pageMsg = $(".pagebox .pagemsg");
+        /*加载前的时间*/
+        this.timeLoad = 0;
+        /*加载最短持续时间*/
+        this.timeWait = 1000;
+        /*计时器*/
+        this.timeSave;
+        /*请求*/
+        this.response;
         /*列表数量按钮点击*/
-        this.tonumCheck = function() {
+        this.tonumCheck = function () {
             var _this = this;
-            $(".tonum a").click(function(even) {
+            $(".tonum a").click(function (even) {
                 if (!$(this).hasClass('current')) {
                     $(this).siblings().removeClass('current');
                     $(this).addClass('current');
@@ -34,39 +61,39 @@ jQuery(document).ready(function() {
             });
         };
         /*加载图标显示*/
-        this.onLoad = function(open) {
+        this.onLoad = function (open) {
             open = open || false;
             var _this = this;
             clearTimeout(_this.timeSave);
-            if(open){
+            if (open) {
                 var time = Date.parse(new Date()) - _this.timeLoad,
-                    timeWait = function(){
+                    timeWait = function () {
                         $(".flower-loader").animate({opacity: 0});
                     };
-                if(time > _this.timeWait){
+                if (time > _this.timeWait) {
                     $(".flower-loader").animate({opacity: 0});
-                }else{
+                } else {
                     _this.timeSave = setTimeout(timeWait, _this.timeWait);
                 }
                 _this.timeLoad = 0;
-            }else{
+            } else {
                 _this.timeLoad = Date.parse(new Date());
                 $(".flower-loader").animate({opacity: 1});
             }
         };
         /*ajax请求状态,若上一个请求正在进行，将中止上次请求*/
-        this.repStop = function(){
+        this.repStop = function () {
             var _this = this;
-            if(_this.response.readyState == 1){
+            if (_this.response.readyState == 1) {
                 _this.response.abort();
                 _this.onLoad(true);
             }
         };
         /*页码点击*/
-        this.numCheck = function() {
+        this.numCheck = function () {
             var _this = this;
             /*页码后滚*/
-            $(".pagebox .pagenext").click(function() {
+            $(".pagebox .pagenext").click(function () {
                 if (_this.showPageLast < _this.pageMax) {
                     _this.showPageLast++;
                     _this.page.eq(_this.showPageLast - 1).show("slow");
@@ -74,7 +101,7 @@ jQuery(document).ready(function() {
                 }
             });
             /*页码前滚*/
-            $(".pagebox .pageprev").click(function() {
+            $(".pagebox .pageprev").click(function () {
                 if ($(".pagebox a.num").index($(".pagebox a.num:visible:first")) > 0) {
                     _this.showPageLast--;
                     _this.page.eq(_this.showPageLast).hide("slow");
@@ -82,7 +109,7 @@ jQuery(document).ready(function() {
                 }
             });
             /*页码数量控制*/
-            $(".pagebox a.num").click(function(even) {
+            $(".pagebox a.num").click(function (even) {
                 if (!$(this).hasClass('pon')) {
                     if (_this.page.index(this) + 1 <= _this.pageMax) {
                         _this.page.eq(_this.checkPage - 1).removeClass('pon');
@@ -97,31 +124,31 @@ jQuery(document).ready(function() {
             });
         };
         /*列表信息修改*/
-        this.listReset = function() {
+        this.listReset = function () {
             var _this = this,
-                    url = "Apps?module=Gbaopen&action=GetCus",
-                    olistNum = _this.listNum[$(".tonum a").index($(".tonum a.current"))];
-            if(_this.timeLoad == 0){
+                url = "Apps?module=Gbaopen&action=GetCus",
+                olistNum = _this.listNum[$(".tonum a").index($(".tonum a.current"))];
+            if (_this.timeLoad == 0) {
                 _this.onLoad();
             }
             url += "&type=" + _this.listID + "&page=" + _this.checkPage + "&num=" + olistNum + _this.search;
             _this.repStop();
-            _this.response = $.get(url, function(result) {
+            _this.response = $.get(url, function (result) {
                 if (!result.err) {
                     var data = result.data;
                     var cuslist = "",
-                            timeList = "",
-                            nameList = "",
-                            oper_each = '',
-                            dataNum = data.cus.length;
-                    $.each(data.cus, function(i, v) {
-                        if(v.Status==0){
-                            oper_each=dataInit.operation[2];
-                        }else{
+                        timeList = "",
+                        nameList = "",
+                        oper_each = '',
+                        dataNum = data.cus.length;
+                    $.each(data.cus, function (i, v) {
+                        if (v.Status == 0) {
+                            oper_each = dataInit.operation[2];
+                        } else {
                             oper_each = v.name ? dataInit.operation[0] : dataInit.operation[1];
                         }
                         v.name = v.name ? v.name : '--';
-                        switch(v.type){
+                        switch (v.type) {
                             case "1":
                                 v.type = 'PC';
                                 break;
@@ -151,12 +178,12 @@ jQuery(document).ready(function() {
                             } else {
                                 timeList = v.PCTimeStart ? '<td>PC：' + v.PCTimeStart + '</td><td>PC：' + v.PCTimeEnd + '</td>' : v.MobileTimeStart ? '<td>手机:' + v.MobileTimeStart + '</td><td>手机：' + v.MobileTimeEnd + '</td>' : '<td>--</td><td>--</td>';
                             }
-                            if(v.agent){
+                            if (v.agent) {
                                 nameList = '<td class="poptip">' + v.name + '<div class="popfrm">\
                                                                 <b class="phpicn">◆</b>\
                                                                 <p>所属人员：' + v.agent + '</p>\
                                                             </div></td>';
-                            }else{
+                            } else {
                                 nameList = '<td>' + v.name + '</td>';
                             }
                             cuslist += '<tr><!--<td><input type="checkbox" name="ID"></td>-->\
@@ -164,7 +191,7 @@ jQuery(document).ready(function() {
                                 ' + nameList + timeList + '\
                                 <td><font style="color:#090">' + v.type + '</font></td>\
                                 <td><div class="a"></div></td>\
-                                <td>' + ((v.name != '--' && v.type != '--'&&v.Status==1) ? '<div class="cases' + (v.Place == 0? '"' : ' place" data="' + v.Place + '"') + '><span>' + v.PlaceName + '</span>' + dataInit.area + '</div>' : '--') + '</td>\
+                                <td>' + ((v.name != '--' && v.type != '--' && v.Status == 1) ? '<div class="cases' + (v.Place == 0 ? '"' : ' place" data="' + v.Place + '"') + '><span>' + v.PlaceName + '</span>' + dataInit.area + '</div>' : '--') + '</td>\
                                 <td><font style="color:#090">' + v.agent_username + '</font></td>\
                                 <td class="text-right">' + oper_each + '</td>\
                                 <input type="hidden" value="' + v.id + '">\
@@ -191,13 +218,13 @@ jQuery(document).ready(function() {
                         }
                     });
                     if (_this.type == 'tr') {
-                        $("#listtbody").hide("slow", function() {
+                        $("#listtbody").hide("slow", function () {
                             $("#listtbody").html(cuslist);
                             $("#listtbody").show("slow");
                         });
                     } else if (_this.type == 'li') {
                         var mhLi = parseInt($(".leftbox ul").css("max-height")),
-                                hLi = parseInt($(".leftbox ul li").css("height"));
+                            hLi = parseInt($(".leftbox ul li").css("height"));
                         (mhLi < (hLi * dataNum)) ? $(".leftbox ul").css("overflow-y", "auto") : "";
                         $(".leftbox ul").html(cuslist);
                     }
@@ -208,9 +235,9 @@ jQuery(document).ready(function() {
             });
         };
         /*列表为table标签时才进行此操作*/
-        this.tableLiCheck = function() {
+        this.tableLiCheck = function () {
             var _this = this;
-            $(".tabList ul li").click(function() {
+            $(".tabList ul li").click(function () {
                 if (!$(this).hasClass('cur')) {
                     var num = parseInt($('.tabList ul li').index(this));
                     $(this).addClass("cur").siblings().removeClass();
@@ -221,7 +248,7 @@ jQuery(document).ready(function() {
                     }
                     _this.onLoad();
                     _this.repStop();
-                    _this.response = $.get("Apps?module=Gbaopen&action=GetCusNum&type=" + num, function(result) {
+                    _this.response = $.get("Apps?module=Gbaopen&action=GetCusNum&type=" + num, function (result) {
                         result.data = parseInt(result.data);
                         if (result.data >= 0) {
                             _this.allListNum = result.data == 0 ? 1 : result.data;
@@ -243,14 +270,14 @@ jQuery(document).ready(function() {
             });
         };
         /*重置编写分页*/
-        this.pageReset = function() {
+        this.pageReset = function () {
             var _this = this;
             /*最大页码值*/
             _this.pageMax = Math.ceil(_this.allListNum / _this.listNum[$(".tonum a").index($(".tonum a.current"))]);
             /*页码队列如果小于最大的页码，创建新的页码标签，扩充队列，直至最大页码*/
             if (_this.page.length < _this.pageMax) {
                 var aOne, has = false;
-                aOne = _this.page.eq(_this.page.length-1);
+                aOne = _this.page.eq(_this.page.length - 1);
                 if (aOne.hasClass("pon")) {
                     has = true;
                     aOne.removeClass("pon");
@@ -294,10 +321,10 @@ jQuery(document).ready(function() {
             _this.pageMsg.text(_this.checkPage + "/" + _this.pageMax);
         };
         /*根据总数量控制页面标签值数量载入*/
-        this.listNumLoad = function() {
+        this.listNumLoad = function () {
             var _this = this,
-                    tonum = $(".tonum a"),
-                    listnum = [];
+                tonum = $(".tonum a"),
+                listnum = [];
             for (var i = 0; i < tonum.length; i++) {
                 if (Math.ceil(_this.allListNum / $(".tonum a").eq(i).text()) == 1) {
                     tonum.eq(i).show("slow");
@@ -311,16 +338,16 @@ jQuery(document).ready(function() {
             _this.listNum = listnum;
         };
         /*客户管理列表搜索模块*/
-        this.searchBox = function() {
+        this.searchBox = function () {
             var _this = this;
-            $("#searchbox").click(function() {
+            $("#searchbox").click(function () {
                 _this.search = $("#search1").val() ? "&contact=" + $("#search1").val() : '';
                 _this.search += $("#search2").val() ? "&name=" + $("#search2").val() : '';
                 _this.search += $("#search3").val() ? "&domain=" + $("#search3").val() : '';
                 if (_this.search) {
                     _this.onLoad();
                     _this.repStop();
-                    _this.response = $.get("Apps?module=Gbaopen&action=GetCusNum&type=-1" + _this.search, function(result) {
+                    _this.response = $.get("Apps?module=Gbaopen&action=GetCusNum&type=-1" + _this.search, function (result) {
                         result.data = parseInt(result.data);
                         _this.listID = -1;
                         $(".tabList ul li").removeClass();
@@ -331,9 +358,9 @@ jQuery(document).ready(function() {
                             $(".tonum a").eq(_this.listNum.length - 1).addClass("current");
                         }
                         _this.pageReset();
-                        if(result.data > 0){
+                        if (result.data > 0) {
                             _this.listReset();
-                        }else{
+                        } else {
                             _this.type == 'tr' ? $("#listtbody").html("") : "";
                             _this.onLoad(true);
                         }
@@ -343,31 +370,30 @@ jQuery(document).ready(function() {
                 }
             });
             //搜索回车事件
-            $("Input[id^='search']").on("keypress", function(e){
-                if(event.keyCode == "13")    
-                {
+            $("Input[id^='search']").on("keypress", function (e) {
+                if (event.keyCode == "13") {
                     $("#searchbox").click();
                 }
             });
         };
         /*兼容客户管理列表,对列表数量控制的标签进行初始化*/
-        this.msgSet = function() {
+        this.msgSet = function () {
             var _this = this;
             _this.type = $(".pagebox").prev()[0].tagName.toLowerCase() == 'form' ? "tr" : "li";
             _this.onLoad();
-            _this.response = $.get("Apps?module=Gbaopen&action=CusInit&type=" + _this.type, function(result) {
+            _this.response = $.get("Apps?module=Gbaopen&action=CusInit&type=" + _this.type, function (result) {
                 console.log(result);
                 var place = '<ul class="one"><span>▬▶</span>\n\
                             <li data="0">关闭</li>\n';
-                $.each(result.data.area, function(i1, v1) {
+                $.each(result.data.area, function (i1, v1) {
                     place += '<li data=' + v1.id + '>' + v1.name;
                     if (v1.child) {
                         place += '<ul class="two">\n<span>▬▶</span>\n';
-                        $.each(v1.child, function(i2, v2) {
+                        $.each(v1.child, function (i2, v2) {
                             place += '<li data=' + v2.id + '>' + v2.name;
                             if (v2.child) {
                                 place += '<ul class="three">\n<span>▬▶</span>\n';
-                                $.each(v2.child, function(i3, v3) {
+                                $.each(v2.child, function (i3, v3) {
                                     place += '<li data=' + v3.id + '>' + v3.name + '</li>';
                                 });
                                 place += '</ul>';
@@ -382,21 +408,21 @@ jQuery(document).ready(function() {
                 /*操作权限初始化*/
                 var operation = ['', '--'];
                 result.data.operat = result.data.operat.split(',');
-                $.each(result.data.operat, function(i2, v2) {
-                    if (v2 == 'renew'){
+                $.each(result.data.operat, function (i2, v2) {
+                    if (v2 == 'renew') {
                         operation[0] += '<a href="javascript:;" class="renew"> 续费 </a>';
                         operation[0] += '<a href="javascript:;" class="morecapacity"> 扩容 </a>';
-                    }else if (v2 == 'process'){
+                    } else if (v2 == 'process') {
                         operation[0] += '<a href="javascript:;" class="processing"> 网站处理 </a>';
                         operation[0] += '<a href="javascript:;" class="sitemove"> 网站迁移 </a>';
-                    }else if (v2 == 'transfer')
+                    } else if (v2 == 'transfer')
                         operation[0] += '<a href="javascript:;" class="custransfer"> 客户转接 </a>';
-                    else if (v2 == 'manage'){
+                    else if (v2 == 'manage') {
                         operation[0] += '<a href="javascript:;" class="g-show"> E推 </a>';
                         operation[0] += '<a href="javascript:;" class="g-manage"> 管理 </a>';
-                    }else if (v2 == 'create')
+                    } else if (v2 == 'create')
                         operation[1] = '<a href="javascript:;" class="g-create"> 开通 </a>';
-                    else if (v2 == 'delete'){
+                    else if (v2 == 'delete') {
                         operation[0] += '<a href="javascript:;" class="delete"> 删除 </a>';
                         operation[2] = '<a href="javascript:;" class="reduction"> 还原 </a>';
                     }
@@ -410,8 +436,8 @@ jQuery(document).ready(function() {
                     _this.searchBox();
                 } else {
                     var ulT = $(".leftbox ul").offset().top,
-                            winH = $(document).height(),
-                            pageboxH = $(".pagebox").outerHeight();
+                        winH = $(document).height(),
+                        pageboxH = $(".pagebox").outerHeight();
                     var ulH = Math.ceil(winH - ulT - pageboxH - 100);
                     $(".leftbox ul").css("max-height", ulH + 'px');
                     if (dataInit.overdue >= 0) {
@@ -422,14 +448,14 @@ jQuery(document).ready(function() {
                 _this.pageReset();
                 if (dataInit.num > 0) {
                     _this.listReset();
-                }else{
+                } else {
                     _this.onLoad(true);
                 }
             });
         };
-        
+
         /*重要模块加载*/
-        this.init = function() {
+        this.init = function () {
             this.msgSet();
             this.tonumCheck();
             this.numCheck();
@@ -438,16 +464,16 @@ jQuery(document).ready(function() {
     }();
 
     //文本框点击复制事件
-    $('#dialog-message').on('click', ".info", function() {
+    $('#dialog-message').on('click', ".info", function () {
         $('#dialog-message .info').select();
         document.execCommand("Copy");
         alert('已复制！');
     });
 
     /*推荐案例模块*/
-    $('.leftbox ul,#listtbody').on('click', ".cases", function() {
+    $('.leftbox ul,#listtbody').on('click', ".cases", function () {
         var cases = $(this),
-                data = cases.attr("data") ? cases.attr("data") : 0;
+            data = cases.attr("data") ? cases.attr("data") : 0;
         if (cases.children("ul").is(":hidden")) {
             cases.children("ul").show("slow");
             data == 0 ? cases.children("ul").children("li").show().eq(0).hide() : cases.children("ul").children("li").show();
@@ -455,21 +481,21 @@ jQuery(document).ready(function() {
             cases.children("ul").hide("slow");
         }
     });
-    $('.leftbox ul,#listtbody').on('click', ".cases li", function(e) {
+    $('.leftbox ul,#listtbody').on('click', ".cases li", function (e) {
         e.preventDefault();
         e.stopPropagation();
         var _this = $(this),
-                load = function(elm) {
-                    var curelm = $(elm);
-                    var parelm = curelm.parent().parent(),
-                            arr = [curelm.attr("data")];
-                    if (parelm[0].tagName.toLowerCase() == 'li') {
-                        $.merge(arr, load(parelm));
-                    } else {
-                        arr.push(parelm);
-                    }
-                    return arr;
-                };
+            load = function (elm) {
+                var curelm = $(elm);
+                var parelm = curelm.parent().parent(),
+                    arr = [curelm.attr("data")];
+                if (parelm[0].tagName.toLowerCase() == 'li') {
+                    $.merge(arr, load(parelm));
+                } else {
+                    arr.push(parelm);
+                }
+                return arr;
+            };
         var data = load(_this);
         var cases = $(data.pop());
         var caselist = data;
@@ -478,15 +504,15 @@ jQuery(document).ready(function() {
         if (data.length > 0) {
             var cus = cases.parent().siblings('input:hidden:last').attr('value');
             var html = '<div class="userdata-content"><input type="hidden" value="' + cus + '" data="' + data + '"><p style="font-size:20px;">';
-            $.get("Apps?module=Gbaopen&action=GetCases&num=" + cus, function(result) {
+            $.get("Apps?module=Gbaopen&action=GetCases&num=" + cus, function (result) {
                 if (!result.err) {
                     var json = result.data;
                     if (data != 0) {
                         if (json.type > 2) {
                             var colortag = '';
                             var simgurl = json.pc.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + json.pc.img[0] + '">如未选择，则默认上次上传的图片：<img src="' + json.pc.img[0] + '" style="width: 100%;"></a></span></span>' : '',
-                                    imgurl = json.pc.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + json.pc.img[1] + '">如未选择，则默认上次上传的图片：<img src="' + json.pc.img[1] + '" style="width: 100%;"></a></span></span>' : '';
-                            $.each(colorInit, function(i1, v1) {
+                                imgurl = json.pc.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + json.pc.img[1] + '">如未选择，则默认上次上传的图片：<img src="' + json.pc.img[1] + '" style="width: 100%;"></a></span></span>' : '';
+                            $.each(colorInit, function (i1, v1) {
                                 if (json.pc.color == false) {
                                     colortag += '<span data="' + v1 + '"' + (v1 == 'colorful' ? '' : ' style="background-color:' + colorData[v1][0] + ';"') + '>' + colorData[v1][1] + '</span>';
                                 } else {
@@ -498,7 +524,7 @@ jQuery(document).ready(function() {
                                 }
                             });
                             var long = '', small = '', mid = '';
-                            $.each(dataInit.tag, function(i2, v2) {
+                            $.each(dataInit.tag, function (i2, v2) {
                                 var cur = json.pc.tag != false ? $.inArray(i2, json.pc.tag) != -1 ? 'class="cur"' : '' : '';
                                 if (v2.length > 8) {
                                     long += '<span ' + cur + ' data="' + i2 + '">' + v2 + '</span>';
@@ -526,8 +552,8 @@ jQuery(document).ready(function() {
                             if (json.type == 1) {
                                 var colortag = '';
                                 var simgurl = json.pc.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + json.pc.img[0] + '">如未选择，则默认上次上传的图片：<img src="' + json.pc.img[0] + '" style="width: 100%;"></a></span></span>' : '',
-                                        imgurl = json.pc.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + json.pc.img[1] + '">如未选择，则默认上次上传的图片：<img src="' + json.pc.img[1] + '" style="width: 100%;"></a></span></span>' : '';
-                                $.each(colorInit, function(i1, v1) {
+                                    imgurl = json.pc.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + json.pc.img[1] + '">如未选择，则默认上次上传的图片：<img src="' + json.pc.img[1] + '" style="width: 100%;"></a></span></span>' : '';
+                                $.each(colorInit, function (i1, v1) {
                                     if (json.pc.color == false) {
                                         colortag += '<span data="' + v1 + '"' + (v1 == 'colorful' ? '' : ' style="background-color:' + colorData[v1][0] + ';"') + '>' + colorData[v1][1] + '</span>';
                                     } else {
@@ -539,7 +565,7 @@ jQuery(document).ready(function() {
                                     }
                                 });
                                 var long = '', small = '', mid = '';
-                                $.each(dataInit.tag, function(i2, v2) {
+                                $.each(dataInit.tag, function (i2, v2) {
                                     var cur = json.pc.tag != false ? $.inArray(i2, json.pc.tag) != -1 ? 'class="cur"' : '' : '';
                                     if (v2.length > 8) {
                                         long += '<span ' + cur + ' data="' + i2 + '">' + v2 + '</span>';
@@ -552,8 +578,8 @@ jQuery(document).ready(function() {
                             } else {
                                 var colortag = '';
                                 var simgurl = json.mobile.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + json.mobile.img[0] + '">如未选择，则默认上次上传的图片：<img src="' + json.mobile.img[0] + '" style="width: 100%;"></a></span></span>' : '',
-                                        imgurl = json.mobile.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + json.mobile.img[1] + '">如未选择，则默认上次上传的图片：<img src="' + json.mobile.img[1] + '" style="width: 100%;"></a></span></span>' : '';
-                                $.each(colorInit, function(i1, v1) {
+                                    imgurl = json.mobile.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + json.mobile.img[1] + '">如未选择，则默认上次上传的图片：<img src="' + json.mobile.img[1] + '" style="width: 100%;"></a></span></span>' : '';
+                                $.each(colorInit, function (i1, v1) {
                                     if (json.mobile.color == false) {
                                         colortag += '<span data="' + v1 + '"' + (v1 == 'colorful' ? '' : ' style="background-color:' + colorData[v1][0] + ';"') + '>' + colorData[v1][1] + '</span>';
                                     } else {
@@ -565,7 +591,7 @@ jQuery(document).ready(function() {
                                     }
                                 });
                                 var long = '', small = '', mid = '';
-                                $.each(dataInit.tag, function(i2, v2) {
+                                $.each(dataInit.tag, function (i2, v2) {
                                     var cur = json.mobile.tag != false ? $.inArray(i2, json.mobile.tag) != -1 ? 'class="cur"' : '' : '';
                                     if (v2.length > 8) {
                                         long += '<span ' + cur + ' data="' + i2 + '">' + v2 + '</span>';
@@ -611,13 +637,13 @@ jQuery(document).ready(function() {
     });
 
     /*续费模块*/
-    $('.leftbox ul,#listtbody').on('click', ".renew", function() {
+    $('.leftbox ul,#listtbody').on('click', ".renew", function () {
         var cus = $(this).parent().parent().find('input:hidden').attr('value');
-        $.get("Apps?module=Gbaopen&action=Operation&type=renew&cus=" + cus, function(result) {
+        $.get("Apps?module=Gbaopen&action=Operation&type=renew&cus=" + cus, function (result) {
             if (!result.err) {
                 $(".dialog-content a.dia-ok").addClass('gorenew');
                 var html = '', price,
-                        data = result.data;
+                    data = result.data;
                 html = '<div class="userdata-content"><p style="font-size:20px;">确定对<strong style="color:red">' + data.name + '</strong>进行续费操作？</p>';
 //                var secTitle = '', radioCho = '';
 //                switch (parseInt(data.type)) {
@@ -668,17 +694,17 @@ jQuery(document).ready(function() {
 //                    default:
 //                        break;
 //                }
-                var capa_price=0;
-                if(result.data.capacity==(300*1024*1024)){
-                    capa_price=500;
-                }else if(result.data.capacity==(500*1024*1024)){
-                    capa_price=800;
-                }else if(result.data.capacity==(1000*1024*1024)){
-                    capa_price=1500;
-                }else if(result.data.capacity==(100*1024*1024)){
-                    capa_price=300;
+                var capa_price = 0;
+                if (result.data.capacity == (300 * 1024 * 1024)) {
+                    capa_price = 500;
+                } else if (result.data.capacity == (500 * 1024 * 1024)) {
+                    capa_price = 800;
+                } else if (result.data.capacity == (1000 * 1024 * 1024)) {
+                    capa_price = 1500;
+                } else if (result.data.capacity == (100 * 1024 * 1024)) {
+                    capa_price = 300;
                 }
-                html +='<p>\
+                html += '<p>\
                         <span class="content-l">续费时间</span>\
                         <span>\
                             <select class="formstyle" style="width:200px">\
@@ -697,7 +723,7 @@ jQuery(document).ready(function() {
                         <span class="content-l">手机续费到</span>\
                         <span><input type="text" name="mobile_time" class="Input" disabled="true"></span>\
                         <span class="as"></span>\
-                    </p>' : '') +'<p>\n\
+                    </p>' : '') + '<p>\n\
                         <span class="content-l">续费空间</span>\
                         <span class="Input">\
                             <input type="radio" name="capacity" class="capacity" data-money="300" value="100">100M\
@@ -705,7 +731,7 @@ jQuery(document).ready(function() {
                             <input type="radio" name="capacity" class="capacity" data-money="800" value="500">500M\
                             <input type="radio" name="capacity" class="capacity" data-money="1500" value="1000">1000M\
                         </span>\
-                    </p>'+ '<p>\
+                    </p>' + '<p>\
                         <span class="content-l">将消费金额</span>\
                         <span>\
                             <input type="text" name="money" class="Input" disabled="true">\
@@ -747,7 +773,7 @@ jQuery(document).ready(function() {
                             $(".userdata-content input[name=\'money\']").val(newprice);\n\
                         }\n\
                         this.init = function(){\n\
-                            $(".capacity[value=\''+result.data.capacity/1024/1024+'\']").prop("checked", true);\n\
+                            $(".capacity[value=\'' + result.data.capacity / 1024 / 1024 + '\']").prop("checked", true);\n\
                             this.change();\n\
                             $(".userdata-content select").change();\n\
                         },\n\
@@ -762,28 +788,28 @@ jQuery(document).ready(function() {
     });
 
     /*信息修改*/
-    $('.leftbox ul,#listtbody').on('click', ".modify", function() {
+    $('.leftbox ul,#listtbody').on('click', ".modify", function () {
         var cus = $(this).parent().parent().find('input:hidden').attr('value');
-        $.get("Apps?module=Gbaopen&action=Operation&type=modify&cus=" + cus, function(result) {
+        $.get("Apps?module=Gbaopen&action=Operation&type=modify&cus=" + cus, function (result) {
             if (!result.err) {
                 $(".dialog-content a.dia-ok").addClass('gomodify');
                 var data = result.data, html, p = '';
                 html = '<div class="userdata-content"><p style="font-size:20px;">确定对' + data.name[1] + '进行修改信息操作？</p>';
-                $.each(data, function(i, v) {
-                    if(i != 'experience'){
+                $.each(data, function (i, v) {
+                    if (i != 'experience') {
                         if (i == 'remark')
                             html += '<p>\
                                     <span class="content-l" style="vertical-align:top">' + v[0] + '</span>\
                                     <textarea name="remark" class="Input" style=" height:100%;"></textarea>\
                                     <span class="as"></span>\
                                 </p>';
-                        else if (i == 'email'){
+                        else if (i == 'email') {
                             html += '<p>\
                                     <span class="content-l">' + v[0] + '</span>\
                                     <span><input type="text" name="' + i + '" class="Input" value="' + v[1] + '" disabled="true"></span>\
                                     <span class="as"></span>\
                                 </p>';
-                        }else{
+                        } else {
                             html += '<p>\
                                     <span class="content-l">' + v[0] + '</span>\
                                     <span><input type="text" name="' + i + '" class="Input" value="' + v[1] + '"></span>\
@@ -801,17 +827,17 @@ jQuery(document).ready(function() {
             }
         });
     });
-    
+
     /*客户转移模块*/
-    $('.leftbox ul,#listtbody').on('click', ".custransfer", function() {
+    $('.leftbox ul,#listtbody').on('click', ".custransfer", function () {
         var cus = $(this).parent().parent().find('input:hidden').attr('value');
-        $.get("Apps?module=Gbaopen&action=Operation&type=transfer&cus=" + cus, function(result) {
+        $.get("Apps?module=Gbaopen&action=Operation&type=transfer&cus=" + cus, function (result) {
             if (!result.err) {
                 $(".dialog-content a.dia-ok").addClass('gocustransfer');
                 var data = result.data, html, option = '';
                 if (data.obj) {
                     option = '<select class="formstyle" style="width:200px">';
-                    $.each(data.obj, function(i, v) {
+                    $.each(data.obj, function (i, v) {
                         option += '<option value="' + i + '">' + v + '</option>';
                     })
                     option += '</select>';
@@ -833,9 +859,9 @@ jQuery(document).ready(function() {
     });
 
     /*网站处理模块*/
-    $('.leftbox ul,#listtbody').on('click', ".processing", function() {
+    $('.leftbox ul,#listtbody').on('click', ".processing", function () {
         var cus = $(this).parent().parent().find('input:hidden').attr('value');
-        $.get("Apps?module=Gbaopen&action=Operation&type=process&cus=" + cus, function(result) {
+        $.get("Apps?module=Gbaopen&action=Operation&type=process&cus=" + cus, function (result) {
             if (!result.err) {
                 $(".dialog-content a.dia-ok").addClass('goprocessing');
                 var data = result.data, html, option = '';
@@ -938,58 +964,58 @@ jQuery(document).ready(function() {
     });
 
     /*开通模块*/
-    $('.leftbox ul,#listtbody').on('click', ".g-create", function() {
+    $('.leftbox ul,#listtbody').on('click', ".g-create", function () {
         var cus = $(this).parent().parent().find('input:hidden').attr('value');
         window.location.href = '?module=Gbaopen&action=Create&cus=' + cus;
     });
 
-    $('.leftbox ul,#listtbody').on('click', ".delete", function() {
+    $('.leftbox ul,#listtbody').on('click', ".delete", function () {
         var cus = $(this).parent().parent().find('input:hidden').attr('value'),
-                html = '<div class="userdata-content"><p style="font-size:20px;">确定删除此客户？</p>\
+            html = '<div class="userdata-content"><p style="font-size:20px;">确定删除此客户？</p>\
                     <input type="hidden" class="Input" value="' + cus + '"></div>';
         $(".dialog-content a.dia-ok").addClass('godelete');
         popup(html);
     });
-    $('.leftbox ul,#listtbody').on('click', ".reduction", function() {
+    $('.leftbox ul,#listtbody').on('click', ".reduction", function () {
         var cus = $(this).parent().parent().find('input:hidden').attr('value'),
-                html = '<div class="userdata-content"><p style="font-size:20px;">确定还原此客户？</p>\
+            html = '<div class="userdata-content"><p style="font-size:20px;">确定还原此客户？</p>\
                     <input type="hidden" class="Input" value="' + cus + '"></div>';
         $(".dialog-content a.dia-ok").addClass('reduction');
         popup(html);
     });
-    $('.leftbox ul,#listtbody').on('click', ".sitemove", function() {
-        var option_html="";
+    $('.leftbox ul,#listtbody').on('click', ".sitemove", function () {
+        var option_html = "";
         var cus = $(this).parent().parent().find('input:hidden').attr('value');
-        var fuwuqiid=0;
+        var fuwuqiid = 0;
         $.ajax({
-            url:"Apps?module=Gbaopen&action=Operation&type=sitemove&cus=" + cus,
-            async:false,
-            type:"GET",
-            dataType:"json",
-            success:function(result){
+            url: "Apps?module=Gbaopen&action=Operation&type=sitemove&cus=" + cus,
+            async: false,
+            type: "GET",
+            dataType: "json",
+            success: function (result) {
                 if (!result.err) {
-                    fuwuqiid=result.data.FuwuqiID;
-                }else {
+                    fuwuqiid = result.data.FuwuqiID;
+                } else {
                     Msg(2, result.msg);
                 }
             }
         });
         $.ajax({
-            url:"Apps?module=Gbaopen&action=getFuwuqi",
-            async:false,
-            type:"GET",
-            dataType:"json",
-            success:function(data){
-                var lists=$.parseJSON(data);
-                $.each(lists,function(k,v){
-                    if(fuwuqiid!=v["ID"]){
-                        option_html+='<option value="'+v["ID"]+'">'+v["FuwuqiName"]+'</option>';
+            url: "Apps?module=Gbaopen&action=getFuwuqi",
+            async: false,
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                var lists = $.parseJSON(data);
+                $.each(lists, function (k, v) {
+                    if (fuwuqiid != v["ID"]) {
+                        option_html += '<option value="' + v["ID"] + '">' + v["FuwuqiName"] + '</option>';
                     }
                 });
             }
         });
         var cus = $(this).parent().parent().find('input:hidden').attr('value'),
-                html = '<div class="userdata-content"><p style="font-size:20px;">确定进行客户迁移？</p>\n\
+            html = '<div class="userdata-content"><p style="font-size:20px;">确定进行客户迁移？</p>\n\
                             <p>\
                                 <input type="hidden" class="Input" value="' + cus + '">\
                                 <span class="content-l">FTP:</span>\n\
@@ -1038,7 +1064,7 @@ jQuery(document).ready(function() {
                             </div>\n\
                             <div class="FTP_1" style="display:none;padding-top: 25px;">\n\
                                 <span class="content-l">服务器选择:</span>\n\
-                                <select class="Input" id="FuwuqiID">'+option_html+'</select>\n\
+                                <select class="Input" id="FuwuqiID">' + option_html + '</select>\n\
                             </div>\n\
                             <span style="color:red;">注:迁移成功之后,请重新解析域名</span>\
                         </div>';
@@ -1047,7 +1073,7 @@ jQuery(document).ready(function() {
     });
 
     /*管理模块*/
-    $('.leftbox ul,#listtbody').on('click', ".g-manage", function() {
+    $('.leftbox ul,#listtbody').on('click', ".g-manage", function () {
         var cus = $(this).parent().parent().find('input:hidden').attr('value');
         var url = '?module=Gbaopen&action=GbaoPenManage';
         window.open(url + '&ID=' + cus, '正在跳转');
@@ -1055,16 +1081,16 @@ jQuery(document).ready(function() {
     /**
      * 微传单
      */
-    $('.leftbox ul,#listtbody').on('click', ".g-show", function() {
+    $('.leftbox ul,#listtbody').on('click', ".g-show", function () {
         var cus = $(this).parent().parent().find('input:hidden').attr('value');
-        var html="";
+        var html = "";
         $.ajax({
-            url:'/Apps?module=Gbaopen&action=getGshow',
-            type:'POST',
-            data:{num:cus},
-            async:false,
-            success:function(data){
-                if(data.data==false){
+            url: '/Apps?module=Gbaopen&action=getGshow',
+            type: 'POST',
+            data: {num: cus},
+            async: false,
+            success: function (data) {
+                if (data.data == false) {
                     html = '<div class="userdata-content"><p style="font-size:20px;">是否开通该客户E推？</p>\
                         <input type="hidden" class="Input" value="' + cus + '">\n\
                             <p>\n\
@@ -1078,7 +1104,7 @@ jQuery(document).ready(function() {
                             $(".userdata-content .years-money").text($(this).val() +"000.00");\n\
                         });\n\
                 </script>';
-                }else{
+                } else {
                     html = '<div class="userdata-content"><p style="font-size:20px;">是否续费该客户E推？</p>\
                         <input type="hidden" class="Input" value="' + cus + '">\n\
                             <p>\n\
@@ -1128,18 +1154,19 @@ jQuery(document).ready(function() {
         $(".dialog-content a.dia-ok").addClass('g-show');
         popup(html);
     });
-    function morecapacity(months,oldcapacity){
-        var old_single_money=($(".userdata-content input[name='morecapacity'][value='"+oldcapacity+"']").data("money")?$(".userdata-content input[name='morecapacity'][value='"+oldcapacity+"']").data("money"):0);
-        $(".userdata-content input[name='morecapacity'][value='"+oldcapacity+"']").prop("checked",true);
-        $(".userdata-content input[name='morecapacity'][value='"+oldcapacity+"']").parent("span").prevAll().hide();
+    function morecapacity(months, oldcapacity) {
+        var old_single_money = ($(".userdata-content input[name='morecapacity'][value='" + oldcapacity + "']").data("money") ? $(".userdata-content input[name='morecapacity'][value='" + oldcapacity + "']").data("money") : 0);
+        $(".userdata-content input[name='morecapacity'][value='" + oldcapacity + "']").prop("checked", true);
+        $(".userdata-content input[name='morecapacity'][value='" + oldcapacity + "']").parent("span").prevAll().hide();
         $(".userdata-content input[name='morecapacity']").unbind();
-        $(".userdata-content input[name='morecapacity']").change(function(){
-            var new_single_money=$(".userdata-content input[name='morecapacity']:checked").data("money");
-            $(".userdata-content .price").val((new_single_money-old_single_money).toFixed(0)+"元");
+        $(".userdata-content input[name='morecapacity']").change(function () {
+            var new_single_money = $(".userdata-content input[name='morecapacity']:checked").data("money");
+            $(".userdata-content .price").val((new_single_money - old_single_money).toFixed(0) + "元");
         });
     }
+
     /*扩容模块*/
-    $('.leftbox ul,#listtbody').on('click', ".morecapacity", function() {
+    $('.leftbox ul,#listtbody').on('click', ".morecapacity", function () {
         var cus = $(this).parent().parent().find('input:hidden').attr('value'),
             html = '<div class="userdata-content"><p style="font-size:20px;">确定扩展此客户容量？</p>\
                         <input type="hidden" class="Input" value="' + cus + '">\n\
@@ -1157,13 +1184,13 @@ jQuery(document).ready(function() {
         $(".dialog-content a.dia-ok").addClass('morecapacity');
         popup(html);
         $.ajax({
-            url:"Apps?module=Gbaopen&action=getCusCapacityInfo",
-            async:false,
-            type:"POST",
-            data:{num:cus},
-            success:function(result){
+            url: "Apps?module=Gbaopen&action=getCusCapacityInfo",
+            async: false,
+            type: "POST",
+            data: {num: cus},
+            success: function (result) {
                 if (!result.err) {
-                    morecapacity(result.months,result.capacity/1024/1024);
+                    morecapacity(result.months, result.capacity / 1024 / 1024);
                 } else {
                     Msg(2, result.msg);
                 }
@@ -1171,12 +1198,12 @@ jQuery(document).ready(function() {
         });
     });
     //案例双站选择效果
-    $(".dialog-content").on('click', "#caseCho1 span", function() {
+    $(".dialog-content").on('click', "#caseCho1 span", function () {
         var _this = this;
         var num = $(_this).index();
         if ($(_this).css("z-index") != 10) {
             $(_this).css("z-index", "10");
-            $("#caseCho1 span").animate({width: 66, borderRadius: 33, left: -35}, function() {
+            $("#caseCho1 span").animate({width: 66, borderRadius: 33, left: -35}, function () {
                 $(_this).addClass("cur").siblings().css("visibility", "hidden");
                 function load() {
                     //加载图标动画
@@ -1186,8 +1213,8 @@ jQuery(document).ready(function() {
                     var caseType = num == 0 ? 'PC' : '手机';
                     var colortag = '', html = '';
                     var simgurl = data.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + data.img[0] + '">如未选择，则默认上次上传的图片：<img src="' + data.img[0] + '" style="width: 100%;"></a></span></span>' : '',
-                            imgurl = data.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + data.img[1] + '">如未选择，则默认上次上传的图片：<img src="' + data.img[1] + '" style="width: 100%;"></a></span></span>' : '';
-                    $.each(colorInit, function(i1, v1) {
+                        imgurl = data.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + data.img[1] + '">如未选择，则默认上次上传的图片：<img src="' + data.img[1] + '" style="width: 100%;"></a></span></span>' : '';
+                    $.each(colorInit, function (i1, v1) {
                         if (data.color == false) {
                             colortag += '<span data="' + v1 + '"' + (v1 == 'colorful' ? '' : ' style="background-color:' + colorData[v1][0] + ';"') + '>' + colorData[v1][1] + '</span>';
                         } else {
@@ -1199,7 +1226,7 @@ jQuery(document).ready(function() {
                         }
                     });
                     var long = '', small = '', mid = '';
-                    $.each(dataInit.tag, function(i2, v2) {
+                    $.each(dataInit.tag, function (i2, v2) {
                         var cur = data.tag != false ? $.inArray(i2, data.tag) != -1 ? 'class="cur"' : '' : '';
                         if (v2.length > 8) {
                             long += '<span ' + cur + ' data="' + i2 + '">' + v2 + '</span>';
@@ -1225,17 +1252,17 @@ jQuery(document).ready(function() {
                     $("#caseCho2").html(html);
                     //圆圈扩散动画
                     $(_this).animate(
-                            {width: 1000, top: -500, left: -520, height: 1000, borderRadius: 533},
-                    function() {
-                        //圆圈缩小动画
-                        $(_this).animate(
+                        {width: 1000, top: -500, left: -520, height: 1000, borderRadius: 533},
+                        function () {
+                            //圆圈缩小动画
+                            $(_this).animate(
                                 {width: 66, top: -66, left: -35, height: 66, borderRadius: 33, opacity: 0},
-                        function() {
-                            $("#caseCho1").remove();
+                                function () {
+                                    $("#caseCho1").remove();
+                                }
+                            );
+                            $("#caseCho2").css("visibility", "visible");
                         }
-                        );
-                        $("#caseCho2").css("visibility", "visible");
-                    }
                     );
                 }
                 ;
@@ -1245,13 +1272,18 @@ jQuery(document).ready(function() {
     });
 
     /*弹窗数据处理ajax请求*/
-    $(".dialog-content a.dia-ok").click(function() {
+    $(".dialog-content a.dia-ok").click(function () {
         var number = $(".userdata-content input[type='hidden']").val();
         if ($(this).hasClass("gorenew")) {
             var year = $(".userdata-content select").children("option:selected").val(),
                 capacity = $(".userdata-content input[name='capacity']:checked").val(),
-                    money = $(".userdata-content input[name='money']").val();
-            $.post("Apps?module=Gbaopen&action=Renew", {num: number,capacity:capacity,price: money, yearnum: year}, function(result) {
+                money = $(".userdata-content input[name='money']").val();
+            $.post("Apps?module=Gbaopen&action=Renew", {
+                num: number,
+                capacity: capacity,
+                price: money,
+                yearnum: year
+            }, function (result) {
                 if (!result.err) {
                     Msg(3, result.data.name + "已成功续费修改");
                 } else {
@@ -1262,10 +1294,10 @@ jQuery(document).ready(function() {
         } else if ($(this).hasClass("gomodify")) {
             var input = $(".userdata-content input[type!='hidden']"), data = {};
             data.num = number;
-            $.each(input, function(i, v) {
+            $.each(input, function (i, v) {
                 data[v.name] = v.value;
             })
-            $.post("Apps?module=Gbaopen&action=Modify", data, function(result) {
+            $.post("Apps?module=Gbaopen&action=Modify", data, function (result) {
                 if (!result.err) {
                     Msg(3, result.data.name + "的信息已成功修改");
                 } else {
@@ -1276,7 +1308,7 @@ jQuery(document).ready(function() {
         } else if ($(this).hasClass("gocustransfer")) {
             var select = $(".userdata-content select").children("option:selected").val();
             if (select != undefined) {
-                $.post("Apps?module=Gbaopen&action=Custransfer", {num: number, id: select}, function(result) {
+                $.post("Apps?module=Gbaopen&action=Custransfer", {num: number, id: select}, function (result) {
                     if (!result.err) {
                         Msg(3, result.data.name + "的信息已成功转移");
                         $(".leftbox ul>input[value='" + number + "'],#listtbody tr>input[value='" + number + "']").parent().remove();
@@ -1290,8 +1322,8 @@ jQuery(document).ready(function() {
             $(".dialog-content a.dia-ok").removeClass('gocustransfer');
         } else if ($(this).hasClass("goprocessing")) {
             var input = $(".userdata-content input[type!='hidden'][type='text']"),
-                    data = '{';
-            $.each(input, function(i, v) {
+                data = '{';
+            $.each(input, function (i, v) {
                 data += '"' + v.name + '":"' + v.value + '",';
             })
             data += '"pc_mobile":"' + $("input[type=\'radio\'][name=\'pc_mobile\']:checked").val() + '",';
@@ -1300,7 +1332,7 @@ jQuery(document).ready(function() {
             data += '"outpc_add":"' + $("input[type=\'checkbox\'][name=\'outpc_add\']").is(':checked') + '",';
             data += '"num":' + number + '}';
             data = $.parseJSON(data);
-            $.post("Apps?module=Gbaopen&action=Processing", data, function(result) {
+            $.post("Apps?module=Gbaopen&action=Processing", data, function (result) {
                 if (!result.err) {
                     Msg(3, result.data.name + "的网站信息已成功修改");
                 } else {
@@ -1309,7 +1341,7 @@ jQuery(document).ready(function() {
             });
             $(".dialog-content a.dia-ok").removeClass('goprocessing');
         } else if ($(this).hasClass("godelete")) {
-            $.post("Apps?module=Agent&action=DeleteCustomer", {num: number}, function(result) {
+            $.post("Apps?module=Agent&action=DeleteCustomer", {num: number}, function (result) {
                 if (!result.err) {
                     Msg(3, result.data.name + "已成功删除");
                 } else {
@@ -1318,7 +1350,7 @@ jQuery(document).ready(function() {
             });
             $(".dialog-content a.dia-ok").removeClass('godelete');
         } else if ($(this).hasClass("reduction")) {
-            $.post("Apps?module=Agent&action=reductionCustomer", {num: number}, function(result) {
+            $.post("Apps?module=Agent&action=reductionCustomer", {num: number}, function (result) {
                 if (!result.err) {
                     Msg(3, result.data.name + "已成功还原");
                 } else {
@@ -1327,22 +1359,22 @@ jQuery(document).ready(function() {
             });
             $(".dialog-content a.dia-ok").removeClass('reduction');
         } else if ($(this).hasClass("sitemove")) {
-            var data={};
+            var data = {};
 //            var FTP=$('input[name=FTP]:checked').val();
-            data["FTP"]=$('.userdata-content input[name=FTP]:checked').val();
-            data["num"]=number;
-            if(data["FTP"]==1){
-                data["FuwuqiID"]=$('.userdata-content #FuwuqiID').val();
-            }else{
-                data["address"]=$('.userdata-content #address').val();
-                data["user"]=$('.userdata-content #user').val();
-                data["pwd"]=$('.userdata-content #pwd').val();
-                data["ftp_url"]=$('.userdata-content #ftp_url').val();
-                data["port"]=$('.userdata-content #port').val();
-                data["dir"]=$('.userdata-content #dir').val();
+            data["FTP"] = $('.userdata-content input[name=FTP]:checked').val();
+            data["num"] = number;
+            if (data["FTP"] == 1) {
+                data["FuwuqiID"] = $('.userdata-content #FuwuqiID').val();
+            } else {
+                data["address"] = $('.userdata-content #address').val();
+                data["user"] = $('.userdata-content #user').val();
+                data["pwd"] = $('.userdata-content #pwd').val();
+                data["ftp_url"] = $('.userdata-content #ftp_url').val();
+                data["port"] = $('.userdata-content #port').val();
+                data["dir"] = $('.userdata-content #dir').val();
             }
             Msg(1, '<span>正在处理，请稍等...</span><span class="flower-loader" style="opacity: 1;"></span>');
-            $.post("Apps?module=Gbaopen&action=SiteMove", data, function(result) {
+            $.post("Apps?module=Gbaopen&action=SiteMove", data, function (result) {
                 if (!result.err) {
                     Msg(3, result.data.name + "已成功迁移");
                 } else {
@@ -1351,11 +1383,11 @@ jQuery(document).ready(function() {
             });
             $(".dialog-content a.dia-ok").removeClass('sitemove');
         } else if ($(this).hasClass("morecapacity")) {
-            var data={};
-            data["morecapacity"]=$('.userdata-content input[name=morecapacity]:checked').val();
-            data["num"]=number;
+            var data = {};
+            data["morecapacity"] = $('.userdata-content input[name=morecapacity]:checked').val();
+            data["num"] = number;
             Msg(1, '<span>正在处理，请稍等...</span><span class="flower-loader" style="opacity: 1;"></span>');
-            $.post("Apps?module=Gbaopen&action=morecapacity", data, function(result) {
+            $.post("Apps?module=Gbaopen&action=morecapacity", data, function (result) {
                 if (!result.err) {
                     Msg(3, result.data.name + "已成功扩容");
                 } else {
@@ -1364,12 +1396,12 @@ jQuery(document).ready(function() {
             });
             $(".dialog-content a.dia-ok").removeClass('morecapacity');
         } else if ($(this).hasClass("g-show")) { //===E推提交
-            var data={};
-            data["year"]=$('.userdata-content .years').val();
-            data["money"]=$('.userdata-content .years-money').text();
-            data["num"]=number;
+            var data = {};
+            data["year"] = $('.userdata-content .years').val();
+            data["money"] = $('.userdata-content .years-money').text();
+            data["num"] = number;
             Msg(1, '<span>正在处理，请稍等...</span><span class="flower-loader" style="opacity: 1;"></span>');
-            $.post("Apps?module=Gbaopen&action=Gshow", data, function(result) {
+            $.post("Apps?module=Gbaopen&action=Gshow", data, function (result) {
                 if (!result.err) {
                     Msg(3, result.msg);
                 } else {
@@ -1414,7 +1446,7 @@ jQuery(document).ready(function() {
                 fileElementId: ['imgupload', 'simgupload'], //文件上传域的ID
                 dataType: 'json',
                 data: {num: number, areaID: area, color: color, tag: tag, type: caseType},
-                success: function(result, status)  //服务器成功响应处理函数
+                success: function (result, status)  //服务器成功响应处理函数
                 {
                     if (!result.err) {
                         if (area == 0) {
@@ -1434,7 +1466,7 @@ jQuery(document).ready(function() {
                         Msg(2, result.msg);
                     }
                 },
-                error: function(data, status, e)//服务器响应失败处理函数
+                error: function (data, status, e)//服务器响应失败处理函数
                 {
                     console.log(e);
                 }
@@ -1443,7 +1475,7 @@ jQuery(document).ready(function() {
             cases.children("ul").hide("slow");
             $(".dialog-content a.dia-ok").removeClass('goimgupload');
         }
-        $('#dialog-box').toggle("slow", function() {
+        $('#dialog-box').toggle("slow", function () {
             $("#dialog-overlay").slideUp("fast");
         });
         $('#dialog-message').html('');
