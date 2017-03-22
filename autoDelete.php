@@ -8,12 +8,12 @@ include './ExpressPHP.Init.php';
 $time=time();
 $day=date("Y-m-d",$time);
 $dtot=strtotime($day);
-$run_time=$dtot+57566;
+$run_time=$dtot+67576;
 // $run_time=$dtot+86400;//第一次执行时间
-$interval=10;
+$interval=60;
 // $interval=86400;//自动执行间隔
 
-$GbpenApps = new InterfaceApps();
+$GbpenApps1 = new InterfaceApps();
 $module = "AutoDelete";
 $action = "DeleteCustomer";
 if($module=='')
@@ -37,8 +37,8 @@ do {
   sleep($loop); 
   
   //执行动作
-  $GbpenApps->Run($module, $action);
-  unset($GbpenApps);
+  $GbpenApps1->Run($module, $action);
+  unset($GbpenApps1);
 
   @rmdir('./cron-run'); // 删除cron-run来告诉程序，这个定时任务已经在执行过程中，不能再执行一个新的同样的任务
 
