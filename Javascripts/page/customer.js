@@ -1155,13 +1155,15 @@ jQuery(document).ready(function () {
         popup(html);
     });
     function morecapacity(months, oldcapacity) {
-        var old_single_money = ($(".userdata-content input[name='morecapacity'][value='" + oldcapacity + "']").data("money") ? $(".userdata-content input[name='morecapacity'][value='" + oldcapacity + "']").data("money") : 0);
+        var old_single_money = ($(".userdata-content input[name='morecapacity'][value='" + oldcapacity + "']").data("money") ?
+            $(".userdata-content input[name='morecapacity'][value='" + oldcapacity + "']").data("money") : 0);
         $(".userdata-content input[name='morecapacity'][value='" + oldcapacity + "']").prop("checked", true);
         $(".userdata-content input[name='morecapacity'][value='" + oldcapacity + "']").parent("span").prevAll().hide();
         $(".userdata-content input[name='morecapacity']").unbind();
         $(".userdata-content input[name='morecapacity']").change(function () {
             var new_single_money = $(".userdata-content input[name='morecapacity']:checked").data("money");
-            $(".userdata-content .price").val((new_single_money - old_single_money).toFixed(0) + "元");
+            // $(".userdata-content .price").val(((new_single_money - old_single_money) * months / 12).toFixed(0) + "元");
+            $(".userdata-content .price").val((new_single_money).toFixed(0) + "元");
         });
     }
 
