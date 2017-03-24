@@ -1049,7 +1049,7 @@ class Gbaopen extends InterfaceVIEWS
                 $Data['Mobile_EndTime'] = date('Y-m-d H:i:s', $Data['Mobile_EndTime']);
             }
             //中英关联			
-            $linkcus = $post['othercus'] ? $post['othercus'] : 0;			
+            $linkcus = $post['othercus'] ? $post['othercus'] : 0;
             $Data['Link_Cus'] = $linkcus ? $cuspromodel->GetOneByWhere('where G_name=\'' . $linkcus . '\'') ? $linkcus : 0 : 0;
 //			file_put_contents('link.txt','date is '.$Data['Link_Cus']);
             //模板号域名处理
