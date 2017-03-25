@@ -382,7 +382,6 @@ jQuery(document).ready(function () {
             _this.type = $(".pagebox").prev()[0].tagName.toLowerCase() == 'form' ? "tr" : "li";
             _this.onLoad();
             _this.response = $.get("Apps?module=Gbaopen&action=CusInit&type=" + _this.type, function (result) {
-                console.log(result);
                 var place = '<ul class="one"><span>▬▶</span>\n\
                             <li data="0">关闭</li>\n';
                 $.each(result.data.area, function (i1, v1) {
@@ -419,7 +418,8 @@ jQuery(document).ready(function () {
                         operation[0] += '<a href="javascript:;" class="custransfer"> 客户转接 </a>';
                     else if (v2 == 'manage') {
                         operation[0] += '<a href="javascript:;" class="g-show"> E推 </a>';
-                        operation[0] += '<a href="javascript:;" class="g-manage"> 管理 </a>';
+                        operation[0] += '<a href="javascript:;" class="g-show-manage"> E推管理 </a>';
+                        operation[0] += '<a href="javascript:;" class="g-manage"> 平台管理 </a>';
                     } else if (v2 == 'create')
                         operation[1] = '<a href="javascript:;" class="g-create"> 开通 </a>';
                     else if (v2 == 'delete') {
@@ -1079,95 +1079,179 @@ jQuery(document).ready(function () {
         window.open(url + '&ID=' + cus, '正在跳转');
     });
     /**
-     * 微传单
+     * E推管理
+     */
+    $('.leftbox ul,#listtbody').on('click', ".g-show-manage", function () {
+        var cus = $(this).parent().parent().find('input:hidden').attr('value');
+        var url = '?module=Gbaopen&action=EtuiManage';
+        window.open(url + '&ID=' + cus, '正在跳转');
+    });
+    /**
+     * E推
      */
     $('.leftbox ul,#listtbody').on('click', ".g-show", function () {
         var cus = $(this).parent().parent().find('input:hidden').attr('value');
         var html = "";
+        var htmljs = "";
         $.ajax({
             url: '/Apps?module=Gbaopen&action=getGshow',
             type: 'POST',
             data: {num: cus},
             async: false,
             success: function (data) {
+                console.log(data);
                 if (data.data == false) {
-                    html = '<div class="userdata-content"><p style="font-size:20px;">是否开通该客户E推？</p>\
+                    html = '<div class="userdata-content"><p style="font-size:20px;">是否开通该客户E推？</p>\n\
                         <input type="hidden" class="Input" value="' + cus + '">\n\
                             <p>\n\
-                                <span class="content-l">年限:</span>\n\
-                                <input class="Input years" type="number" min="1" value="1"/>\n\
-                                ￥<span class="years-money">1000.00</span>\n\
+                                <span class="content-l">套餐:</span>\n\
+                                <input class="" name="e-combo" type="radio" data-money="0" value="0" checked/>免费版\n\
+                                <input class="" name="e-combo" type="radio" data-money="388" value="1"/>基础版\n\
+                                <input class="" name="e-combo" type="radio" data-money="688" value="2"/>普通版\n\
+                                <input class="" name="e-combo" type="radio" data-money="1388" value="3"/>升级版\n\
+                                <input class="" name="e-combo" type="radio" data-money="0" value="4"/>定制版\n\
+                                <input class="Input" style="display: none;" name="e-combo-custom" type="number" min="1" value="" placeholder="输入价格"/>\n\
                             </p>\n\
-                    </div>\n\
-                    <script type="text/javascript">\n\
-                        $(".userdata-content .years").change(function(){\n\
-                            $(".userdata-content .years-money").text($(this).val() +"000.00");\n\
+                            <p>\n\
+                                <span class="content-l">年限:</span>\n\
+                                <input class="" name="e-year" type="radio" data-years="1" value="1" checked/>1年\n\
+                                <input class="" name="e-year" type="radio" data-years="2" value="2"/>2年\n\
+                                <input class="" name="e-year" type="radio" data-years="3" value="3"/>3年\n\
+                                <input class="" name="e-year" type="radio" data-years="5" value="5"/>5年\n\
+                            </p>\n\
+                            <p>\n\
+                                <span class="content-l">价格:</span>\n\
+                                ￥<span class="combo-year-money">0.00</span>\n\
+                            </p>\n\
+                        </div>';
+                    htmljs = '<script type="text/javascript">\n\
+                        var year = 1, combo = 0, combo_year_money = 0;\n\
+                        $(".userdata-content [name=\'e-combo\']").change(function(){\n\
+                            if($(this).val() == 4) {\n\
+                                $(".userdata-content [name=\'e-combo-custom\']").show();\n\
+                                combo = 0;\n\
+                                combo_year_change();\n\
+                            }else{\n\
+                                $(".userdata-content [name=\'e-combo-custom\']").hide();\n\
+                                combo = $(this).data("money");\n\
+                                combo_year_change();\n\
+                            }\n\
                         });\n\
+                        $(".userdata-content [name=\'e-combo-custom\']").focusout(function(){\n\
+                            combo = $(this).val();\n\
+                            combo_year_change();\n\
+                        });\n\
+                        $(".userdata-content [name=\'e-year\']").change(function(){\n\
+                            year = $(this).data("years");\n\
+                            combo_year_change();\n\
+                        });\n\
+                        $(".userdata-content [name=\'e-year-custom\']").focusout(function(){\n\
+                            year = parseInt($(this).val());\n\
+                            combo_year_change();\n\
+                        });\n\
+                        function combo_year_change(){\n\
+                            combo_year_money = year * combo;\n\
+                            $(".userdata-content .combo-year-money").text(combo_year_money);\n\
+                        };\n\
                 </script>';
                 } else {
+                    $(".g-show-manage").prop('display','block');
                     html = '<div class="userdata-content"><p style="font-size:20px;">是否续费该客户E推？</p>\
                         <input type="hidden" class="Input" value="' + cus + '">\n\
                             <p>\n\
+                                <span class="content-l">套餐:</span>\n\
+                                <input class="" name="e-combo" type="radio" data-money="0" value="0" checked/>免费版\n\
+                                <input class="" name="e-combo" type="radio" data-money="388" value="1"/>基础版\n\
+                                <input class="" name="e-combo" type="radio" data-money="688" value="2"/>普通版\n\
+                                <input class="" name="e-combo" type="radio" data-money="1388" value="3"/>升级版\n\
+                                <input class="" name="e-combo" type="radio" data-money="0" value="4"/>定制版\n\
+                                <input class="Input" style="display: none;" name="e-combo-custom" type="number" min="1" value="" placeholder="输入价格"/>\n\
+                            </p>\n\
+                            <p>\n\
                                 <span class="content-l">年限:</span>\n\
-                                <input class="Input years" type="number" min="1" value="1"/>\n\
-                                ￥<span class="years-money">1000.00</span>\n\
+                                <input class="" name="e-year" type="radio" data-years="1" value="1" checked/>1年\n\
+                                <input class="" name="e-year" type="radio" data-years="2" value="2"/>2年\n\
+                                <input class="" name="e-year" type="radio" data-years="3" value="3"/>3年\n\
+                                <input class="" name="e-year" type="radio" data-years="5" value="5"/>5年\n\
                             </p>\n\
                             <p>\n\
                                 <span class="content-l">续费至:</span>\n\
                                 <input class="Input date" name="date" type="text" value="" disabled="true"/>\n\
+                                ￥<span class="combo-year-money">0.00</span>\n\
                             </p>\n\
-                    </div>\n\
-                    <script type="text/javascript">\n\
-                    var jsUserdata = function (){\n\
-                        theTime=(new Date()).Format("yyyy-MM-dd hh:mm:ss");\n\
-                        this.radioCho;\n\
-                        this.year;\n\
-                        var _this = this;\n\
-                        ;this.EndTime = "' + data.data.EndTime + '">theTime?"' + data.data.EndTime + '":theTime;\n\
-                        ;this.change = function(){\n\
-                            _this.year = $(".userdata-content .years").val();\n\
-                            $(".userdata-content .years").change(function(){\n\
-                                _this.year = $(this).val();\n\
-                                _this.reset();\n\
-                                $(".userdata-content .years-money").text(_this.year +"000.00");\n\
-                                $(".userdata-content [name=\'money\']").val(_this.year +"000.00");\n\
+                        </div>';
+                    htmljs = '<script type="text/javascript">\n\
+                        var jsUserdata = function (){\n\
+                            var theTime, EndTime, newyear;\n\
+                            var year = 1, combo = 0, combo_year_money = 0;\n\
+                            theTime = (new Date()).Format("yyyy-MM-dd hh:mm:ss");\n\
+                            EndTime = "' + data.data.EndTime + '" > theTime ? "' + data.data.EndTime + '" : theTime;\n\
+                            var icombo = ' + data.data.combo + ';\n\
+                            $(".userdata-content [name=\'e-combo\']").change(function(){\n\
+                                if($(this).val() == 4) {\n\
+                                    $(".userdata-content [name=\'e-combo-custom\']").show();\n\
+                                    combo = 0;\n\
+                                    combo_year_change();\n\
+                                }else{\n\
+                                    $(".userdata-content [name=\'e-combo-custom\']").hide();\n\
+                                    combo = $(this).data("money");\n\
+                                    combo_year_change();\n\
+                                }\n\
                             });\n\
-                        };\n\
-                        this.reset = function(){\n\
-                            var newyear;\n\
-                            newyear = new Date(_this.EndTime);\n\
-                            newyear.setFullYear(parseInt(newyear.getFullYear())+parseInt(_this.year));\n\
-                            newyear = newyear.Format("yyyy-MM-dd hh:mm:ss");\n\
-                            $(".userdata-content input[name=\'date\']").val(newyear);\n\
-                        }\n\
-                        this.init = function(){\n\
-                            this.change();\n\
-                            this.reset();\n\
-                            $(".userdata-content .years").change();\n\
-                        },\n\
-                        this.init();\n\
-                    }();\n\
-                    </script>';
+                            $(".userdata-content [name=\'e-combo-custom\']").focusout(function(){\n\
+                                combo = $(this).val();\n\
+                                combo_year_change();\n\
+                            });\n\
+                            $(".userdata-content [name=\'e-year\']").change(function(){\n\
+                                year = $(this).data("years");\n\
+                                combo_year_change();\n\
+                                reset();\n\
+                            });\n\
+                            function reset(){\n\
+                                newyear = new Date(EndTime);\n\
+                                newyear.setFullYear(parseInt(newyear.getFullYear())+parseInt(year));\n\
+                                newyear = newyear.Format("yyyy-MM-dd hh:mm:ss");\n\
+                                $(".userdata-content input[name=\'date\']").val(newyear);\n\
+                            };\n\
+                            function combo_year_change(){\n\
+                                combo_year_money = year * combo;\n\
+                                $(".userdata-content .combo-year-money").text(combo_year_money);\n\
+                            };\n\
+                            function init(){\n\
+                                if(icombo == null){\n\
+                                    combo = 0;\n\
+                                }else{\n\
+                                    $(".userdata-content [name=\'e-combo\'][value=\'"+icombo+"\']").prop("checked", "checked");\n\
+                                    $(".userdata-content [name=\'e-combo\']:lt(\'"+icombo+"\')").prop("disabled", "disabled");\n\
+                                    combo = $(".userdata-content [name=\'e-combo\'][value=\'"+icombo+"\']").data("money");\n\
+                                }\n\
+                            }\n\
+                            init();\n\
+                            reset();\n\
+                            combo_year_change();\n\
+                        }();\n\
+                        </script>';
                 }
             }
         });
         $(".dialog-content a.dia-ok").addClass('g-show');
-        popup(html);
+        popup(html + htmljs);
     });
+
     function morecapacity(months, oldcapacity) {
-		console.log("month:"+months);
-		console.log("oldcapacity:"+oldcapacity);
+        console.log("month:" + months);
+        console.log("oldcapacity:" + oldcapacity);
         var old_single_money = ($(".userdata-content input[name='morecapacity'][value='" + oldcapacity + "']").data("money") ?
             $(".userdata-content input[name='morecapacity'][value='" + oldcapacity + "']").data("money") : 0);
-       // $(".userdata-content input[name='morecapacity'][value='" + oldcapacity + "']").prop("checked", true);
+        // $(".userdata-content input[name='morecapacity'][value='" + oldcapacity + "']").prop("checked", true);
         $(".userdata-content input[name='morecapacity'][value='" + oldcapacity + "']").parent("span").prevAll().hide();
         $(".userdata-content input[name='morecapacity']").unbind();
         $(".userdata-content input[name='morecapacity']").change(function () {
             var new_single_money = $(".userdata-content input[name='morecapacity']:checked").data("money");
-	        // $(".userdata-content .price").val(((new_single_money - old_single_money) * months / 12).toFixed(0) + "元");
+            // $(".userdata-content .price").val(((new_single_money - old_single_money) * months / 12).toFixed(0) + "元");
             $(".userdata-content .price").val((new_single_money).toFixed(0) + "元");
-			console.log("new_single_money:"+new_single_money);
-			console.log("old_single_money:"+old_single_money);
+            console.log("new_single_money:" + new_single_money);
+            console.log("old_single_money:" + old_single_money);
 
         });
     }
@@ -1404,9 +1488,10 @@ jQuery(document).ready(function () {
             $(".dialog-content a.dia-ok").removeClass('morecapacity');
         } else if ($(this).hasClass("g-show")) { //===E推提交
             var data = {};
-            data["year"] = $('.userdata-content .years').val();
-            data["money"] = $('.userdata-content .years-money').text();
-            data["num"] = number;
+            data["year"] = $('.userdata-content [name="e-year"]:checked').val();//开通年限
+            data["combo"] = $('.userdata-content [name="e-combo"]:checked').val();//开通版本
+            data["money"] = $('.userdata-content .combo-year-money').text();//开通价格
+            data["num"] = number;//？
             Msg(1, '<span>正在处理，请稍等...</span><span class="flower-loader" style="opacity: 1;"></span>');
             $.post("Apps?module=Gbaopen&action=Gshow", data, function (result) {
                 if (!result.err) {
