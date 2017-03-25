@@ -2970,7 +2970,8 @@ class Gbaopen extends InterfaceVIEWS
         $result = array('err' => 0, 'data' => '', 'msg' => '');
         $post = $this->_POST;
         $money = $post["money"];
-        $agent_id = (int)$_SESSION ['AgentID'];
+        $combo = $post["combo"]; //add
+        $agent_id = (int)$_SESSION['AgentID'];
         $cus_id = $post["num"];
         $gshow = new GshowModule();
         $logcost = new LogcostModule();
@@ -2981,6 +2982,8 @@ class Gbaopen extends InterfaceVIEWS
             $nowtime = strtotime($gshowinfo["EndTime"]) > time() ? strtotime($gshowinfo["EndTime"]) : time();
             $madify_info["EndTime"] = (date('Y', $nowtime) + $post["year"]) . '-' . date('m-d H:i:s', $nowtime);
             $madify_info["UpdateTime"] = date('Y-m-d H:i:s', time());
+            $madify_info["UpdateTime"] = date('Y-m-d H:i:s', time());
+            $madify_info["combo"] = $combo;
             $ret = $gshow->UpdateArray($madify_info, array("CustomersID" => $post["num"]));
             if ($ret) {
 //                $ret['code'] = 200;//$this->toGshow($madify_info);
@@ -2988,7 +2991,7 @@ class Gbaopen extends InterfaceVIEWS
                 if ($ret["code"] != 200) {//===?200是什么意思
                     $gshow->UpdateArray($gshowinfo, array("CustomersID" => $post["num"]));
                     $result["err"] = 1;
-                    $result["msg"] = "微传单同步数据$madify_info失败";
+                    $result["msg"] = "微传单同步数据失败";
                 } else {
                     // TODO:扣款操作
                     $this->consume($money, 6, $cus_id, $agent_id);
@@ -3007,6 +3010,7 @@ class Gbaopen extends InterfaceVIEWS
             $ins_info["StartTime"] = date('Y-m-d H:i:s', time());
             $ins_info["Email"] = $cust_info["Email"];
             $ins_info["CustomersID"] = $post["num"];
+            $ins_info["combo"] = $combo;
             $ret = $gshow->InsertArray($ins_info);
             if ($ret) {
                 $ret = $this->toGshow($ins_info);
@@ -3031,7 +3035,7 @@ class Gbaopen extends InterfaceVIEWS
     }
 
     /**
-     * ？
+     * 生成登录E推的验证文件
      *
      * @param $data
      * @return int|mixed
