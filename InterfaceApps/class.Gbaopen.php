@@ -1443,6 +1443,12 @@ class Gbaopen extends InterfaceVIEWS
                         $Data['G_Ftp_Address'] = $sever_msg['FTP'];
                         $Data['G_Ftp_User'] = $sever_msg['FTPName'];
                         $Data['G_Ftp_Pwd'] = $sever_msg['FTPPassword'];
+
+						//备用ftp
+                        $Data['G_Ftp_Address_B'] = $sever_msg['FTP_B'];
+                        $Data['G_Ftp_User_B'] = $sever_msg['FTPName_B'];
+                        $Data['G_Ftp_Pwd_B'] = $sever_msg['FTPPassword_B'];
+
                         $Data['G_Ftp_FwAdress'] = $sever_msg['FwAdress'];
                         $Data['G_Ftp_Duankou'] = $sever_msg['FTPDuankou'];
                         $Data['G_Ftp_Mulu'] = $sever_msg['FTPMulu'];
@@ -1934,6 +1940,12 @@ class Gbaopen extends InterfaceVIEWS
         $ToString .= '&ftp_address=' . $CustProInfo ['G_Ftp_Address'];
         $ToString .= '&ftp_user=' . $CustProInfo ['G_Ftp_User'];
         $ToString .= '&ftp_pwd=' . $CustProInfo ['G_Ftp_Pwd'];
+
+		//备用ftp
+        $ToString .= '&ftp_address_b=' . $CustProInfo ['G_Ftp_Address_B'];
+        $ToString .= '&ftp_user_b=' . $CustProInfo ['G_Ftp_User_B'];
+        $ToString .= '&ftp_pwd_b=' . $CustProInfo ['G_Ftp_Pwd_B'];
+
         $ToString .= '&weburl=' . $CustProInfo['G_Ftp_FwAdress'];
         $ToString .= '&ftp_port=' . $CustProInfo['G_Ftp_Duankou'];
         $ToString .= '&ftp_dir=' . $CustProInfo['G_Ftp_Mulu'];
@@ -2659,6 +2671,10 @@ class Gbaopen extends InterfaceVIEWS
                 $info["G_Ftp_Duankou"] = $fuwuqi_info["FTPDuankou"];
                 $info["G_Ftp_Mulu"] = $fuwuqi_info["FTPMulu"];
                 $info["FTP"] = 1;
+				//备用ftp
+                $info["G_Ftp_Address_B"] = $fuwuqi_info["FTP_B"];
+                $info["G_Ftp_User_B"] = $fuwuqi_info["FTPName_B"];
+                $info["G_Ftp_Pwd_B"] = $fuwuqi_info["FTPPassword_B"];
             } else {
                 $result['err'] = 1003;
                 $result['msg'] = '未找到该服务器';
@@ -2684,8 +2700,15 @@ class Gbaopen extends InterfaceVIEWS
             $ToString .= '&ftp_user=' . $info ['G_Ftp_User'];
             $ToString .= '&ftp_pwd=' . $info ['G_Ftp_Pwd'];
             $ToString .= '&ftp_dir=' . $info ['G_Ftp_Mulu'];
+			//ftp_b传参
+            $ToString .= '&ftp_address_b=' . $info ['G_Ftp_Address_B'];
+            $ToString .= '&ftp_user_b=' . $info ['G_Ftp_User_B'];
+            $ToString .= '&ftp_pwd_b=' . $info ['G_Ftp_Pwd_B'];
+
             $ToString .= '&ftp_flag=' . ($info ['FuwuqiID'] > 0 ? "1" : "0");
-            $ToString .= '&ftp_url=' . ($info ['FuwuqiID'] > 0 ? preg_replace("/^http:\/\/c/", "http://" . $cuspro_info["G_name"], $info ['G_Ftp_FwAdress']) : $info ['G_Ftp_FwAdress']);
+            //$ToString .= '&ftp_url=' . ($info ['FuwuqiID'] > 0 ? preg_replace("/^http:\/\/c/", "http://" . $cuspro_info["G_name"], $info ['G_Ftp_FwAdress']) : $info ['G_Ftp_FwAdress']);
+			$ToString .= '&ftp_url=' . ($info ['FuwuqiID'] > 0 ? "http://" . $info ['G_Ftp_Address'] . '/' .  $cuspro_info["G_name"]: $info ['G_Ftp_FwAdress'] . '/' .  $cuspro_info["G_name"]);
+            $ToString .= '&ftp_url_b=http://' . $info ['G_Ftp_Address_B'] . '/' .  $cuspro_info["G_name"];
             //随机文件名开始生成
             $randomLock = getstr();
             $password = md5($randomLock);
