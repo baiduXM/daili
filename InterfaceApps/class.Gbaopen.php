@@ -2740,17 +2740,26 @@ class Gbaopen extends InterfaceVIEWS
             $ToString .= '&taget=' . md5($text . $password);
             $ReturnString = request_by_other($TuUrl, $ToString);
             $ReturnArray = json_decode($ReturnString, true);
-            $IsOk = $this->ToGbaoPenEditInfo($cuspro_info);
-            if ($IsOk['err'] != 1000) {
-                $result['err'] = 1002;
-                $result['msg'] = '数据同步失败，请重试';
-                $this->LogsFunction->LogsCusRecord(121, 6, $CustmoersID, $result['msg']);
-                $result['data'] = $IsOk;
-                return $result;
+            //判断迁移动作是否成功，如果不成功，将数据库还原，报错
+            if($ReturnArray[0]['err']==1000){
+                $IsOk = $this->ToGbaoPenEditInfo($cuspro_info);
+                if ($IsOk['err'] != 1000) {
+                    $result['err'] = 1002;
+                    $result['msg'] = '数据同步失败，请重试';
+                    $this->LogsFunction->LogsCusRecord(121, 6, $CustmoersID, $result['msg']);
+                    $result['data'] = $IsOk;
+                    return $result;
+                }
+                $result['msg'] = '网站迁移成功';
+                $result['data']['name'] = $customerInfo['CompanyName'];
+                $this->LogsFunction->LogsCusRecord(121, 1, $CustmoersID, $result['msg']);
+            }else{
+                $custpro->UpdateArray($cuspro_old, $CustmoersID);
+                $result['err'] = 1003;
+                $result['msg'] = '网站迁移失败';
+                $this->LogsFunction->LogsCusRecord(121, 0, $CustmoersID, $result['msg']);
             }
-            $result['msg'] = '网站迁移成功';
-            $result['data']['name'] = $customerInfo['CompanyName'];
-            $this->LogsFunction->LogsCusRecord(121, 1, $CustmoersID, $result['msg']);
+            
             return $result;
         } else {
             $result['err'] = 1003;

@@ -555,7 +555,6 @@ class Agent extends InterfaceVIEWS {
                 $ToString .= '&taget=' . md5($text . $password);
                 $ReturnString = request_by_other($TuUrl, $ToString);
                 $ReturnArray = json_decode($ReturnString, true);
-				file_put_contents('linkcus.txt',$ReturnArray['msg']);
                 if ($ReturnArray['err'] == 1000) {
                     $result['data'] = array('name' => $CustomersInfo['CompanyName']);
                     $result['msg'] = '还原客户成功';
