@@ -162,67 +162,6 @@ class Gbaopen extends ForeVIEWS
         }
     }
 
-//    /**
-//     * 跳转至微传单握手验证
-//     */
-//    public function cdShakeHands(){
-//        $remember=Input::get("remember");
-//        $username=Input::get("username");
-//        $cust=Customer::where("email",$username)->first();
-//        if(md5($cust["remember_token"].$cust["email"])==$remember){
-//            return json_encode(array("err"=>0));
-//        }else{
-//            return json_encode(array("err"=>1));
-//        }
-//    }
-
-//    public function autoLogin() {
-//        echo '<meta charset="utf-8">';
-//        $datas = $_GET;
-//        $field = 'email_varchar';
-//
-//        $userinfo[$field] = $datas['username'];
-//        $userinfo['status_int'] = 1;
-//
-//        $User = M('users');
-//
-//        $returnInfo = $User->where($userinfo)->find();
-//        if ($returnInfo) {
-//            $url = 'http://www.db.com/cdshakehands';
-//            $post = array("username" => $datas['username'], "remember" => md5($datas['remember'] . $datas['username']));
-//            $ret = $this->PostCurl($url, $post, $cookie = '');
-//            $ret = json_decode($ret, true);
-//            if ($ret["err"]) {
-//                echo "错误登录！";
-//                exit();
-//            }
-//            if (intval($returnInfo['end_time']) > 0 && $returnInfo['end_time'] < time()) {
-//                echo '<script>alert("您的账号已过期，请与管理员联系");window.history.go(-1);</script>'; //{"success":false,"code":1004,"msg":"您的账号已过期，请与管理员联系","map":{"isValidateCodeLogin":false}}';
-//            } else {
-//
-//                session('userid', $returnInfo["userid_int"]);
-//                session('name', $returnInfo["uname"]);
-//                session('username', $returnInfo[$field]);
-//                session('phone', $returnInfo['phone']);
-//                session('level_int', $returnInfo["level_int"]);
-//                session('type', $returnInfo["type"]);
-//                session('email', $returnInfo["email_varchar"]);
-//                session('md5str', md5('adklsj[]999875sssee,' . $returnInfo["id"]));
-//                cookie('USERID', $returnInfo["userid_int"]);
-//                cookie('MD5STR', md5('adklsj[]999875sssee,' . $returnInfo["id"]));
-//                header('HTTP/1.1 200 ok');
-//
-//
-//                $update['last_time'] = date('y-m-d H:i:s', time());
-//                $User->where(array('userid_int' => $returnInfo["userid_int"]))->save($update);
-//                echo '<script>alert("登录成功");window.location="/#/main";</script>';
-//            }
-//            exit;
-//        } else {
-//            echo '<script>alert("账号不存在或者已经被禁用");window.history.go(-1);</script>';
-//            exit;
-//        }
-//    }
 
 
     public function ToOne()
