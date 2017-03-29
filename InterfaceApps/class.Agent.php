@@ -525,7 +525,7 @@ class Agent extends InterfaceVIEWS {
         $CustProInfo = $CustProModule->GetInfoByWhere(' where CustomersID = ' . $CustomersID);
         if ($CustomersModule->UpdateArray(array("Status"=>1), array("CustomersID"=>$CustomersID))/*$CustomersModule->DeleteInfoByKeyID($CustomersID)*/) {
             if ($CustProInfo) {
-//                $CustProModule->UpdateArray(array("status"=>1), array("CustomersID"=>$CustomersID));
+                $CustProModule->UpdateArray(array("status"=>1), array("CustomersID"=>$CustomersID));
 //                $CustProModule->DeleteInfoByWhere(' where CustomersID = ' . $CustomersID);
                 $ToString = 'username=' . $CustProInfo['G_name'];
                 $TuUrl = GBAOPEN_DOMAIN . 'api/reductionCustomer';
