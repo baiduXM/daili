@@ -3105,6 +3105,7 @@ class Gbaopen extends InterfaceVIEWS
         $ToString .= '&phone=';
         $ToString .= '&qq=';
         $ToString .= '&id=';
+        $ToString .= '&xd=100';
         //随机文件名开始生成
         $randomLock = getstr();
         $password = md5($randomLock);
