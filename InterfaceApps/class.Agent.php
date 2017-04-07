@@ -525,7 +525,7 @@ class Agent extends InterfaceVIEWS {
         $CustProInfo = $CustProModule->GetInfoByWhere(' where CustomersID = ' . $CustomersID);
         if ($CustomersModule->UpdateArray(array("Status"=>1), array("CustomersID"=>$CustomersID))/*$CustomersModule->DeleteInfoByKeyID($CustomersID)*/) {
             if ($CustProInfo) {
-//                $CustProModule->UpdateArray(array("status"=>1), array("CustomersID"=>$CustomersID));
+                $CustProModule->UpdateArray(array("status"=>1), array("CustomersID"=>$CustomersID));
 //                $CustProModule->DeleteInfoByWhere(' where CustomersID = ' . $CustomersID);
                 $ToString = 'username=' . $CustProInfo['G_name'];
                 $TuUrl = GBAOPEN_DOMAIN . 'api/reductionCustomer';
@@ -555,7 +555,6 @@ class Agent extends InterfaceVIEWS {
                 $ToString .= '&taget=' . md5($text . $password);
                 $ReturnString = request_by_other($TuUrl, $ToString);
                 $ReturnArray = json_decode($ReturnString, true);
-				file_put_contents('linkcus.txt',$ReturnArray['msg']);
                 if ($ReturnArray['err'] == 1000) {
                     $result['data'] = array('name' => $CustomersInfo['CompanyName']);
                     $result['msg'] = '还原客户成功';
