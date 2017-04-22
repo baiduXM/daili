@@ -1075,7 +1075,9 @@ class Gbaopen extends InterfaceVIEWS
                         return $result;
                     }
                     $Data['Mobile_model'] = 0;
-                    $Data['Mobile_domain'] = $post['outmobile_add'] ? 'http://' . str_replace('http://', '', $post['outmobiledomain']) : '';
+                    // $Data['Mobile_domain'] = $post['outmobile_add'] ? 'http://' . str_replace('http://', '', $post['outmobiledomain']) : '';
+                    //将外域手机域名独立一个字段
+                    $Data['Mobile_out_domain'] = $post['outmobile_add'] ? 'http://' . str_replace('http://', '', $post['outmobiledomain']) : '';
                     $Data['Mobile_domain'] = $Data['Mobile_domain'] ? str_replace(' ', '', $Data['Mobile_domain']) : '';
                 } else {
                     $result['err'] = 1002;
@@ -1093,7 +1095,9 @@ class Gbaopen extends InterfaceVIEWS
                 $Data['Mobile_model'] = $post['mobilemodel'];
                 if ($this->GetModleIDByName($Data['Mobile_model']) > 0) {
                     $Data['PC_model'] = 0;
-                    $Data['PC_domain'] = $post['outpc_add'] ? 'http://' . str_replace('http://', '', $post['outpcdomain']) : '';
+                    // $Data['PC_domain'] = $post['outpc_add'] ? 'http://' . str_replace('http://', '', $post['outpcdomain']) : '';
+                    //将外域PC域名独立一个字段
+                    $Data['PC_out_domain'] = $post['outpc_add'] ? 'http://' . str_replace('http://', '', $post['outpcdomain']) : '';
                     $Data['PC_domain'] = str_replace(' ', '', $Data['PC_domain']);
                     if ($post['mobiledomain']) {
                         $Data['Mobile_domain'] = 'http://' . str_replace('http://', '', $post['mobiledomain']);
@@ -1490,8 +1494,11 @@ class Gbaopen extends InterfaceVIEWS
                         }
                         $Data['Mobile_model'] = 0;
                         if ($post['outmobile_add']) {
-                            $Data['Mobile_domain'] = 'http://' . str_replace('http://', '', $post['outmobiledomain']);
-                            $Data['Mobile_domain'] = str_replace(' ', '', $Data['Mobile_domain']);
+                            // $Data['Mobile_domain'] = 'http://' . str_replace('http://', '', $post['outmobiledomain']);
+                            // $Data['Mobile_domain'] = str_replace(' ', '', $Data['Mobile_domain']);
+                            //将外域手机域名独立一个字段
+                            $Data['Mobile_out_domain'] = 'http://' . str_replace('http://', '', $post['outmobiledomain']);
+                            $Data['Mobile_out_domain'] = str_replace(' ', '', $Data['Mobile_out_domain']);
                         }
                     } else {
                         $result['err'] = 1002;
@@ -1512,8 +1519,11 @@ class Gbaopen extends InterfaceVIEWS
                     if (is_array($modelMsg)) {
                         $Data['PC_model'] = 0;
                         if ($post['outpc_add']) {
-                            $Data['PC_domain'] = 'http://' . str_replace('http://', '', $post['outpcdomain']);
-                            $Data['PC_domain'] = str_replace(' ', '', $Data['PC_domain']);
+                            // $Data['PC_domain'] = 'http://' . str_replace('http://', '', $post['outpcdomain']);
+                            // $Data['PC_domain'] = str_replace(' ', '', $Data['PC_domain']);
+                            //将外域PC域名独立一个字段
+                            $Data['PC_out_domain'] = 'http://' . str_replace('http://', '', $post['outpcdomain']);
+                            $Data['PC_out_domain'] = str_replace(' ', '', $Data['PC_out_domain']);
                         }
                         if ($post['mobiledomain']) {
                             $Data['Mobile_domain'] = 'http://' . str_replace('http://', '', $post['mobiledomain']);
@@ -1919,13 +1929,17 @@ class Gbaopen extends InterfaceVIEWS
         $ToString .= 'name=' . $CustProInfo ['G_name'];
 
         if ($CustProInfo ['PC_model']) {
-            preg_match('/[A-Z]{2}[0]*(\d*)/', $CustProInfo ['PC_model'], $have);
+            // preg_match('/[A-Z]{2}[0]*(\d*)/', $CustProInfo ['PC_model'], $have);//匹配原有PC模板的num的正则
+            preg_match('/G[0]*(\d*)/', $CustProInfo ['PC_model'], $have);//匹配新PC模板的num的正则
+
             $ToString .= '&pc_tpl_id=' . $have[1];
         } else
             $ToString .= '&pc_tpl_id=' . $CustProInfo ['PC_model'];
 
         if ($CustProInfo ['Mobile_model']) {
-            preg_match('/[A-Z]{2}[0]*(\d*)/', $CustProInfo ['Mobile_model'], $have);
+            // preg_match('/[A-Z]{2}[0]*(\d*)/', $CustProInfo ['Mobile_model'], $have);//匹配原有手机模板的num的正则
+            preg_match('/[A-Z]{2}[0]*(\d*)/', $CustProInfo ['Mobile_model'], $have);//匹配新手机模板的num的正则
+            
             $ToString .= '&mobile_tpl_id=' . $have[1];
         } else
             $ToString .= '&mobile_tpl_id=' . $CustProInfo ['Mobile_model'];
@@ -1945,6 +1959,10 @@ class Gbaopen extends InterfaceVIEWS
         $ToString .= '&ftp_address_b=' . $CustProInfo ['G_Ftp_Address_B'];
         $ToString .= '&ftp_user_b=' . $CustProInfo ['G_Ftp_User_B'];
         $ToString .= '&ftp_pwd_b=' . $CustProInfo ['G_Ftp_Pwd_B'];
+
+        //构造外域域名的传参字符串
+        $ToString .= '&pc_out_domain=' . $CustProInfo ['PC_out_domain'];
+        $ToString .= '&mobile_out_domain=' . $CustProInfo ['Mobile_out_domain'];
 
         $ToString .= '&weburl=' . $CustProInfo['G_Ftp_FwAdress'];
         $ToString .= '&ftp_port=' . $CustProInfo['G_Ftp_Duankou'];

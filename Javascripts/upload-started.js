@@ -72,8 +72,12 @@ jQuery(function() {
             finish = new Object(),
             uploader,
             configData = dataInit(),
-            colorInit = ['white', 'grey', 'black', 'blue', 'green', 'yellow', 'orange', 'pink', 'red', 'purple', 'brown', 'colorful'],
-            colorData = {white: ['white', '白色'], grey: ['grey', '灰色'], black: ['black', '黑色'], blue: ['blue', '蓝色'], green: ['green', '绿色'], yellow: ['yellow', '黄色'], orange: ['orange', '橙色'], pink: ['pink', '粉色'], red: ['red', '红色'], purple: ['purple', '紫色'], brown: ['#804000', '棕色'], colorful: ['', '彩色']};
+            // colorInit = ['white', 'grey', 'black', 'blue', 'green', 'yellow', 'orange', 'pink', 'red', 'purple', 'brown', 'colorful'],
+            // colorData = {white: ['white', '白色'], grey: ['grey', '灰色'], black: ['black', '黑色'], blue: ['blue', '蓝色'], green: ['green', '绿色'], yellow: ['yellow', '黄色'], orange: ['orange', '橙色'], pink: ['pink', '粉色'], red: ['red', '红色'], purple: ['purple', '紫色'], brown: ['#804000', '棕色'], colorful: ['', '彩色']};
+            //===新颜色===
+            colorInit = ['white','black', 'blue', 'green', 'yellow', 'orange', 'red', 'purple', 'colorful'],
+            colorData = {white: ['white', '白色'], black: ['black', '黑色'], blue: ['blue', '蓝色'], green: ['green', '绿色'], yellow: ['yellow', '黄色'], orange: ['orange', '橙色'],red: ['red', '红色'], purple: ['purple', '紫色'], colorful: ['', '彩色']};
+            //===新颜色end===
     $.each(colorInit, function(i1, v1) {
         colortag += '<span data="' + v1 + '"' + (v1 == 'colorful' ? '' : ' style="background-color:' + colorData[v1][0] + ';"') + '>' + colorData[v1][1] + '</span>';
     });
@@ -125,10 +129,15 @@ jQuery(function() {
                 $("#config-list .csv").show("slow").siblings("div").hide("slow");
             }
         }
+        // var addline = rarData[file.id] ? '<p>模板名 <input type="text" name="model" placeholder="不填，自动新建模板号" class="Input" style="height: 32px;line-height: 32px;width: 60%;background:rgba(0, 0, 0, 0);"><span class="loadmodel transition1">载入</span></p>\n\
+        //                             <p>语言选择：<span class="lang"><tt class="transition1">CN</tt><span class="transition1"></span></span></p>'
+        //         :
+        //         '';
         var addline = rarData[file.id] ? '<p>模板名 <input type="text" name="model" placeholder="不填，自动新建模板号" class="Input" style="height: 32px;line-height: 32px;width: 60%;background:rgba(0, 0, 0, 0);"><span class="loadmodel transition1">载入</span></p>\n\
-                                    <p>语言选择：<span class="lang"><tt class="transition1">CN</tt><span class="transition1"></span></span></p>'
+                                    <p>语言选择：<span class="lang"><span><select id="lang" name="lang" style="width:120px"><option value="CN" selected="selected">中文</option><option value="EN">英文</option><option value="TW">繁体中文</option><option value="JP">日文</option></select></span></span></span></p>'
                 :
                 '';
+
         $list.append('<div id="' + file.id + '" class="item' + cur + '">' +
                 '<h4 class="info"><span><img style="width: 30px;padding-top: 10px;padding-right: 7px;" src="./Images/' + file.ext + '.png"></span>' + file.name + '</h4>' +
                 addline +
@@ -179,20 +188,21 @@ jQuery(function() {
         }
     });
     //语言切换
-    $("#thelist").on("click", ".lang", function(e) {
+    // $("#thelist").on("click", ".lang", function(e) {
+    $("#thelist").on("change", ".lang", function(e) {
         e.preventDefault();
         e.stopPropagation();
         if (uploader.isInProgress()) {
             Msg(1, '正在上传，切换不了了');
         } else {
-            var _this = $(this);
-            if (_this.hasClass("cur")) {
-                _this.find("tt").text("CN");
-                _this.removeClass("cur");
-            } else {
-                _this.find("tt").text("EN");
-                _this.addClass("cur");
-            }
+            // var _this = $(this);
+            // if (_this.hasClass("cur")) {
+            //     _this.find("tt").text("CN");
+            //     _this.removeClass("cur");
+            // } else {
+            //     _this.find("tt").text("EN");
+            //     _this.addClass("cur");
+            // }
         }
     });
     //模板信息载入输入框回车事件
@@ -222,9 +232,12 @@ jQuery(function() {
                             lang = _this.parent().next().find(".lang");
                             file = _this.parent().parent();
                             rarData[file.attr("id")] = data;
-                            if (lang.find("tt").text() != json.lang) {
-                                lang.click();
-                            }
+                            // if (lang.find("tt").text() != json.lang) {
+                            //     lang.click();
+                            // }
+                            //语言下拉框选中
+                            $("#lang").val(json.lang);
+
                             if (file.hasClass("cur")) {
                                 dataInit(rarData[file.attr("id")]);
                             }
@@ -249,7 +262,8 @@ jQuery(function() {
         var $li = $('#' + file.id);
         if (file.ext == 'zip') {
             file.msg = $li.find("input").val();
-            file.lang = $li.find(".lang").hasClass("cur") ? 'EN' : 'CN';
+            // file.lang = $li.find(".lang").hasClass("cur") ? 'EN' : 'CN';
+            file.lang = $li.find(".lang").val();
             file.data = $li.hasClass("cur") ? dataInit() : rarData[file.id];
         }
     });
