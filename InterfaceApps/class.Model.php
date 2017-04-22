@@ -47,9 +47,20 @@ class Model extends InterfaceVIEWS {
             $Data['Youhui'] = trim($post['youhui']);
             $PCModel = $ModelModule->GetOneByWhere('where NO="' . $Data['PCNum'] . '"');
             $PhoneModel = $ModelModule->GetOneByWhere('where NO="' . $Data['PhoneNum'] . '"');
+
+            //===如果NO字段无法获取PC/手机模板信息，则从NO_bak字段获取===
+            if(!$PCModel){
+                $PCModel = $ModelModule->GetOneByWhere('where NO_bak="' . $Data['PCNum'] . '"');
+            }
+            if(!$PhoneModel){
+                $PhoneModel = $ModelModule->GetOneByWhere('where NO_bak="' . $Data['PhoneNum'] . '"');
+            }
+            //===获取NO_bak结束===
+
             if(!$PCModel || !$PhoneModel){
                 $result['err'] = 1000;
-                $result['msg'] = $PCMsg ? '手机模板不存在' : 'PC模板不存在';
+                // $result['msg'] = $PCMsg ? '手机模板不存在' : 'PC模板不存在';//$PCMsg未赋值，可能造成无论哪个模板不存在，都报PC不存在
+                $result['msg'] = $PCModel ? '手机模板不存在' : 'PC模板不存在';
                 return $result;
             }
             if($PackModule->GetOneByWhere('where PackagesNum="' . $Data['PackagesNum'] . '"')){
@@ -57,12 +68,16 @@ class Model extends InterfaceVIEWS {
                 $result['msg'] = '当前套餐模板已存在，请输入其他模板名';
                 return $result;
             }
-            $Data['PCUrl'] = $Data['PCUrl'] ? $Data['PCUrl'] : 'http://m.' . $Data['PackagesNum'] . '.n01.5067.org';
+            // $Data['PCUrl'] = $Data['PCUrl'] ? $Data['PCUrl'] : 'http://m.' . $Data['PackagesNum'] . '.n01.5067.org';
+            //比上面那条去掉了m
+            $Data['PCUrl'] = $Data['PCUrl'] ? $Data['PCUrl'] : 'http://' . $Data['PackagesNum'] . '.n01.5067.org';
             $Data['PhoneUrl'] = $Data['PhoneUrl'] ? $Data['PhoneUrl'] : 'http://m.' . $Data['PackagesNum'] . '.n01.5067.org';
             $Data['TuiJian'] = $post['tuijian'];
             $Data['ModelLan'] = $post['lang'];
+
+            //===只匹配新的命名规则===
             if (!empty($Data['PackagesNum'])) {
-                if (!preg_match('/GT\d{4}/', $Data['PackagesNum']) or preg_match('/GT\d{5}/', $Data['PackagesNum'])) {
+                if (!preg_match('/G\d{4}T(CN|EN|TW|JP)\d{2}/', $Data['PackagesNum']) or preg_match('/G\d{4}T(CN|EN|TW|JP)\d{4}/', $Data['PackagesNum'])) {
                     $result['err'] = 1001;
                     $result['msg'] = '错误的双站模板名';
                     return $result;
@@ -72,17 +87,44 @@ class Model extends InterfaceVIEWS {
                 $result['msg'] = '请填写双站模板名';
                 return $result;
             }
-            if ((!preg_match('/GM\d{4}/', $Data['PCNum']) and !preg_match('/GP\d{4}/', $Data['PCNum'])) or preg_match('/GM\d{5}/', $Data['PCNum']) or preg_match('/GP\d{5}/', $Data['PCNum'])) {
+            if (!preg_match('/G\d{4}P(CN|EN|TW|JP)\d{2}/', $Data['PCNum']) or preg_match('/G\d{4}P(CN|EN|TW|JP)\d{4}/', $Data['PCNum'])) {
                 $result['err'] = 1001;
                 $result['msg'] = '错误的PC模板名';
                 return $result;
             }
-            if ((!preg_match('/GM\d{4}/', $Data['PhoneNum']) and !preg_match('/GP\d{4}/', $Data['PhoneNum'])) or preg_match('/GM\d{5}/', $Data['PhoneNum']) or preg_match('/GP\d{5}/', $Data['PhoneNum'])) {
+            if (!preg_match('/G\d{4}M(CN|EN|TW|JP)\d{2}/', $Data['PhoneNum']) or preg_match('/G\d{4}M(CN|EN|TW|JP)\d{4}/', $Data['PhoneNum'])) {
                 $result['err'] = 1001;
                 $result['msg'] = '错误的手机模板名';
                 return $result;
             }
-            preg_match('/[A-Z]{2}[0]*(\d*)/', $Data['PackagesNum'], $have);
+            //===匹配end===
+
+            //匹配原有的命名规则
+            // if (!empty($Data['PackagesNum'])) {
+            //     if (!preg_match('/GT\d{4}/', $Data['PackagesNum']) or preg_match('/GT\d{5}/', $Data['PackagesNum'])) {
+            //         $result['err'] = 1001;
+            //         $result['msg'] = '错误的双站模板名';
+            //         return $result;
+            //     }
+            // }else{
+            //     $result['err'] = 1001;
+            //     $result['msg'] = '请填写双站模板名';
+            //     return $result;
+            // }
+            // if ((!preg_match('/GM\d{4}/', $Data['PCNum']) and !preg_match('/GP\d{4}/', $Data['PCNum'])) or preg_match('/GM\d{5}/', $Data['PCNum']) or preg_match('/GP\d{5}/', $Data['PCNum'])) {
+            //     $result['err'] = 1001;
+            //     $result['msg'] = '错误的PC模板名';
+            //     return $result;
+            // }
+            // if ((!preg_match('/GM\d{4}/', $Data['PhoneNum']) and !preg_match('/GP\d{4}/', $Data['PhoneNum'])) or preg_match('/GM\d{5}/', $Data['PhoneNum']) or preg_match('/GP\d{5}/', $Data['PhoneNum'])) {
+            //     $result['err'] = 1001;
+            //     $result['msg'] = '错误的手机模板名';
+            //     return $result;
+            // }
+
+            // preg_match('/[A-Z]{2}[0]*(\d*)/', $Data['PackagesNum'], $have);//取原有命名规则的num
+            preg_match('/G[0]*(\d*)/', $Data['PackagesNum'], $have);//取新命名规则的num
+
             $Data['Num'] = $have[1];
             $Data['Color'] = $PCModel['Color'] . ',' . $PhoneModel['Color'];
             $Data['Keyword'] = $PCModel['Keyword'];
@@ -277,6 +319,16 @@ class Model extends InterfaceVIEWS {
         }
         foreach ($modelList as $k => $v) {
             $data[$k]['name'] = $v['NO'] ? $v['NO'] : $v['PackagesNum'];
+            //===有了新命名之后的判断===
+            // if($v['NO']){//先看新命名是否存在
+            //     $data[$k]['name'] = $v['NO'];
+            // }elseif($v['NO_bak']){//没有就看旧命名
+            //     $data[$k]['name'] = $v['NO_bak'];
+            // }else{//都没有，则在双站表里
+            //     $data[$k]['name'] = $v$v['PackagesNum'];
+            // }
+            //===判断结束===
+
             if ($type != 3) {
                 $data[$k]['url'][] = $v['Url'];
                 $data[$k]['url'][] = false;
@@ -352,9 +404,28 @@ class Model extends InterfaceVIEWS {
         if ($level == 1) {
             $modelName = $this->_GET['name'];
             $result = array('err' => 0, 'msg' => '获取成功', 'data' => array());
-            if (preg_match('/[A-Z]{2}[0]*(\d*)/', $modelName)) {
+
+            //===判断是哪种命名方式，并通过不同的命名获取信息===
+            if(preg_match('/G\d{4}(P|M)(CN|EN|TW|JP)\d{2}/', $modelName) and !preg_match('/G\d{4}(P|M)(CN|EN|TW|JP)\d{4}/', $modelName)){
                 $Model = new ModelModule();
                 $modelMsg = $Model->GetOneByWhere(array('Price', 'Youhui', 'Url', 'TuiJian', 'BaiDuXingPing', 'ModelLan', 'Color', 'ModelClassID'), 'where NO="' . $modelName . '"');
+                if ($modelMsg) {
+                    $Data['price'] = $modelMsg['Price'];
+                    $Data['youhui'] = $modelMsg['Youhui'];
+                    $Data['url'] = $modelMsg['Url'];
+                    $Data['tuijian'] = $modelMsg['TuiJian'];
+                    $Data['star'] = $modelMsg['BaiDuXingPing'];
+                    $Data['lang'] = $modelMsg['ModelLan'];
+                    $Data['target'] = trim($modelMsg['ModelClassID'], ',');
+                    $Data['color'] = trim($modelMsg['Color'], ',');
+                    $result['data'] = $Data;
+                } else {
+                    $result['err'] = 1001;
+                    $result['msg'] = '错误的模板编号,不存在此模板';
+                }
+            }elseif (preg_match('/[A-Z]{2}[0]*(\d*)/', $modelName)) {
+                $Model = new ModelModule();
+                $modelMsg = $Model->GetOneByWhere(array('Price', 'Youhui', 'Url', 'TuiJian', 'BaiDuXingPing', 'ModelLan', 'Color', 'ModelClassID'), 'where NO_bak="' . $modelName . '"');
                 if ($modelMsg) {
                     $Data['price'] = $modelMsg['Price'];
                     $Data['youhui'] = $modelMsg['Youhui'];
@@ -373,6 +444,30 @@ class Model extends InterfaceVIEWS {
                 $result['err'] = 1000;
                 $result['msg'] = '错误的模板编号格式';
             }
+            //===获取end===
+
+            //原获取方式
+            // if (preg_match('/[A-Z]{2}[0]*(\d*)/', $modelName)) {
+            //     $Model = new ModelModule();
+            //     $modelMsg = $Model->GetOneByWhere(array('Price', 'Youhui', 'Url', 'TuiJian', 'BaiDuXingPing', 'ModelLan', 'Color', 'ModelClassID'), 'where NO="' . $modelName . '"');
+            //     if ($modelMsg) {
+            //         $Data['price'] = $modelMsg['Price'];
+            //         $Data['youhui'] = $modelMsg['Youhui'];
+            //         $Data['url'] = $modelMsg['Url'];
+            //         $Data['tuijian'] = $modelMsg['TuiJian'];
+            //         $Data['star'] = $modelMsg['BaiDuXingPing'];
+            //         $Data['lang'] = $modelMsg['ModelLan'];
+            //         $Data['target'] = trim($modelMsg['ModelClassID'], ',');
+            //         $Data['color'] = trim($modelMsg['Color'], ',');
+            //         $result['data'] = $Data;
+            //     } else {
+            //         $result['err'] = 1001;
+            //         $result['msg'] = '错误的模板编号,不存在此模板';
+            //     }
+            // } else {
+            //     $result['err'] = 1000;
+            //     $result['msg'] = '错误的模板编号格式';
+            // }
         } else {
             $result['err'] = 1002;
             $result['msg'] = '非法请求';
@@ -438,7 +533,8 @@ class Model extends InterfaceVIEWS {
 
             //配置信息
             $msg = isset($_REQUEST["data"]) ? json_decode($_REQUEST["data"], true) : array();
-            $lang = strtoupper($this->_REQUEST["lang"]) == 'EN' ? 'EN' : 'CN';
+            // $lang = strtoupper($this->_REQUEST["lang"]) == 'EN' ? 'EN' : 'CN';
+            $lang = strtoupper($this->_REQUEST["lang"]);//新命名还有中文繁体及日文，不能用上面的判断
 
             if (!$fileName) {
                 header("HTTP/1.0 500 Internal Server Error");
@@ -641,23 +737,101 @@ class Model extends InterfaceVIEWS {
                             $Data['Content'] = $msg['ModelContent'] ? $msg['ModelContent'] : '';
                             // 获取文件指定名称
                             $Modelname = $this->_REQUEST['msg'] ? $this->_REQUEST['msg'] : false;
-                            if ($Modelname) {
-                                if (preg_match('/GM\d{4}/', $Modelname) or preg_match('/GP\d{4}/', $Modelname)) {
+
+                            //===模板名的判断获取===
+                            //判断是哪种命名规则
+                            if($Modelname){
+                               if(preg_match('/G\d{4}(P|M)(CN|EN|TW|JP)\d{2}/', $Modelname)){
+                                    //最后两位数超过2位也会匹配，用这条限制到3位，预留1位给可能超出的模板
+                                    if (preg_match('/G\d{4}(P|M)(CN|EN|TW|JP)\d{4}/', $Modelname)) {
+                                        unlink($configLoad);
+                                        unlink($uploadPath);
+                                        $result = array('err' => 1003, 'data' => '', 'msg' => '模板文件中config.ini里配置出错，请填写Type类型！');
+                                        return $result;
+                                    }
+                                }elseif(preg_match('/GM\d{4}/', $Modelname) or preg_match('/GP\d{4}/', $Modelname)){
                                     if (preg_match('/GM\d{5}/', $Modelname) or preg_match('/GP\d{5}/', $Modelname)) {
                                         unlink($configLoad);
                                         unlink($uploadPath);
                                         $result = array('err' => 1003, 'data' => '', 'msg' => '模板文件中config.ini里配置出错，请填写Type类型！');
                                         return $result;
                                     }
-                                } else {
+                                    //根据旧命名获取对应的新命名
+                                    $Modelname_bak = $Modelname;//上传成功后删除备份压缩包用
+                                    $ModelGot = $ModelModule->GetOneInfoByKeyID($Modelname_bak,'NO_bak');
+                                    if($modelGot){//如果数据库里没有旧命名，则使用旧命名为错误的
+                                        $Modelname = $ModelGot['NO'];
+                                    }else{
+                                        unlink($configLoad);
+                                        unlink($uploadPath);
+                                        $result = array('err' => 1003, 'data' => '', 'msg' => '错误的模板名，请重新上传！');
+                                        return $result;
+                                    }                                    
+                                }else{
                                     unlink($configLoad);
                                     unlink($uploadPath);
                                     $result = array('err' => 1003, 'data' => '', 'msg' => '错误的模板名，请重新上传！');
                                     return $result;
-                                }
+                                } 
                             } else {
                                 $Modelname = '';
                             }
+                            //===模板名的判断获取end====
+
+                            //原模板名的判断
+                            // if ($Modelname) {
+                            //     if (preg_match('/GM\d{4}/', $Modelname) or preg_match('/GP\d{4}/', $Modelname)) {
+                            //         if (preg_match('/GM\d{5}/', $Modelname) or preg_match('/GP\d{5}/', $Modelname)) {
+                            //             unlink($configLoad);
+                            //             unlink($uploadPath);
+                            //             $result = array('err' => 1003, 'data' => '', 'msg' => '模板文件中config.ini里配置出错，请填写Type类型！');
+                            //             return $result;
+                            //         }
+                            //     } else {
+                            //         unlink($configLoad);
+                            //         unlink($uploadPath);
+                            //         $result = array('err' => 1003, 'data' => '', 'msg' => '错误的模板名，请重新上传！');
+                            //         return $result;
+                            //     }
+                            // } else {
+                            //     $Modelname = '';
+                            // }
+
+                            //===新规则命名所需颜色编号===
+                            switch ($Data['ZhuSeDiao']) {
+                                case 'red':
+                                    $colorNum .= '1';
+                                    break;
+                                case 'yellow':
+                                    $colorNum .= '2';
+                                    break;
+                                case 'orange':
+                                    $colorNum .= '3';
+                                    break;
+                                case 'blue':
+                                    $colorNum .= '4';
+                                    break;
+                                case 'green':
+                                    $colorNum .= '5';
+                                    break;
+                                case 'purple':
+                                    $colorNum .= '6';
+                                    break;
+                                case 'black':
+                                    $colorNum .= '7';
+                                    break;
+                                case 'white':
+                                    $colorNum .= '8';
+                                    break;
+                                case 'colorful':
+                                    $colorNum .= '9';
+                                    break;                                
+                                default:
+                                    $colorNum .= '0';
+                                    break;
+                            }
+                            //===颜色编号获取end===
+
                             //压缩包重命名
                             if (empty($Modelname)) {
                                 if ($Data['Type'] == 'PC') {
@@ -666,11 +840,38 @@ class Model extends InterfaceVIEWS {
                                     $Data['Num'] = $NewName;
                                     $geshu = strlen((string) $NewName);
                                     $geshu = 4 - $geshu;
-                                    $Modelname = 'GP';
+                                    // $Modelname = 'GP';//原命名规则
+                                    $Modelname = 'G';//新命名规则
                                     for ($i = 0; $i < $geshu; $i++) {
                                         $Modelname .='0';
                                     }
                                     $Modelname .= $Data['Num'];
+
+                                    //===PC新命名规则===
+                                    $Modelname .= 'P';
+                                    $Modelname .= $lang;
+                                    $Modelname .= $colorNum;
+                                    //查询是否已有同系列的模板
+                                    $NameArr = array();
+                                    $NameArr = $ModelModule->GetListsAll('tb_model', ' where NO like "'.$Modelname.'%"');
+                                    if($NameArr){
+                                        foreach ($NameArr as $value) {
+                                            foreach ($value as $k => $v) {
+                                                if($k == 'NO'){
+                                                    //获取同系列模板的最后一位编号(颜色变种编号)
+                                                    $endArr[] = substr($v, -1);
+                                                }
+                                            }
+                                        }
+                                        //取这位编号中的最大值
+                                        $endNum = max($endArr);
+                                        $endNum = $endNum+1;
+                                    }else{
+                                        $endNum = 0;
+                                    }
+                                    $Modelname .= $endNum;
+                                    //===PC新命名规则end===
+
                                     $Data['NO'] = $Modelname;
                                     $filename = $Modelname . '.zip';
                                 } else {
@@ -679,11 +880,38 @@ class Model extends InterfaceVIEWS {
                                     $Data['Num'] = $NewName;
                                     $geshu = strlen((string) $NewName);
                                     $geshu = 4 - $geshu;
-                                    $Modelname = 'GM';
+                                    // $Modelname = 'GM';//原命名规则
+                                    $Modelname = 'G';//新命名规则
                                     for ($i = 0; $i < $geshu; $i++) {
                                         $Modelname .='0';
                                     }
                                     $Modelname .= $Data['Num'];
+
+                                    //===手机新命名规则===
+                                    $Modelname .= 'M';
+                                    $Modelname .= $lang;
+                                    $Modelname .= $colorNum;
+                                    //查询是否已有同系列的模板
+                                    $NameArr = array();
+                                    $NameArr = $ModelModule->GetListsAll('tb_model', ' where NO like "'.$Modelname.'%"');
+                                    if($NameArr){
+                                        foreach ($NameArr as $value) {
+                                            foreach ($value as $k => $v) {
+                                                if($k == 'NO'){
+                                                    //获取同系列模板的最后一位编号(颜色变种编号)
+                                                    $endArr[] = substr($v, -1);
+                                                }
+                                            }
+                                        }
+                                        //取这位编号中的最大值
+                                        $endNum = max($endArr);
+                                        $endNum = $endNum+1;
+                                    }else{
+                                        $endNum = 0;
+                                    }
+                                    $Modelname .= $endNum;
+                                    //===手机新命名规则end===
+
                                     $Data['NO'] = $Modelname;
                                     $filename = $Modelname . '.zip';
                                 }
@@ -692,7 +920,8 @@ class Model extends InterfaceVIEWS {
                             } else {
                                 $Data['NO'] = $Modelname;
                                 $filename = $Modelname . '.zip';
-                                preg_match('/[A-Z]{2}[0]*(\d*)/', $Modelname, $have);
+                                // preg_match('/[A-Z]{2}[0]*(\d*)/', $Modelname, $have);//匹配原有命名的子模式
+                                preg_match('/[A-Z]{1}[0]*(\d*)/', $Modelname, $have);//匹配新命名的子模式
                                 $Data['Num'] = $have[1];
                                 if (!$Data['Num']) {
                                     unlink($configLoad);
@@ -747,6 +976,15 @@ class Model extends InterfaceVIEWS {
 
                             unlink($configLoad);
                             unlink($uploadZip);
+
+                            //===如果有旧命名的备份包，删除===
+                            if($Modelname_bak){
+                                if(file_exists("tpl/".$Modelname_bak)){
+                                    @unlink("tpl/".$Modelname_bak);
+                                }
+                            }                            
+                            //===删除旧命名备份包end===
+
                             $result = array('err' => 0, 'data' => '', 'msg' => '上传成功！');
                             return $result;
                         } elseif ($fileName) {
@@ -756,14 +994,33 @@ class Model extends InterfaceVIEWS {
                                 $addColor = explode('.', $addColor[1]);
                                 if (count($addColor) == 2) {
                                     $addColor = $addColor[0];
-                                    if ((preg_match('/GM\d{4}/', $Modelname) or preg_match('/GP\d{4}/', $Modelname)) && !(preg_match('/GM\d{5}/', $Modelname) or preg_match('/GP\d{5}/', $Modelname))) {
+                                    //===符合新命名的规则===
+                                    if ((preg_match('/GM\d{4}/', $Modelname) or preg_match('/GP\d{4}/', $Modelname)) && !(preg_match('/GM\d{5}/', $Modelname) or preg_match('/GP\d{5}/', $Modelname))) {//如果是旧命名方式，搜索NO_bak字段
+                                        $Modelmsg = $ModelModule->GetOneInfoByKeyID('\'' . $Modelname . '\'', 'NO_bak');
+                                        if ($Modelmsg)
+                                            $Modelmsg = in_array($addColor, explode(',', $Modelmsg['Color'])) ? false : $Modelmsg['Color'] . $addColor . ',';
+                                        else
+                                            $addColor = false;
+                                    } elseif(preg_match('/G\d{4}(P|M)(CN|EN|TW|JP)\d{2}/', $Modelname)&&!preg_match('/G\d{4}(P|M)(CN|EN|TW|JP)\d{4}/', $Modelname)){//如果是新命名方式，搜索NO字段
                                         $Modelmsg = $ModelModule->GetOneInfoByKeyID('\'' . $Modelname . '\'', 'NO');
                                         if ($Modelmsg)
                                             $Modelmsg = in_array($addColor, explode(',', $Modelmsg['Color'])) ? false : $Modelmsg['Color'] . $addColor . ',';
                                         else
                                             $addColor = false;
-                                    } else
+
+                                    }else
                                         $addColor = false;
+                                    //===符合新命名end===
+
+                                    //原有的命名方式
+                                    // if ((preg_match('/GM\d{4}/', $Modelname) or preg_match('/GP\d{4}/', $Modelname)) && !(preg_match('/GM\d{5}/', $Modelname) or preg_match('/GP\d{5}/', $Modelname))) {
+                                    //     $Modelmsg = $ModelModule->GetOneInfoByKeyID('\'' . $Modelname . '\'', 'NO');
+                                    //     if ($Modelmsg)
+                                    //         $Modelmsg = in_array($addColor, explode(',', $Modelmsg['Color'])) ? false : $Modelmsg['Color'] . $addColor . ',';
+                                    //     else
+                                    //         $addColor = false;
+                                    // } else
+                                    //     $addColor = false;
                                 } else
                                     $addColor = false;
                             } else
@@ -916,10 +1173,14 @@ class Model extends InterfaceVIEWS {
                 if($data["Type"]=="PC"){
                     $data['EWM'] = 'http://s.jiathis.com/qrcode.php?url=' . $data['Url'];
                 }else{
-                    if(strpos($data["Url"], 'http://GM')===false){
+                    //===新命名规则下的URL===
+                    if(strpos($data["Url"], 'http://G')===false){
+                    // if(strpos($data["Url"], 'http://GM')===false){
                         $data['EWM'] = 'http://s.jiathis.com/qrcode.php?url=' . $data['Url'];
                     }else{
-                        $data['Url']=str_replace('http://GM', 'http://m.GM', $data['Url']);
+                        //===新命名规则下的URL===
+                        $data['Url']=str_replace('http://G', 'http://m.G', $data['Url']);
+                        // $data['Url']=str_replace('http://GM', 'http://m.GM', $data['Url']);
                         $data['EWM'] = 'http://s.jiathis.com/qrcode.php?url=' . $data['Url'];
                     }
                 }
