@@ -1113,7 +1113,7 @@ jQuery(document).ready(function () {
             data: {num: cus},
             async: false,
             success: function (data) {
-                // console.log(data);
+                console.log(data);
                 if (data.data == false) {
                     html = '<div class="userdata-content"><p style="font-size:20px;">是否开通该客户E推？</p>\n\
                         <input type="hidden" class="Input" value="' + cus + '">\n\
