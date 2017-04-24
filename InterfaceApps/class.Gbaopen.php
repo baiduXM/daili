@@ -3124,6 +3124,7 @@ class Gbaopen extends InterfaceVIEWS
         $ToString .= '&qq=';
         $ToString .= '&id=';
         $ToString .= '&combo=' . $data['combo']; // E推开通套餐类型
+
         //随机文件名开始生成
         $randomLock = getstr();
         $password = md5($randomLock);
