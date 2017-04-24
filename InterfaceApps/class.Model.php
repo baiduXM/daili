@@ -649,7 +649,6 @@ class Model extends InterfaceVIEWS {
                                         $result = array('err' => 1003, 'data' => '', 'msg' => '模板文件中config.ini里配置出错，请填写Type类型！');
                                         return $result;
                                     }
-                                } else {
                                     unlink($configLoad);
                                     unlink($uploadPath);
                                     $result = array('err' => 1003, 'data' => '', 'msg' => '错误的模板名，请重新上传！');
