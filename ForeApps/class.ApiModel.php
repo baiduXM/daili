@@ -79,9 +79,11 @@ class ApiModel extends ForeVIEWS {
             if($this->_GET['Type'] == 0){
                 $where .= $Color ? ' and CaseImagePC like \'%' . $Color . '%\'' : '';
                 $where .= $SortID ? ' and CaseImagePC like \'%,' . $SortID . ',%\'' : '';
+                $where .= ' and CaseImagePC is not null ';
             }else{
                 $where .= $Color ? ' and CaseImageMobile like \'%' . $Color . '%\'' : '';
                 $where .= $SortID ? ' and CaseImageMobile like \'%,' . $SortID . ',%\'' : '';
+                $where .= ' and CaseImageMobile is not null ';
             }
 
             $where .= ' and (PC_EndTime > NOW() or Mobile_EndTime > now())'; // 判断案例是否过期
