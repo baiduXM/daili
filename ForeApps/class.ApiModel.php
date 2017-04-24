@@ -83,6 +83,7 @@ class ApiModel extends ForeVIEWS {
                 $where .= $Color ? ' and CaseImageMobile like \'%' . $Color . '%\'' : '';
                 $where .= $SortID ? ' and CaseImageMobile like \'%,' . $SortID . ',%\'' : '';
             }
+
             $where .= ' and (PC_EndTime > NOW() or Mobile_EndTime > now())'; // 判断案例是否过期
             $sql = 'select count(1) as Num from tb_customers_project a inner join tb_customers b on a.CustomersID=b.CustomersID ' . $where;
             $num = $DB->Select($sql);
