@@ -79,9 +79,11 @@ class ApiModel extends ForeVIEWS {
             if($this->_GET['Type'] == 0){
                 $where .= $Color ? ' and CaseImagePC like \'%' . $Color . '%\'' : '';
                 $where .= $SortID ? ' and CaseImagePC like \'%,' . $SortID . ',%\'' : '';
+				$where .= ' and CaseImagePC is not null';
             }else{
                 $where .= $Color ? ' and CaseImageMobile like \'%' . $Color . '%\'' : '';
                 $where .= $SortID ? ' and CaseImageMobile like \'%,' . $SortID . ',%\'' : '';
+				$where .= ' and CaseImageMobile is not null';
             }
             $where .= ' and (PC_EndTime > NOW() or Mobile_EndTime > now())'; // 判断案例是否过期
             $sql = 'select count(1) as Num from tb_customers_project a inner join tb_customers b on a.CustomersID=b.CustomersID ' . $where;
@@ -89,6 +91,7 @@ class ApiModel extends ForeVIEWS {
             $num = $num[0]['Num'];
             $sql = 'select a.PC_domain,a.CustomersID,a.' . $Type . ',b.CompanyName from tb_customers_project a inner join tb_customers b on a.CustomersID=b.CustomersID ';
             $sql = $sql . $where . $limit;
+
             $ModelList = $DB->Select($sql);
             $String = '';
             foreach ($ModelList as $Value) {
