@@ -1,12 +1,8 @@
 jQuery(document).ready(function() {
     var     dataInit,
-            // colorInit = ['white', 'grey', 'black', 'blue', 'green', 'yellow', 'orange', 'pink', 'red', 'purple', 'brown', 'colorful'],
+            colorInit = ['white', 'grey', 'black', 'blue', 'green', 'yellow', 'orange', 'pink', 'red', 'purple', 'brown', 'colorful'],
             tjInit = ['关闭', '开启', '首页'],
-            // colorData = {white: ['white', '白色'], grey: ['grey', '灰色'], black: ['black', '黑色'], blue: ['blue', '蓝色'], green: ['green', '绿色'], yellow: ['yellow', '黄色'], orange: ['orange', '橙色'], pink: ['pink', '粉色'], red: ['red', '红色'], purple: ['purple', '紫色'], brown: ['#804000', '棕色'], colorful: ['', '彩色']};
-            //===新颜色===
-            colorInit = ['white', 'black', 'blue', 'green', 'yellow', 'orange',  'red', 'purple', 'colorful'],
-            colorData = {white: ['white', '白色'], black: ['black', '黑色'], blue: ['blue', '蓝色'], green: ['green', '绿色'], yellow: ['yellow', '黄色'], orange: ['orange', '橙色'], red: ['red', '红色'], purple: ['purple', '紫色'], colorful: ['', '彩色']};
-            //===新颜色end===
+            colorData = {white: ['white', '白色'], grey: ['grey', '灰色'], black: ['black', '黑色'], blue: ['blue', '蓝色'], green: ['green', '绿色'], yellow: ['yellow', '黄色'], orange: ['orange', '橙色'], pink: ['pink', '粉色'], red: ['red', '红色'], purple: ['purple', '紫色'], brown: ['#804000', '棕色'], colorful: ['', '彩色']};
     /*翻页*/
     var pagelist = function() {
         this.allListNum = 1;    						/*总共的客户数量*/

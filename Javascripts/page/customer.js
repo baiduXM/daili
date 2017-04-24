@@ -1,35 +1,21 @@
 jQuery(document).ready(function () {
     var dataInit,
         /*颜色初始化*/
-        // colorInit = ['white', 'grey', 'black', 'blue', 'green', 'yellow', 'orange', 'pink', 'red', 'purple', 'brown', 'colorful'],
-        // colorData = {
-        //     white: ['white', '白色'],
-        //     grey: ['grey', '灰色'],
-        //     black: ['black', '黑色'],
-        //     blue: ['blue', '蓝色'],
-        //     green: ['green', '绿色'],
-        //     yellow: ['yellow', '黄色'],
-        //     orange: ['orange', '橙色'],
-        //     pink: ['pink', '粉色'],
-        //     red: ['red', '红色'],
-        //     purple: ['purple', '紫色'],
-        //     brown: ['#804000', '棕色'],
-        //     colorful: ['', '彩色']
-        // };
-        //===新颜色初始化===
-        colorInit = ['white',  'black', 'blue', 'green', 'yellow', 'orange', 'red', 'purple', 'colorful'],
+        colorInit = ['white', 'grey', 'black', 'blue', 'green', 'yellow', 'orange', 'pink', 'red', 'purple', 'brown', 'colorful'],
         colorData = {
             white: ['white', '白色'],
+            grey: ['grey', '灰色'],
             black: ['black', '黑色'],
             blue: ['blue', '蓝色'],
             green: ['green', '绿色'],
             yellow: ['yellow', '黄色'],
             orange: ['orange', '橙色'],
+            pink: ['pink', '粉色'],
             red: ['red', '红色'],
             purple: ['purple', '紫色'],
+            brown: ['#804000', '棕色'],
             colorful: ['', '彩色']
         };
-        //===初始化end===
     /*翻页*/
     var pagelist = function () {
         /*总共的客户数量*/
