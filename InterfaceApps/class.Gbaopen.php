@@ -486,8 +486,7 @@ class Gbaopen extends InterfaceVIEWS
                     if ($this->Assess($power, $this->process)) {
                         $cuspromodel = new CustProModule;
                         $fuwuqi = new FuwuqiModule();
-                        // $lists = array('G_name', 'CPhone', 'PK_model', 'PC_model', 'Mobile_model', 'Link_Cus', 'PC_AddTime', 'Mobile_AddTime', 'PC_StartTime', 'Mobile_StartTime', 'PC_domain', 'Mobile_domain', 'Customization', 'FuwuqiID');
-                        $lists = array('G_name', 'CPhone', 'PK_model', 'PC_model','pc_out_domain', 'Mobile_model','mobile_out_domain', 'Link_Cus', 'PC_AddTime', 'Mobile_AddTime', 'PC_StartTime', 'Mobile_StartTime', 'PC_domain', 'Mobile_domain', 'Customization', 'FuwuqiID');
+                        $lists = array('G_name', 'CPhone', 'PK_model', 'PC_model', 'Mobile_model', 'Link_Cus', 'PC_AddTime', 'Mobile_AddTime', 'PC_StartTime', 'Mobile_StartTime', 'PC_domain', 'Mobile_domain', 'Customization', 'FuwuqiID');
                         $cuspro = $cuspromodel->GetOneByWhere($lists, 'where CustomersID=' . $cus_id);
                         if ($cuspro) {
                             if ($cuspro['FuwuqiID']) {
@@ -524,10 +523,8 @@ class Gbaopen extends InterfaceVIEWS
                                 'mobilemodel' => $cuspro['Mobile_model'],
                                 'pc_starttime' => $cuspro['PC_StartTime'],
                                 'mobile_starttime' => $cuspro['Mobile_StartTime'],
-                                // 'pcdomain' => $cuspro['PC_domain'] ? $cuspro['PC_domain'] : '',
-                                'pcdomain' => $cuspro['PC_domain'] ? $cuspro['PC_domain'] : $cuspro['pc_out_domain'],
-                                // 'mobiledomain' => $cuspro['Mobile_domain'] ? $cuspro['Mobile_domain'] : '',
-                                'mobiledomain' => $cuspro['Mobile_domain'] ? $cuspro['Mobile_domain'] : $cuspro['mobile_out_domain'],
+                                'pcdomain' => $cuspro['PC_domain'] ? $cuspro['PC_domain'] : '',
+                                'mobiledomain' => $cuspro['Mobile_domain'] ? $cuspro['Mobile_domain'] : '',
                                 'senior' => $cuspro['Customization'],
                                 'othercus' => $cuspro['Link_Cus']);
                             $result['data'] = $data;
@@ -1080,7 +1077,7 @@ class Gbaopen extends InterfaceVIEWS
                     $Data['Mobile_model'] = 0;
                     //外域手机域名独立
                     $Data['mobile_out_domain'] = $post['outmobile_add'] ? 'http://' . str_replace('http://', '', $post['outmobiledomain']) : '';
-                    $Data['mobile_out_domain'] = $Data['mobile_out_domain'] ? str_replace(' ', '', $Data['mobile_out_domain']) : '';
+                    $Data['mobile_out_domain'] = $Data['mobile_domain'] ? str_replace(' ', '', $Data['mobile_domain']) : '';
                     // $Data['Mobile_domain'] = $post['outmobile_add'] ? 'http://' . str_replace('http://', '', $post['outmobiledomain']) : '';
                     // $Data['Mobile_domain'] = $Data['Mobile_domain'] ? str_replace(' ', '', $Data['Mobile_domain']) : '';
                 } else {
@@ -1099,7 +1096,7 @@ class Gbaopen extends InterfaceVIEWS
                 $Data['Mobile_model'] = $post['mobilemodel'];
                 if ($this->GetModleIDByName($Data['Mobile_model']) > 0) {
                     $Data['PC_model'] = 0;
-                    //外域PC域名独立
+                    //外域手机域名独立
                     $Data['pc_out_domain'] = $post['outpc_add'] ? 'http://' . str_replace('http://', '', $post['outpcdomain']) : '';
                     $Data['pc_out_domain'] = str_replace(' ', '', $Data['pc_out_domain']);
                     // $Data['PC_domain'] = $post['outpc_add'] ? 'http://' . str_replace('http://', '', $post['outpcdomain']) : '';
