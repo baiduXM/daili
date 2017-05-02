@@ -2001,7 +2001,11 @@ class Gbaopen extends InterfaceVIEWS
                 return -1;
             }
             $model = new ModelModule();
-            $modelmsg = $model->GetOneByWhere(array('ID', 'Youhui'), 'where NO="' . $name . '"');
+            // $modelmsg = $model->GetOneByWhere(array('ID', 'Youhui'), 'where NO="' . $name . '"');
+            $modelmsg = $model->modelQuery(array('select ID,Youhui from tb_model where NO="' . $name . '"');
+            if(!$modelmsg){
+                $modelmsg = $model->GetOneByWhere(array('ID', 'Youhui'), 'where NO_bak="' . $name . '"');
+            }
             if ($modelmsg)
                 return $modelmsg;
             else
