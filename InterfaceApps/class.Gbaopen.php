@@ -2004,6 +2004,9 @@ class Gbaopen extends InterfaceVIEWS
             }
             $model = new ModelModule();
             $modelmsg = $model->GetOneByWhere(array('ID', 'Youhui'), 'where NO="' . $name . '"');
+            if(!$modelmsg){
+                $modelmsg = $model->GetOneByWhere(array('ID', 'Youhui'), 'where NO_bak="' . $name . '"');
+            }
             if ($modelmsg)
                 return $modelmsg;
             else
