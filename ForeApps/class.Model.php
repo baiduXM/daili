@@ -47,13 +47,12 @@ class Model extends ForeVIEWS {
             // }
             //===未找到压缩包，则根据该模板名去数据库搜索旧模板名，再去判断压缩包是否存在===
             $ModelModule = new ModelModule();
-            // $Model_bak = $ModelModule->GetOneByWhere(array('NO_bak'),'where NO="' . $filename . '"');
-            $sql = 'select NO_bak from tb_model where NO="'.$filename.'"';
-            $Model_bak = $ModelModule->modelQuery($sql);
-            if(file_exists("tpl/" . $Model_bak . ".zip")){
+            $Model_bak = $ModelModule->GetOneByWhere(array('NO_bak'),'where NO like "%' . $filename . '%"');
+            $Model_zip = $Model_bak['NO_bak'];
+            if(file_exists("tpl/" . $Model_zip . ".zip")){
                 header('Content-type: application/octet-stream');
-                header('Content-Disposition: attachment; filename="'.$Model_bak.'.zip"');
-                readfile("tpl/" . $Model_bak . ".zip");   
+                header('Content-Disposition: attachment; filename="'.$Model_zip.'.zip"');
+                readfile("tpl/" . $Model_zip . ".zip");   
             }else{
                 $TuUrl=GBAOPEN_DOMAIN."api/downloadtemplate";
                 $ToString = 'name=' . $filename."&token=".md5("linshimingma");
