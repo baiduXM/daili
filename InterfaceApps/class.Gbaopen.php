@@ -1918,19 +1918,17 @@ class Gbaopen extends InterfaceVIEWS
         $TuUrl = GBAOPEN_DOMAIN . 'api/modifyuser';
         $ToString .= 'name=' . $CustProInfo ['G_name'];
 
-        // if ($CustProInfo ['PC_model']) {
-        //     preg_match('/[A-Z]{2}[0]*(\d*)/', $CustProInfo ['PC_model'], $have);
-        //     $ToString .= '&pc_tpl_id=' . $have[1];
-        // } else
-        //     $ToString .= '&pc_tpl_id=' . $CustProInfo ['PC_model'];
+        if ($CustProInfo ['PC_model']) {
+            preg_match('/[A-Z]{2}[0]*(\d*)/', $CustProInfo ['PC_model'], $have);
+            $ToString .= '&pc_tpl_id=' . $have[1];
+        } else
+            $ToString .= '&pc_tpl_id=' . $CustProInfo ['PC_model'];
 
-        // if ($CustProInfo ['Mobile_model']) {
-        //     preg_match('/[A-Z]{2}[0]*(\d*)/', $CustProInfo ['Mobile_model'], $have);
-        //     $ToString .= '&mobile_tpl_id=' . $have[1];
-        // } else
-        //     $ToString .= '&mobile_tpl_id=' . $CustProInfo ['Mobile_model'];
-        $ToString .= '&pc_tpl_id=' . $CustProInfo ['PC_model'];
-        $ToString .= '&mobile_tpl_id=' . $CustProInfo ['Mobile_model'];
+        if ($CustProInfo ['Mobile_model']) {
+            preg_match('/[A-Z]{2}[0]*(\d*)/', $CustProInfo ['Mobile_model'], $have);
+            $ToString .= '&mobile_tpl_id=' . $have[1];
+        } else
+            $ToString .= '&mobile_tpl_id=' . $CustProInfo ['Mobile_model'];
 
         $ToString .= '&stage=' . $CustProInfo ['CPhone'];
         $ToString .= '&pc_domain=' . $CustProInfo ['PC_domain'];
