@@ -47,9 +47,18 @@ class Model extends InterfaceVIEWS {
             $Data['Youhui'] = trim($post['youhui']);
             $PCModel = $ModelModule->GetOneByWhere('where NO="' . $Data['PCNum'] . '"');
             $PhoneModel = $ModelModule->GetOneByWhere('where NO="' . $Data['PhoneNum'] . '"');
+            //===如果NO字段无法获取PC/手机模板信息，则从NO_bak字段获取===
+            if(!$PCModel){
+                $PCModel = $ModelModule->GetOneByWhere('where NO_bak="' . $Data['PCNum'] . '"');
+            }
+            if(!$PhoneModel){
+                $PhoneModel = $ModelModule->GetOneByWhere('where NO_bak="' . $Data['PhoneNum'] . '"');
+            }
+            //===获取NO_bak结束===
             if(!$PCModel || !$PhoneModel){
                 $result['err'] = 1000;
-                $result['msg'] = $PCMsg ? '手机模板不存在' : 'PC模板不存在';
+                // $result['msg'] = $PCMsg ? '手机模板不存在' : 'PC模板不存在';
+                $result['msg'] = $PCModel ? '手机模板不存在' : 'PC模板不存在';
                 return $result;
             }
             if($PackModule->GetOneByWhere('where PackagesNum="' . $Data['PackagesNum'] . '"')){
@@ -57,12 +66,35 @@ class Model extends InterfaceVIEWS {
                 $result['msg'] = '当前套餐模板已存在，请输入其他模板名';
                 return $result;
             }
-            $Data['PCUrl'] = $Data['PCUrl'] ? $Data['PCUrl'] : 'http://m.' . $Data['PackagesNum'] . '.n01.5067.org';
+            // $Data['PCUrl'] = $Data['PCUrl'] ? $Data['PCUrl'] : 'http://m.' . $Data['PackagesNum'] . '.n01.5067.org';
+            $Data['PCUrl'] = $Data['PCUrl'] ? $Data['PCUrl'] : 'http://' . $Data['PackagesNum'] . '.n01.5067.org';
             $Data['PhoneUrl'] = $Data['PhoneUrl'] ? $Data['PhoneUrl'] : 'http://m.' . $Data['PackagesNum'] . '.n01.5067.org';
             $Data['TuiJian'] = $post['tuijian'];
             $Data['ModelLan'] = $post['lang'];
+            // if (!empty($Data['PackagesNum'])) {
+            //     if (!preg_match('/GT\d{4}/', $Data['PackagesNum']) or preg_match('/GT\d{5}/', $Data['PackagesNum'])) {
+            //         $result['err'] = 1001;
+            //         $result['msg'] = '错误的双站模板名';
+            //         return $result;
+            //     }
+            // }else{
+            //     $result['err'] = 1001;
+            //     $result['msg'] = '请填写双站模板名';
+            //     return $result;
+            // }
+            // if ((!preg_match('/GM\d{4}/', $Data['PCNum']) and !preg_match('/GP\d{4}/', $Data['PCNum'])) or preg_match('/GM\d{5}/', $Data['PCNum']) or preg_match('/GP\d{5}/', $Data['PCNum'])) {
+            //     $result['err'] = 1001;
+            //     $result['msg'] = '错误的PC模板名';
+            //     return $result;
+            // }
+            // if ((!preg_match('/GM\d{4}/', $Data['PhoneNum']) and !preg_match('/GP\d{4}/', $Data['PhoneNum'])) or preg_match('/GM\d{5}/', $Data['PhoneNum']) or preg_match('/GP\d{5}/', $Data['PhoneNum'])) {
+            //     $result['err'] = 1001;
+            //     $result['msg'] = '错误的手机模板名';
+            //     return $result;
+            // }
+            //===只匹配新的命名规则===
             if (!empty($Data['PackagesNum'])) {
-                if (!preg_match('/GT\d{4}/', $Data['PackagesNum']) or preg_match('/GT\d{5}/', $Data['PackagesNum'])) {
+                if (!preg_match('/G\d{4}T(CN|EN|TW|JP)\d{2}/', $Data['PackagesNum']) or preg_match('/G\d{4}T(CN|EN|TW|JP)\d{4}/', $Data['PackagesNum'])) {
                     $result['err'] = 1001;
                     $result['msg'] = '错误的双站模板名';
                     return $result;
@@ -72,17 +104,20 @@ class Model extends InterfaceVIEWS {
                 $result['msg'] = '请填写双站模板名';
                 return $result;
             }
-            if ((!preg_match('/GM\d{4}/', $Data['PCNum']) and !preg_match('/GP\d{4}/', $Data['PCNum'])) or preg_match('/GM\d{5}/', $Data['PCNum']) or preg_match('/GP\d{5}/', $Data['PCNum'])) {
+            if (!preg_match('/G\d{4}P(CN|EN|TW|JP)\d{2}/', $Data['PCNum']) or preg_match('/G\d{4}P(CN|EN|TW|JP)\d{4}/', $Data['PCNum'])) {
                 $result['err'] = 1001;
                 $result['msg'] = '错误的PC模板名';
                 return $result;
             }
-            if ((!preg_match('/GM\d{4}/', $Data['PhoneNum']) and !preg_match('/GP\d{4}/', $Data['PhoneNum'])) or preg_match('/GM\d{5}/', $Data['PhoneNum']) or preg_match('/GP\d{5}/', $Data['PhoneNum'])) {
+            if (!preg_match('/G\d{4}M(CN|EN|TW|JP)\d{2}/', $Data['PhoneNum']) or preg_match('/G\d{4}M(CN|EN|TW|JP)\d{4}/', $Data['PhoneNum'])) {
                 $result['err'] = 1001;
                 $result['msg'] = '错误的手机模板名';
                 return $result;
             }
-            preg_match('/[A-Z]{2}[0]*(\d*)/', $Data['PackagesNum'], $have);
+            //===匹配end===
+            // preg_match('/[A-Z]{2}[0]*(\d*)/', $Data['PackagesNum'], $have);
+            preg_match('/G[0]*(\d*)/', $Data['PackagesNum'], $have);
+            $Data['PackagesNum_bak'] = $Data['PackagesNum'];
             $Data['Num'] = $have[1];
             $Data['Color'] = $PCModel['Color'] . ',' . $PhoneModel['Color'];
             $Data['Keyword'] = $PCModel['Keyword'];
