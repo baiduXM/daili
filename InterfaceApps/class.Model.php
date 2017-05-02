@@ -45,16 +45,12 @@ class Model extends InterfaceVIEWS {
             $Data['PhoneUrl'] = trim($post['mobile_url']);
             $Data['Price'] = trim($post['price']);
             $Data['Youhui'] = trim($post['youhui']);
-            $PCModel = $ModelModule->GetOneByWhere('where NO="' . $Data['PCNum'] . '"');
-            $PhoneModel = $ModelModule->GetOneByWhere('where NO="' . $Data['PhoneNum'] . '"');
-            //===如果NO字段无法获取PC/手机模板信息，则从NO_bak字段获取===
-            if(!$PCModel){
-                $PCModel = $ModelModule->GetOneByWhere('where NO="' . $Data['PCNum'] . '"');
-            }
-            if(!$PhoneModel){
-                $PhoneModel = $ModelModule->GetOneByWhere('where NO="' . $Data['PhoneNum'] . '"');
-            }
-            //===获取NO_bak结束===
+            // $PCModel = $ModelModule->GetOneByWhere('where NO="' . $Data['PCNum'] . '"');
+            // $PhoneModel = $ModelModule->GetOneByWhere('where NO="' . $Data['PhoneNum'] . '"');
+            $pc_sql = 'select * from tb_model where ON="' . $Data['PCNum'] . '"';
+            $mobile_sql = 'select * from tb_model where ON="' . $Data['PhoneNum'] . '"';
+            $PCModel = $ModelModule->modelQuery($pc_sql);
+            $PhoneModel = $ModelModule->modelQuery($mobile_sql);
             if(!$PCModel || !$PhoneModel){
                 $result['err'] = 1000;
                 // $result['msg'] = $PCMsg ? '手机模板不存在' : 'PC模板不存在';

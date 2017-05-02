@@ -159,5 +159,9 @@ class ModelModule {
         $DB = new DB ();
         return $DB->GetOne('select * from tb_model_packages where ' . $this->KeyID . ' > ' . $KeyID . $Add . ' order by ' . $this->KeyID . ' asc');
     }
+    public function modelQuery($sql) {
+        $DB = new DB ();
+        return $DB->Query($sql);
+    }
 
 }
