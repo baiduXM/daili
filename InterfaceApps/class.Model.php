@@ -47,8 +47,8 @@ class Model extends InterfaceVIEWS {
             $Data['Youhui'] = trim($post['youhui']);
             // $PCModel = $ModelModule->GetOneByWhere('where NO="' . $Data['PCNum'] . '"');
             // $PhoneModel = $ModelModule->GetOneByWhere('where NO="' . $Data['PhoneNum'] . '"');
-            $pc_sql = 'select * from tb_model where ON="' . $Data['PCNum'] . '"';
-            $mobile_sql = 'select * from tb_model where ON="' . $Data['PhoneNum'] . '"';
+            $pc_sql = 'select * from tb_model where NO="' . $Data['PCNum'] . '"';
+            $mobile_sql = 'select * from tb_model where NO="' . $Data['PhoneNum'] . '"';
             $PCModel = $ModelModule->modelQuery($pc_sql);
             $PhoneModel = $ModelModule->modelQuery($mobile_sql);
             if(!$PCModel || !$PhoneModel){
