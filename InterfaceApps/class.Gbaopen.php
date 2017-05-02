@@ -2002,7 +2002,7 @@ class Gbaopen extends InterfaceVIEWS
             }
             $model = new ModelModule();
             // $modelmsg = $model->GetOneByWhere(array('ID', 'Youhui'), 'where NO="' . $name . '"');
-            $modelmsg = $model->modelQuery(array('select ID,Youhui from tb_model where NO="' . $name . '"');
+            $modelmsg = $model->modelQuery('select ID,Youhui from tb_model where NO="' . $name . '"');
             if(!$modelmsg){
                 $modelmsg = $model->GetOneByWhere(array('ID', 'Youhui'), 'where NO_bak="' . $name . '"');
             }
