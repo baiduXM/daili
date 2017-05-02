@@ -352,9 +352,27 @@ class Model extends InterfaceVIEWS {
         if ($level == 1) {
             $modelName = $this->_GET['name'];
             $result = array('err' => 0, 'msg' => '获取成功', 'data' => array());
-            if (preg_match('/[A-Z]{2}[0]*(\d*)/', $modelName)) {
+            //===判断是哪种命名方式，并通过不同的命名获取信息===
+            if(preg_match('/G\d{4}(P|M)(CN|EN|TW|JP)\d{2}/', $modelName) and !preg_match('/G\d{4}(P|M)(CN|EN|TW|JP)\d{4}/', $modelName)){
                 $Model = new ModelModule();
                 $modelMsg = $Model->GetOneByWhere(array('Price', 'Youhui', 'Url', 'TuiJian', 'BaiDuXingPing', 'ModelLan', 'Color', 'ModelClassID'), 'where NO="' . $modelName . '"');
+                if ($modelMsg) {
+                    $Data['price'] = $modelMsg['Price'];
+                    $Data['youhui'] = $modelMsg['Youhui'];
+                    $Data['url'] = $modelMsg['Url'];
+                    $Data['tuijian'] = $modelMsg['TuiJian'];
+                    $Data['star'] = $modelMsg['BaiDuXingPing'];
+                    $Data['lang'] = $modelMsg['ModelLan'];
+                    $Data['target'] = trim($modelMsg['ModelClassID'], ',');
+                    $Data['color'] = trim($modelMsg['Color'], ',');
+                    $result['data'] = $Data;
+                } else {
+                    $result['err'] = 1001;
+                    $result['msg'] = '错误的模板编号,不存在此模板';
+                }
+            }elseif (preg_match('/[A-Z]{2}[0]*(\d*)/', $modelName)) {
+                $Model = new ModelModule();
+                $modelMsg = $Model->GetOneByWhere(array('Price', 'Youhui', 'Url', 'TuiJian', 'BaiDuXingPing', 'ModelLan', 'Color', 'ModelClassID'), 'where NO_bak="' . $modelName . '"');
                 if ($modelMsg) {
                     $Data['price'] = $modelMsg['Price'];
                     $Data['youhui'] = $modelMsg['Youhui'];
@@ -373,6 +391,28 @@ class Model extends InterfaceVIEWS {
                 $result['err'] = 1000;
                 $result['msg'] = '错误的模板编号格式';
             }
+            //===获取end===
+            // if (preg_match('/[A-Z]{2}[0]*(\d*)/', $modelName)) {
+            //     $Model = new ModelModule();
+            //     $modelMsg = $Model->GetOneByWhere(array('Price', 'Youhui', 'Url', 'TuiJian', 'BaiDuXingPing', 'ModelLan', 'Color', 'ModelClassID'), 'where NO="' . $modelName . '"');
+            //     if ($modelMsg) {
+            //         $Data['price'] = $modelMsg['Price'];
+            //         $Data['youhui'] = $modelMsg['Youhui'];
+            //         $Data['url'] = $modelMsg['Url'];
+            //         $Data['tuijian'] = $modelMsg['TuiJian'];
+            //         $Data['star'] = $modelMsg['BaiDuXingPing'];
+            //         $Data['lang'] = $modelMsg['ModelLan'];
+            //         $Data['target'] = trim($modelMsg['ModelClassID'], ',');
+            //         $Data['color'] = trim($modelMsg['Color'], ',');
+            //         $result['data'] = $Data;
+            //     } else {
+            //         $result['err'] = 1001;
+            //         $result['msg'] = '错误的模板编号,不存在此模板';
+            //     }
+            // } else {
+            //     $result['err'] = 1000;
+            //     $result['msg'] = '错误的模板编号格式';
+            // }
         } else {
             $result['err'] = 1002;
             $result['msg'] = '非法请求';

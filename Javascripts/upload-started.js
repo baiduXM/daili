@@ -125,7 +125,8 @@ jQuery(function() {
                 $("#config-list .csv").show("slow").siblings("div").hide("slow");
             }
         }
-        var addline = rarData[file.id] ? '<p>模板名 <input type="text" name="model" placeholder="不填，自动新建模板号" class="Input" style="height: 32px;line-height: 32px;width: 60%;background:rgba(0, 0, 0, 0);"><span class="loadmodel transition1">载入</span></p>\n\
+        // var addline = rarData[file.id] ? '<p>模板名 <input type="text" name="model" placeholder="不填，自动新建模板号" class="Input" style="height: 32px;line-height: 32px;width: 60%;background:rgba(0, 0, 0, 0);"><span class="loadmodel transition1">载入</span></p>\n\
+        var addline = rarData[file.id] ? '<p>模板名 <input type="text" name="model" placeholder="请手动填写模板号" class="Input" style="height: 32px;line-height: 32px;width: 60%;background:rgba(0, 0, 0, 0);"><span class="loadmodel transition1">载入</span></p>\n\
                                     <p>语言选择：<span class="lang"><tt class="transition1">CN</tt><span class="transition1"></span></span></p>'
                 :
                 '';
