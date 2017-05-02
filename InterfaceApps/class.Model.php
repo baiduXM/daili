@@ -701,7 +701,7 @@ class Model extends InterfaceVIEWS {
                                     }
                                     //根据旧命名获取对应的新命名
                                     $Modelname_bak = $Modelname;//上传成功后删除备份压缩包用
-                                    $ModelGot = $ModelModule->GetOneInfoByKeyID($Modelname_bak,'NO_bak');
+                                    $ModelGot = $ModelModule->GetOneInfoByKeyID('\'' . $Modelname_bak . '\'','NO_bak');
                                     if($ModelGot){//如果数据库里没有旧命名，则使用旧命名为错误的
                                         $Modelname = $ModelGot['NO'];
                                     }else{
