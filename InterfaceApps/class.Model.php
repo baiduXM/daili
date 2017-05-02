@@ -641,58 +641,100 @@ class Model extends InterfaceVIEWS {
                             $Data['Content'] = $msg['ModelContent'] ? $msg['ModelContent'] : '';
                             // 获取文件指定名称
                             $Modelname = $this->_REQUEST['msg'] ? $this->_REQUEST['msg'] : false;
-                            if ($Modelname) {
-                                if (preg_match('/GM\d{4}/', $Modelname) or preg_match('/GP\d{4}/', $Modelname)) {
+                            //===模板名的判断获取===
+                            //判断是哪种命名规则
+                            if($Modelname){
+                               if(preg_match('/G\d{4}(P|M)(CN|EN|TW|JP)\d{2}/', $Modelname)){
+                                    //最后两位数超过2位也会匹配，用这条限制到3位，预留1位给可能超出的模板
+                                    if (preg_match('/G\d{4}(P|M)(CN|EN|TW|JP)\d{4}/', $Modelname)) {
+                                        unlink($configLoad);
+                                        unlink($uploadPath);
+                                        $result = array('err' => 1003, 'data' => '', 'msg' => '模板名错误！');
+                                        return $result;
+                                    }
+                                }elseif(preg_match('/GM\d{4}/', $Modelname) or preg_match('/GP\d{4}/', $Modelname)){
                                     if (preg_match('/GM\d{5}/', $Modelname) or preg_match('/GP\d{5}/', $Modelname)) {
                                         unlink($configLoad);
                                         unlink($uploadPath);
-                                        $result = array('err' => 1003, 'data' => '', 'msg' => '模板文件中config.ini里配置出错，请填写Type类型！');
+                                        $result = array('err' => 1003, 'data' => '', 'msg' => '模板名错误！');
                                         return $result;
                                     }
-                                } else {
+                                    //根据旧命名获取对应的新命名
+                                    $Modelname_bak = $Modelname;//上传成功后删除备份压缩包用
+                                    $ModelGot = $ModelModule->GetOneInfoByKeyID($Modelname_bak,'NO_bak');
+                                    if($ModelGot){//如果数据库里没有旧命名，则使用旧命名为错误的
+                                        $Modelname = $ModelGot['NO'];
+                                    }else{
+                                        unlink($configLoad);
+                                        unlink($uploadPath);
+                                        $result = array('err' => 1003, 'data' => '', 'msg' => '错误的模板名，请重新上传！');
+                                        return $result;
+                                    }                                    
+                                }else{
                                     unlink($configLoad);
                                     unlink($uploadPath);
                                     $result = array('err' => 1003, 'data' => '', 'msg' => '错误的模板名，请重新上传！');
                                     return $result;
-                                }
+                                } 
                             } else {
                                 $Modelname = '';
                             }
+                            //===模板名的判断获取end====
+                            // if ($Modelname) {
+                            //     if (preg_match('/GM\d{4}/', $Modelname) or preg_match('/GP\d{4}/', $Modelname)) {
+                            //         if (preg_match('/GM\d{5}/', $Modelname) or preg_match('/GP\d{5}/', $Modelname)) {
+                            //             unlink($configLoad);
+                            //             unlink($uploadPath);
+                            //             $result = array('err' => 1003, 'data' => '', 'msg' => '模板文件中config.ini里配置出错，请填写Type类型！');
+                            //             return $result;
+                            //         }
+                            //     } else {
+                            //         unlink($configLoad);
+                            //         unlink($uploadPath);
+                            //         $result = array('err' => 1003, 'data' => '', 'msg' => '错误的模板名，请重新上传！');
+                            //         return $result;
+                            //     }
+                            // } else {
+                            //     $Modelname = '';
+                            // }
                             //压缩包重命名
                             if (empty($Modelname)) {
-                                if ($Data['Type'] == 'PC') {
-                                    $NewName = $ModelModule->GetOneForNew('PC', $lang);
-                                    $NewName = (int) $NewName['Num'] + 1;
-                                    $Data['Num'] = $NewName;
-                                    $geshu = strlen((string) $NewName);
-                                    $geshu = 4 - $geshu;
-                                    $Modelname = 'GP';
-                                    for ($i = 0; $i < $geshu; $i++) {
-                                        $Modelname .='0';
-                                    }
-                                    $Modelname .= $Data['Num'];
-                                    $Data['NO'] = $Modelname;
-                                    $filename = $Modelname . '.zip';
-                                } else {
-                                    $NewName = $ModelModule->GetOneForNew('手机', $lang);
-                                    $NewName = (int) $NewName['Num'] + 1;
-                                    $Data['Num'] = $NewName;
-                                    $geshu = strlen((string) $NewName);
-                                    $geshu = 4 - $geshu;
-                                    $Modelname = 'GM';
-                                    for ($i = 0; $i < $geshu; $i++) {
-                                        $Modelname .='0';
-                                    }
-                                    $Modelname .= $Data['Num'];
-                                    $Data['NO'] = $Modelname;
-                                    $filename = $Modelname . '.zip';
-                                }
-                                $uploadZip = $uploadDir . DIRECTORY_SEPARATOR . $filename;
-                                rename($uploadPath, $uploadZip);
+                                // if ($Data['Type'] == 'PC') {
+                                //     $NewName = $ModelModule->GetOneForNew('PC', $lang);
+                                //     $NewName = (int) $NewName['Num'] + 1;
+                                //     $Data['Num'] = $NewName;
+                                //     $geshu = strlen((string) $NewName);
+                                //     $geshu = 4 - $geshu;
+                                //     $Modelname = 'GP';
+                                //     for ($i = 0; $i < $geshu; $i++) {
+                                //         $Modelname .='0';
+                                //     }
+                                //     $Modelname .= $Data['Num'];
+                                //     $Data['NO'] = $Modelname;
+                                //     $filename = $Modelname . '.zip';
+                                // } else {
+                                //     $NewName = $ModelModule->GetOneForNew('手机', $lang);
+                                //     $NewName = (int) $NewName['Num'] + 1;
+                                //     $Data['Num'] = $NewName;
+                                //     $geshu = strlen((string) $NewName);
+                                //     $geshu = 4 - $geshu;
+                                //     $Modelname = 'GM';
+                                //     for ($i = 0; $i < $geshu; $i++) {
+                                //         $Modelname .='0';
+                                //     }
+                                //     $Modelname .= $Data['Num'];
+                                //     $Data['NO'] = $Modelname;
+                                //     $filename = $Modelname . '.zip';
+                                // }
+                                // $uploadZip = $uploadDir . DIRECTORY_SEPARATOR . $filename;
+                                // rename($uploadPath, $uploadZip);
+                                $result = array('err' => 1003, 'data' => '', 'msg' => '请填写模板名！');
+                                return $result;
                             } else {
                                 $Data['NO'] = $Modelname;
                                 $filename = $Modelname . '.zip';
-                                preg_match('/[A-Z]{2}[0]*(\d*)/', $Modelname, $have);
+                                // preg_match('/[A-Z]{2}[0]*(\d*)/', $Modelname, $have);
+                                preg_match('/[A-Z]{1}[0]*(\d*)/', $Modelname, $have);
                                 $Data['Num'] = $have[1];
                                 if (!$Data['Num']) {
                                     unlink($configLoad);
@@ -747,6 +789,13 @@ class Model extends InterfaceVIEWS {
 
                             unlink($configLoad);
                             unlink($uploadZip);
+                            //===如果有旧命名的备份包，删除===
+                            // if($Modelname_bak){
+                            //     if(file_exists("tpl/".$Modelname_bak)){
+                            //         @unlink("tpl/".$Modelname_bak);
+                            //     }
+                            // }                            
+                            //===删除旧命名备份包end===
                             $result = array('err' => 0, 'data' => '', 'msg' => '上传成功！');
                             return $result;
                         } elseif ($fileName) {
@@ -916,10 +965,12 @@ class Model extends InterfaceVIEWS {
                 if($data["Type"]=="PC"){
                     $data['EWM'] = 'http://s.jiathis.com/qrcode.php?url=' . $data['Url'];
                 }else{
-                    if(strpos($data["Url"], 'http://GM')===false){
+                    // if(strpos($data["Url"], 'http://GM')===false){
+                    if(strpos($data["Url"], 'http://G')===false){
                         $data['EWM'] = 'http://s.jiathis.com/qrcode.php?url=' . $data['Url'];
                     }else{
-                        $data['Url']=str_replace('http://GM', 'http://m.GM', $data['Url']);
+                        // $data['Url']=str_replace('http://GM', 'http://m.GM', $data['Url']);
+                        $data['Url']=str_replace('http://G', 'http://m.G', $data['Url']);
                         $data['EWM'] = 'http://s.jiathis.com/qrcode.php?url=' . $data['Url'];
                     }
                 }
