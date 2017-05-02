@@ -49,10 +49,10 @@ class Model extends InterfaceVIEWS {
             $PhoneModel = $ModelModule->GetOneByWhere('where NO="' . $Data['PhoneNum'] . '"');
             //===如果NO字段无法获取PC/手机模板信息，则从NO_bak字段获取===
             if(!$PCModel){
-                $PCModel = $ModelModule->GetOneByWhere('where NO_bak="' . $Data['PCNum'] . '"');
+                $PCModel = $ModelModule->GetOneByWhere('where NO="' . $Data['PCNum'] . '"');
             }
             if(!$PhoneModel){
-                $PhoneModel = $ModelModule->GetOneByWhere('where NO_bak="' . $Data['PhoneNum'] . '"');
+                $PhoneModel = $ModelModule->GetOneByWhere('where NO="' . $Data['PhoneNum'] . '"');
             }
             //===获取NO_bak结束===
             if(!$PCModel || !$PhoneModel){
