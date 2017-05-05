@@ -1997,6 +1997,9 @@ class Gbaopen extends InterfaceVIEWS
             }
             $model = new ModelPackageModule();
             $modelmsg = $model->GetOneByWhere(array('PhoneNum', 'PCNum', 'Youhui'), 'where PackagesNum="' . $name . '"');
+            if($modelmsg){
+                $modelmsg = $model->GetOneByWhere(array('PhoneNum', 'PCNum', 'Youhui'), 'where PackagesNum_bak="' . $name . '"');
+            }
             return $modelmsg;
         } else {
             if (!$name) {

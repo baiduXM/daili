@@ -851,6 +851,7 @@ class Model extends InterfaceVIEWS {
                                     $Modelever = $ModelModule->GetOneInfoByKeyID('\'' . $Modelname . '\'', 'NO');
                                     $ModelModule->UpdateArrayByNO($Data, $Modelname);
                                 } else {
+                                    $Data['NO_bak'] = $Modelname;
                                     $ModelModule->InsertArray($Data);
                                 }
                             }
