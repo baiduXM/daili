@@ -142,7 +142,13 @@ class ApiModel extends ForeVIEWS {
                 $cusmsg = $cus->GetOneByWhere(array('CompanyName'), 'where CustomersID=' . $cusid);
                 $BackInfo = $cuspro->GetOneByWhere(array('CustomersID'), 'where CustomersProjectID>' . $cuspromsg['CustomersProjectID'] . ' and Cases > 0');
                 $NextInfo = $cuspro->GetOneByWhere(array('CustomersID'), 'where CustomersProjectID<' . $cuspromsg['CustomersProjectID'] . ' and Cases > 0 order by CustomersProjectID desc');
-                $pcmsg = $pc->GetOneByWhere(array('ModelLan', 'Language', 'Price', 'Youhui'), 'where NO=\'' . $cuspromsg['PC_model'] . '\'');
+                // $pcmsg = $pc->GetOneByWhere(array('ModelLan', 'Language', 'Price', 'Youhui'), 'where NO=\'' . $cuspromsg['PC_model'] . '\'');
+                if(preg_match('/G\d{4}P(CN|EN|TW|JP)\d{2}/', $cuspromsg['PC_model'])){
+                    $pcmsg = $pc->GetOneByWhere(array('ModelLan', 'Language', 'Price', 'Youhui'), 'where NO=\'' . $cuspromsg['PC_model'] . '\'');
+                }else{
+                    $pcmsg = $pc->GetOneByWhere(array('NO','ModelLan', 'Language', 'Price', 'Youhui'), 'where NO_bak=\'' . $cuspromsg['PC_model'] . '\'');
+                    $cuspromsg['PC_model'] = $pcmsg['NO'];
+                }
                 $casedata = explode(',', $cuspromsg['CaseImagePC']);
                 for ($i = 0, $count = count($casedata), $type = 1; $i < $count; $i++) {
                     if ($casedata[$i]) {

@@ -1051,7 +1051,6 @@ class Gbaopen extends InterfaceVIEWS
             //中英关联			
             $linkcus = $post['othercus'] ? $post['othercus'] : 0;
             $Data['Link_Cus'] = $linkcus ? $cuspromodel->GetOneByWhere('where G_name=\'' . $linkcus . '\'') ? $linkcus : 0 : 0;
-//			file_put_contents('link.txt','date is '.$Data['Link_Cus']);
             //模板号域名处理
             $Model = new ModelModule();
             $Data['CPhone'] = $post['pc_mobile'];
@@ -1324,7 +1323,7 @@ class Gbaopen extends InterfaceVIEWS
 //                $update_self['CostAll'] = $update_self['CostAll'] + $price;
 //            }
             $Data['UpdateTime'] = date('Y-m-d H:i:s', time());
-//			file_put_contents('tongyi.txt',$Data['Link_Cus']);
+
             $IsOk = $this->ToGbaoPenEditInfo(array_replace($cuspro, $Data));
             if ($IsOk['err'] != 1000) {
                 $result['err'] = 1001;
@@ -1350,7 +1349,7 @@ class Gbaopen extends InterfaceVIEWS
 //                    return $result;
 //                }
 //            }
-//			file_put_contents('linkcus.txt',$Data['Link_Cus']);
+
             $cuspromodel->UpdateArray($Data, $cus_id);
             $result['data']['name'] = '您选择的客户';
             $result['msg'] = '修改成功';
