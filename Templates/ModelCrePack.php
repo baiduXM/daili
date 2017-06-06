@@ -26,19 +26,10 @@
                                     </p>
                                     <p>
                                         <span class="content-l">语言选择：</span>
-                                        <!-- <span class="lang ">
+                                        <span class="lang ">
                                             <tt class="transition1">CN</tt>
                                             <span class="transition1"></span>
-                                        </span> -->
-                                        <span>
-                                            <select name="lang" style="width:120px">
-                                                <option value="CN" selected="selected">中文</option>
-                                                <option value="EN">英文</option>
-                                                <option value="TW">繁体中文</option>
-                                                <option value="JP">日文</option>
-                                            </select>
                                         </span>
-
                                         <span class="content-l">推荐</span>
                                         <span>
                                             <select name="tuijian" style="width:120px">

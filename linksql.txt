@@ -1,1 +1,0 @@
-result is UPDATE `tb_customers_project` SET `Link_Cus` = 'lushanmater1',`CPhone` = '4',`Customization` = '0',`PK_model` = 'GT0083',`PC_model` = 'GP0179',`Mobile_model` = 'GM0211',`PC_domain` = 'http://lushanmater.com',`Mobile_domain` = 'http://m.lushanmater.com',`UpdateTime` = '2017-03-20 10:45:17'  WHERE (`CustomersID` = '2027')

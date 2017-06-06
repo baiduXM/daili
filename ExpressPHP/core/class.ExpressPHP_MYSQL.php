@@ -293,7 +293,7 @@ abstract class ExpressPHP_MYSQL {
 		$sql = "UPDATE `$tablename` SET {$sql_ext} {$where}";
 		//echo $sql;exit;		
 		$result = $this->Update ( $sql );
-//		file_put_contents('linksql.txt','result is '.$sql);
+
 		return $result;
 	}
 	/**

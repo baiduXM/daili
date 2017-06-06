@@ -1,30 +1,33 @@
 <?php
 
-class ApiModel extends ForeVIEWS {
+class ApiModel extends ForeVIEWS
+{
 
-    public function __Public() {
+    public function __Public()
+    {
         header('Content-type: application/json');
     }
 
 //==========================================PC==============
     //返回分类列表	http://dailipingtai.dn160.com.cn/index.php?module=ApiModel&action=GetCalssList
-    public function GetCalssList() {
+    public function GetCalssList()
+    {
         $ModelClass = new ModelClassModule();
         $ModelClassLists = $ModelClass->GetListsAll();
-        $DB=new DB();
-        $get=  $this->_GET;
-        if($get["type"]=="1"){
-           $sql="select count(*) as num from tb_model_packages where TuiJian>0 and ModelClassID like "; 
-        }else if($get["type"]=="2"){
-           $sql="select count(*) as num from tb_model where Type='PC' and TuiJian>0 and ModelClassID like ";  
-        }else{
-           $sql="select count(*) as num from tb_model where Type='手机' and TuiJian>0 and ModelClassID like "; 
+        $DB = new DB();
+        $get = $this->_GET;
+        if ($get["type"] == "1") {
+            $sql = "select count(*) as num from tb_model_packages where TuiJian>0 and ModelClassID like ";
+        } else if ($get["type"] == "2") {
+            $sql = "select count(*) as num from tb_model where Type='PC' and TuiJian>0 and ModelClassID like ";
+        } else {
+            $sql = "select count(*) as num from tb_model where Type='手机' and TuiJian>0 and ModelClassID like ";
         }
-        
-        foreach($ModelClassLists as $k=>$v){
-            $count=0;
-            $count=$DB->select($sql."'%,".$v["ID"].",%'");
-            if($count[0]["num"]==0){
+
+        foreach ($ModelClassLists as $k => $v) {
+            $count = 0;
+            $count = $DB->select($sql . "'%," . $v["ID"] . ",%'");
+            if ($count[0]["num"] == 0) {
                 unset($ModelClassLists[$k]);
             }
         }
@@ -43,9 +46,11 @@ class ApiModel extends ForeVIEWS {
     }
 
     //返回地区列表
-    public function GetAreaList() {
+    public function GetAreaList()
+    {
         $area = new AreaModule;
         $areaList = $area->GetAllByWhere();
+        $String = '';
         foreach ($areaList as $v) {
             $String .= '<area>
                             <id>' . $v['ID'] . '</id>
@@ -60,7 +65,8 @@ class ApiModel extends ForeVIEWS {
     }
 
     //返回案例列表
-    public function GetCasesList() {
+    public function GetCasesList()
+    {
         if ($this->_GET) {
             $Color = trim($this->_GET['Color']); //颜色
             $Cases = _intval($this->_GET['Cases']); //案例区域号
@@ -76,11 +82,11 @@ class ApiModel extends ForeVIEWS {
             $DB = new DB();
             $where = $Cases ? ' where Cases like \'' . $Cases . '%\'' : ' where Cases > 0';
             $where .= $Keyword ? ' and CompanyName like \'%' . $Keyword . '%\'' : '';
-            if($this->_GET['Type'] == 0){
+            if ($this->_GET['Type'] == 0) {
                 $where .= $Color ? ' and CaseImagePC like \'%' . $Color . '%\'' : '';
                 $where .= $SortID ? ' and CaseImagePC like \'%,' . $SortID . ',%\'' : '';
                 $where .= ' and CaseImagePC is not null ';
-            }else{
+            } else {
                 $where .= $Color ? ' and CaseImageMobile like \'%' . $Color . '%\'' : '';
                 $where .= $SortID ? ' and CaseImageMobile like \'%,' . $SortID . ',%\'' : '';
                 $where .= ' and CaseImageMobile is not null ';
@@ -95,15 +101,15 @@ class ApiModel extends ForeVIEWS {
             $ModelList = $DB->Select($sql);
             $String = '';
             foreach ($ModelList as $Value) {
-                if($Value[$Type]){
+                if ($Value[$Type]) {
                     $casedata = explode(',', $Value[$Type]);
                     $count = count($casedata);
-                                    $load = explode('/', $casedata[$count - 2]);
-                                    if($load[1] == 'uploads'){
-                                            unset($load[0]);
-                                            unset($load[1]);
-                                            $casedata[$count - 2] = implode('/', $load);
-                                    }
+                    $load = explode('/', $casedata[$count - 2]);
+                    if ($load[1] == 'uploads') {
+                        unset($load[0]);
+                        unset($load[1]);
+                        $casedata[$count - 2] = implode('/', $load);
+                    }
                     $img = IMG_DOMAIN . $casedata[$count - 2];
                     $String .= '  <model>
                                     <id>' . $Value['CustomersID'] . '</id>
@@ -112,13 +118,13 @@ class ApiModel extends ForeVIEWS {
                                     <img>' . $img . '</img>
                                     </model>
                                     ';
-                }else
+                } else
                     continue;
             }
             $String = '<?xml version="1.0" encoding="utf-8"?>
 			<models>
 			' . $String .
-                    '  <page>
+                '  <page>
 				<total>' . $num . '</total>
 			</page>
 			</models>';
@@ -131,7 +137,8 @@ class ApiModel extends ForeVIEWS {
     }
 
     //返回案例列表
-    public function GetCasesModel() {
+    public function GetCasesModel()
+    {
         if ($this->_GET && _intval($this->_GET['ModelID'])) {
             $cusid = _intval($this->_GET['ModelID']); //客户ID
             $cuspro = new CustProModule;
@@ -142,7 +149,13 @@ class ApiModel extends ForeVIEWS {
                 $cusmsg = $cus->GetOneByWhere(array('CompanyName'), 'where CustomersID=' . $cusid);
                 $BackInfo = $cuspro->GetOneByWhere(array('CustomersID'), 'where CustomersProjectID>' . $cuspromsg['CustomersProjectID'] . ' and Cases > 0');
                 $NextInfo = $cuspro->GetOneByWhere(array('CustomersID'), 'where CustomersProjectID<' . $cuspromsg['CustomersProjectID'] . ' and Cases > 0 order by CustomersProjectID desc');
-                $pcmsg = $pc->GetOneByWhere(array('ModelLan', 'Language', 'Price', 'Youhui'), 'where NO=\'' . $cuspromsg['PC_model'] . '\'');
+                // $pcmsg = $pc->GetOneByWhere(array('ModelLan', 'Language', 'Price', 'Youhui'), 'where NO=\'' . $cuspromsg['PC_model'] . '\'');
+                if (preg_match('/G\d{4}P(CN|EN|TW|JP)\d{2}/', $cuspromsg['PC_model'])) {
+                    $pcmsg = $pc->GetOneByWhere(array('ModelLan', 'Language', 'Price', 'Youhui'), 'where NO=\'' . $cuspromsg['PC_model'] . '\'');
+                } else {
+                    $pcmsg = $pc->GetOneByWhere(array('NO', 'ModelLan', 'Language', 'Price', 'Youhui'), 'where NO_bak=\'' . $cuspromsg['PC_model'] . '\'');
+                    $cuspromsg['PC_model'] = $pcmsg['NO'];
+                }
                 $casedata = explode(',', $cuspromsg['CaseImagePC']);
                 for ($i = 0, $count = count($casedata), $type = 1; $i < $count; $i++) {
                     if ($casedata[$i]) {
@@ -169,7 +182,7 @@ class ApiModel extends ForeVIEWS {
                     }
                 }
                 $load = explode('/', $case['img'][1]);
-                if($load[1] == 'uploads'){
+                if ($load[1] == 'uploads') {
                     unset($load[0]);
                     unset($load[1]);
                     $case['img'][1] = implode('/', $load);
@@ -202,7 +215,8 @@ class ApiModel extends ForeVIEWS {
     }
 
     //返回PC数据列表	http://dailipingtai.dn160.com.cn/index.php?module=ApiModel&action=GetPCModelList&SortGUID=&Color=blue&Keyword=&Page=1&Number=2
-    public function GetPCModelList() {
+    public function GetPCModelList()
+    {
 
         if ($this->_GET) {
             $SortGUID = trim($this->_GET['SortGUID']); //类别ID
@@ -260,7 +274,7 @@ class ApiModel extends ForeVIEWS {
             $String = '<?xml version="1.0" encoding="utf-8"?>
 			<models>
 			' . $String .
-                    '  <page>
+                '  <page>
 				<total>' . $ModelListNun['Num'] . '</total>
 			  </page>
 			</models>';
@@ -273,7 +287,8 @@ class ApiModel extends ForeVIEWS {
     }
 
     //获取数据模型	http://dailipingtai.dn160.com.cn/index.php?module=ApiModel&action=GetPCModel&ModelID=2
-    public function GetPCModel() {
+    public function GetPCModel()
+    {
         $ModelID = _intval($this->_GET['ModelID']); //当前页数
         $Model = new ModelModule();
         $ModelInfo = $Model->GetOneInfoByKeyID($ModelID);
@@ -300,6 +315,7 @@ class ApiModel extends ForeVIEWS {
         //下一篇
         $NextInfo = $Model->GetOneInfoByKeyIDzNext($ModelID, ' and TuiJian>0 and Type=\'PC\'');
         $ModelInfo['Color'] = str_replace(',', ' ', $ModelInfo['Color']);
+        $String = '';
         $String .= '<?xml version="1.0" encoding="utf-8"?>
 		<main>
 		  <model>
@@ -327,7 +343,8 @@ class ApiModel extends ForeVIEWS {
     }
 
     //获取推荐PC模版	http://dl.5067.org/index.php?module=ApiModel&action=GetPCModelRead&Number=5
-    public function GetPCModelRead() {
+    public function GetPCModelRead()
+    {
 
         if ($this->_GET) {
             $Model = new ModelModule();
@@ -355,7 +372,7 @@ class ApiModel extends ForeVIEWS {
                     $num = rand(1, count($Like_array)) - 1;
                     $cut[] = $Like_array[$num]['ID'];
                     $ModelList[$count] = $Like_array[$num];
-                    $count +=1;
+                    $count += 1;
                 }
             }
             //套餐推荐结束
@@ -368,7 +385,7 @@ class ApiModel extends ForeVIEWS {
                     $num = rand(1, count($Color_array)) - 1;
                     $cut[] = $Color_array[$num]['ID'];
                     $ModelList[$count] = $Color_array[$num];
-                    $count +=1;
+                    $count += 1;
                 }
             }
             //颜色推荐结束
@@ -384,7 +401,7 @@ class ApiModel extends ForeVIEWS {
                         $linshi = $Model->GetListsAll('tb_model', ' where ID not in (' . $paichu . ') and Type=\'PC\' and TuiJian>0 and ModelClassID like \'%,' . $v . ',%\'');
                         for ($i = 0; $i < count($linshi); $i++) {
                             $cut[] = $linshi[$i]['ID'];
-                            $count +=1;
+                            $count += 1;
                         }
                         $Type_array = array_merge($Type_array, $linshi);
                         if ($count >= $Number) {
@@ -427,7 +444,7 @@ class ApiModel extends ForeVIEWS {
 				<picture>' . $Value['Pic'] . '</picture>
 			  </model>
 			';
-                $count +=1;
+                $count += 1;
                 if ($count >= $Number) {
                     break;
                 }
@@ -435,7 +452,7 @@ class ApiModel extends ForeVIEWS {
             $String = '<?xml version="1.0" encoding="utf-8"?>
 			<models>
 			' . $String .
-                    '  <page>
+                '  <page>
 				<total>' . $count . '</total>
 			  </page>
 			</models>';
@@ -449,7 +466,8 @@ class ApiModel extends ForeVIEWS {
 
 //==========================手机=============
 //返回手机数据列表	http://dailipingtai.dn160.com.cn/index.php?module=ApiModel&action=GetMobileModelList&SortGUID=&Color=blue&Keyword=&Page=1&Number=2
-    public function GetMobileModelList() {
+    public function GetMobileModelList()
+    {
 
         if ($this->_GET) {
             $SortGUID = trim($this->_GET['SortGUID']); //类别ID
@@ -523,7 +541,7 @@ class ApiModel extends ForeVIEWS {
             $String = '<?xml version="1.0" encoding="utf-8"?>
 			<models>
 			' . $String .
-                    '  <page>
+                '  <page>
 				<total>' . $ModelListNun['Num'] . '</total>
 			  </page>
 			</models>';
@@ -536,7 +554,8 @@ class ApiModel extends ForeVIEWS {
     }
 
     //获取手机数据模型	http://dailipingtai.dn160.com.cn/index.php?module=ApiModel&action=GetMobileModel&ModelID=2
-    public function GetMobileModel() {
+    public function GetMobileModel()
+    {
         $ModelID = _intval($this->_GET['ModelID']); //当前ID
         $Model = new ModelModule();
         $ModelInfo = $Model->GetOneInfoByKeyID($ModelID);
@@ -575,6 +594,7 @@ class ApiModel extends ForeVIEWS {
         //下一篇
         $NextInfo = $Model->GetOneInfoByKeyIDzNext($ModelID, ' and TuiJian>0 and Type=\'手机\'');
         $ModelInfo['Color'] = str_replace(',', ' ', $ModelInfo['Color']);
+        $String = '';
         $String .= '<?xml version="1.0" encoding="utf-8"?>
 		<main>
 		  <model>
@@ -603,7 +623,8 @@ class ApiModel extends ForeVIEWS {
     }
 
     //获取推荐手机模版	http://dailipingtai.dn160.com.cn/index.php?module=ApiModel&action=GetMobileModelRead&Number=5
-    public function GetMobileModelRead() {
+    public function GetMobileModelRead()
+    {
 
         if ($this->_GET) {
             $Model = new ModelModule();
@@ -631,7 +652,7 @@ class ApiModel extends ForeVIEWS {
                     $num = rand(1, count($Like_array)) - 1;
                     $cut[] = $Like_array[$num]['ID'];
                     $ModelList[$count] = $Like_array[$num];
-                    $count +=1;
+                    $count += 1;
                 }
             }
             //套餐推荐结束
@@ -644,7 +665,7 @@ class ApiModel extends ForeVIEWS {
                     $num = rand(1, count($Color_array)) - 1;
                     $cut[] = $Color_array[$num]['ID'];
                     $ModelList[$count] = $Color_array[$num];
-                    $count +=1;
+                    $count += 1;
                 }
             }
             //颜色推荐结束
@@ -660,7 +681,7 @@ class ApiModel extends ForeVIEWS {
                         $linshi = $Model->GetListsAll('tb_model', ' where ID not in (' . $paichu . ') and Type=\'手机\' and TuiJian>0 and ModelClassID like \'%,' . $v . ',%\'');
                         for ($i = 0; $i < count($linshi); $i++) {
                             $cut[] = $linshi[$i]['ID'];
-                            $count +=1;
+                            $count += 1;
                         }
                         $Type_array = array_merge($Type_array, $linshi);
                         if ($count >= $Number) {
@@ -716,7 +737,7 @@ class ApiModel extends ForeVIEWS {
 				<time>' . $Value['AddTime'] . '</time>
 				</model>
 				';
-                $count +=1;
+                $count += 1;
                 if ($count >= $Number) {
                     break;
                 }
@@ -724,7 +745,7 @@ class ApiModel extends ForeVIEWS {
             $String = '<?xml version="1.0" encoding="utf-8"?>
 			<models>
 			' . $String .
-                    '  <page>
+                '  <page>
 				<total>' . $count . '</total>
 			  </page>
 			</models>';
@@ -737,7 +758,8 @@ class ApiModel extends ForeVIEWS {
     }
 
     //获取双站模版
-    public function GetDoubleStModelList() {
+    public function GetDoubleStModelList()
+    {
         if ($this->_GET) {
             $SortGUID = trim($this->_GET['SortGUID']); //类别ID
             $Color = trim($this->_GET['Color']); //颜色
@@ -763,7 +785,7 @@ class ApiModel extends ForeVIEWS {
                 $Where .= ' and Youhui<' . $Eprice;
             if ($lang)
                 $Where .= ' and ModelLan = \'' . $lang . '\'';
-            if ($SortGUID){
+            if ($SortGUID) {
                 $Where .= ' and ModelClassID like \'%,' . $SortGUID . ',%\'';
             }
             $Model = new ModelModule();
@@ -805,7 +827,7 @@ class ApiModel extends ForeVIEWS {
             $String = '<?xml version="1.0" encoding="utf-8"?>
 				<models>
 				' . $String .
-                    '  <page>
+                '  <page>
 					<total>' . $ModelListNun['Num'] . '</total>
 				  </page>
 				</models>';
@@ -818,7 +840,8 @@ class ApiModel extends ForeVIEWS {
     }
 
     //获取双站数据模型
-    public function GetDoubleStModel() {
+    public function GetDoubleStModel()
+    {
         $ModelID = _intval($this->_GET['ModelID']);
         $Model = new ModelModule();
         $ModelInfo = $Model->GetOnePackagesInfoByKeyID($ModelID);
@@ -851,6 +874,7 @@ class ApiModel extends ForeVIEWS {
             $ModelInfo['Content'] = '<![CDATA[<div align="center"><img width="100%" src="' . IMG_DOMAIN . $ModelPC['Pic'] . '" /></div>
 									<div align="center"><img width="50%" src="' . IMG_DOMAIN . $ModelPhone['Pic'] . '" /></div>]]>';
         }
+        $String = '';
         $String .= '<?xml version="1.0" encoding="utf-8"?>
 		<main>
 		  <model>
@@ -880,7 +904,8 @@ class ApiModel extends ForeVIEWS {
     }
 
     //获取双站模版
-    public function GetDoubleStModelRead() {
+    public function GetDoubleStModelRead()
+    {
 
         if ($this->_GET) {
             $Number = _intval($this->_GET['Number']); //每页显示数量
@@ -919,7 +944,7 @@ class ApiModel extends ForeVIEWS {
             $String = '<?xml version="1.0" encoding="utf-8"?>
 			<models>
 			' . $String .
-                    '  <page>
+                '  <page>
 				<total>' . $ModelListNun['Num'] . '</total>
 			  </page>
 			</models>';
@@ -932,7 +957,8 @@ class ApiModel extends ForeVIEWS {
     }
 
     //获取一次性的验证文件
-    public function GetHandShake() {
+    public function GetHandShake()
+    {
         if ($this->_GET['num']) {
             $String = file_get_contents('./token/' . $this->_GET['num'] . '.dll');
             unlink('./token/' . $this->_GET['num'] . '.dll');
@@ -950,7 +976,8 @@ class ApiModel extends ForeVIEWS {
     }
 
     //获取优惠价
-    public function GetCoupons() {
+    public function GetCoupons()
+    {
         if ($this->_GET['code']) {
             $code = $this->_GET['code'];
             $code = 'code=' . $code;
@@ -962,32 +989,35 @@ class ApiModel extends ForeVIEWS {
             die($Coupons);
         }
     }
-    public function GetDoubleStModelListAll(){
-        $modelpack=new ModelPackageModule();
-        $data=$modelpack->GetListByWhere();
-        
+
+    public function GetDoubleStModelListAll()
+    {
+        $modelpack = new ModelPackageModule();
+        $data = $modelpack->GetListByWhere();
+
         foreach ($data as $Value) {
-                if (!$Value['Url_status']) {
-                    $Value['PCUrl'] = '';
-                    $Value['EWM'] = '';
-                } else {
-                    $Value['EWM'] = 'http://s.jiathis.com/qrcode.php?url=' . $Value['PhoneUrl'];
+            if (!$Value['Url_status']) {
+                $Value['PCUrl'] = '';
+                $Value['EWM'] = '';
+            } else {
+                $Value['EWM'] = 'http://s.jiathis.com/qrcode.php?url=' . $Value['PhoneUrl'];
+            }
+            $ModelClassInfo = "";
+            $ModelClass = new ModelClassModule();
+            $ModelClassID = explode(',', $Value['ModelClassID']);
+            foreach ($ModelClassID as $val) {
+                if ($val) {
+                    $CName = $ModelClass->GetOneInfoByKeyID($val);
+                    $ModelClassInfo .= $CName['CName'];
                 }
-                $ModelClassInfo="";
-                $ModelClass=new ModelClassModule();
-                $ModelClassID = explode(',', $Value['ModelClassID']);
-                foreach ($ModelClassID as $val) {
-                    if ($val) {
-                        $CName = $ModelClass->GetOneInfoByKeyID($val);
-                        $ModelClassInfo .= $CName['CName'];
-                    }
-                }
-                $String .= '<model>
+            }
+            $String = '';
+            $String .= '<model>
 			<id>' . $Value['ID'] . '</id>
 			<no>' . $Value['PackagesNum'] . '</no>
 			<title>' . $Value['PackagesName'] . '</title>
 			<color>' . $Value['Color'] . '</color>
-                        <tuijian>'. $Value['TuiJian'] .'</tuijian>
+                        <tuijian>' . $Value['TuiJian'] . '</tuijian>
 			<star>' . $Value['BaiDuXingPing'] . '</star>
 			<descript>' . $Value['Descript'] . '</descript>
 			<price>' . $Value['Price'] . '</price>
@@ -1005,46 +1035,49 @@ class ApiModel extends ForeVIEWS {
                         <modelclassid>' . $Value['ModelClassID'] . '</modelclassid>
 		  </model>
 		';
-            }
-            $String = '<?xml version="1.0" encoding="utf-8"?>
+        }
+        $String = '<?xml version="1.0" encoding="utf-8"?>
 			<models>
 			' . $String .
-                    ' </models>';
-            echo $String;
-            exit;
+            ' </models>';
+        echo $String;
+        exit;
     }
-    public function GetModelListAll(){
-        $Model=new ModelModule();
-        $data=$Model->GetListByWhere();
+
+    public function GetModelListAll()
+    {
+        $Model = new ModelModule();
+        $data = $Model->GetListByWhere();
         foreach ($data as $Value) {
-                $ModelClassInfo="";
-                if (!$Value['Url_status']) {
-                    $Value['EWM'] = '';
+            $ModelClassInfo = "";
+            if (!$Value['Url_status']) {
+                $Value['EWM'] = '';
+            } else {
+                if ($Value["Type"] == "手机") {
+                    $Value['EWM'] = 'http://s.jiathis.com/qrcode.php?url=' . $Value['Url'];
                 } else {
-                    if($Value["Type"]=="手机"){
+                    if (strpos($Value["Url"], 'http://GM') === false) {
                         $Value['EWM'] = 'http://s.jiathis.com/qrcode.php?url=' . $Value['Url'];
-                    }else{
-                        if(strpos($Value["Url"], 'http://GM')===false){
-                            $Value['EWM'] = 'http://s.jiathis.com/qrcode.php?url=' . $Value['Url'];
-                        }else{
-                            $Value['Url']=str_replace('http://GM', 'http://m.GM', $Value['Url']);
-                            $Value['EWM'] = 'http://s.jiathis.com/qrcode.php?url=' . $Value['Url'];
-                        }
+                    } else {
+                        $Value['Url'] = str_replace('http://GM', 'http://m.GM', $Value['Url']);
+                        $Value['EWM'] = 'http://s.jiathis.com/qrcode.php?url=' . $Value['Url'];
                     }
                 }
-                $ModelClass=new ModelClassModule();
-                $ModelClassID = explode(',', $Value['ModelClassID']);
-                foreach ($ModelClassID as $val) {
-                    if ($val) {
-                        $CName = $ModelClass->GetOneInfoByKeyID($val);
-                        $ModelClassInfo .= $CName['CName'];
-                    }
+            }
+            $ModelClass = new ModelClassModule();
+            $ModelClassID = explode(',', $Value['ModelClassID']);
+            foreach ($ModelClassID as $val) {
+                if ($val) {
+                    $CName = $ModelClass->GetOneInfoByKeyID($val);
+                    $ModelClassInfo .= $CName['CName'];
                 }
-                $String .= '<model>
+            }
+            $String = '';
+            $String .= '<model>
 			<id>' . $Value['ID'] . '</id>
 			<no>' . $Value['NO'] . '</no>
 			<title>' . $Value['Name'] . '</title>
-                        <tuijian>'. $Value['TuiJian'] .'</tuijian>
+                        <tuijian>' . $Value['TuiJian'] . '</tuijian>
 			<color>' . $Value['Color'] . '</color>
 			<star>' . $Value['BaiDuXingPing'] . '</star>
 			<descript>' . $Value['Descript'] . '</descript>
@@ -1063,18 +1096,20 @@ class ApiModel extends ForeVIEWS {
                         <type>' . $Value['Type'] . '</type>
 		  </model>
 		';
-            }
-            $String = '<?xml version="1.0" encoding="utf-8"?>
+        }
+        $String = '<?xml version="1.0" encoding="utf-8"?>
 			<models>
 			' . $String .
-                    ' </models>';
-            echo $String;
-            exit;
+            ' </models>';
+        echo $String;
+        exit;
     }
 
-    public function GetModelClassListAll() {
+    public function GetModelClassListAll()
+    {
         $ModelClass = new ModelClassModule();
         $data = $ModelClass->GetListsAll();
+        $String = '';
         foreach ($data as $Value) {
             $String .= '<model>
 			<id>' . $Value['ID'] . '</id>
@@ -1085,7 +1120,7 @@ class ApiModel extends ForeVIEWS {
         $String = '<?xml version="1.0" encoding="utf-8"?>
 			<models>
 			' . $String .
-                ' </models>';
+            ' </models>';
         echo $String;
         exit;
     }
