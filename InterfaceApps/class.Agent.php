@@ -158,6 +158,7 @@ class Agent extends InterfaceVIEWS {
             if($level == 1){
                 $ser_msg = $usermodel->GetOneInfoByKeyID($sev_id);
                 if($ser_msg['Level'] == 2){
+					$Data['PassWord'] = md5($pwd);
                     if ($usermodel->UpdateArrayByKeyID($Data, $sev_id)) {
                         $result['err'] = 0;
                         $result['msg'] = '密码修改成功';
