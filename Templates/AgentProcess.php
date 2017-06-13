@@ -1,5 +1,5 @@
 <?php include 'AgentHead.php'; ?>
-<body>
+    <body>
     <div id="dialog-overlay"></div>
     <div id="dialog-box">
         <div class="dialog-content">
@@ -23,50 +23,54 @@
                     <div class="tabCon">
                         <div class="cur">
                             <div class="shbox">
-                                <?php if(!$Type){ ?>
-                                <div class="search">
-                                    <div class="leftS"> <font>按<?php echo $Type ? '代理商' : '客服' ?>信息查找:</font>
-                                        <span>
-                                            <input type="text" class="Input" placeholder="<?php echo $Type ? '代理商' : '客服' ?>账号" id="search1"> <i class="iconfont"></i>
+                                <?php if (!$Type) { ?>
+                                    <div class="search">
+                                        <div class="leftS"><font>按<?php echo $Type ? '代理商' : '客服' ?>信息查找:</font>
+                                            <span>
+                                            <input type="text" class="Input"
+                                                   placeholder="<?php echo $Type ? '代理商' : '客服' ?>账号" id="search1"> <i
+                                                        class="iconfont"></i>
                                         </span>
-                                        <span>
+                                            <span>
                                             <button type="submit" id="searchbox" class="searchbottom">查找</button>
                                         </span>
+                                        </div>
                                     </div>
-                                </div>
                                 <?php } ?>
                                 <form action="" id="listform">
                                     <table border="0" cellspacing="0" cellpadding="0" width="100%" class="showbox">
                                         <tbody>
-                                            <tr>
+                                        <tr>
                                             <!--<th width="5%"><input type="checkbox"></th>-->
-                                                <th class="text-left">账号</th>
-                                                <th>电话</th>
-                                                <th>邮箱</th>
-                                                <th>客户数量</th>
-                                                <th class="text-right" width="25%">操作/管理</th>
-                                            </tr>
+                                            <th class="text-left">账号</th>
+                                            <th>电话</th>
+                                            <th>邮箱</th>
+                                            <th>客户数量</th>
+                                            <th class="text-right" width="25%">操作/管理</th>
+                                        </tr>
                                         </tbody>
                                         <tbody id="listtbody">
-                                            <?php foreach ($Data['agentlist'] as $val) { ?>
-                                                <tr>
-    <!--                                            <td><input type="checkbox" name="ID"></td>-->
-                                                    <td class="text-left"><?php echo $val['UserName'] ?></td>
-                                                    <td class="enfont"><?php echo $val['ContactName'] ? $val['ContactTel'] : '--' ?></td>
-                                                    <td class="enfont"><?php echo $val['ContactTel'] ? $val['ContactEmail'] : '--' ?></td>
-                                                    <td><font style="color:#090"><?php echo $val['CusNum'] ? $val['CusNum'] : 0; ?></font></td>
-                                                    <td class="text-right pop">
-                                                        <!--                                                    <a href="javascript:;" class="recharge">充值</a>
-                                                                                                            <font class="line">|</font>-->
-                                                        <a href="javascript:;" class="modify">密码修改</a>
-                                                        <?php if($_SESSION["Level"]==1){?>
-                                                            <a href="javascript:;" class="recharge">充值</a>
-                                                        <?php }?>
-                                                    <?php if(!$Type){ ?>
+                                        <?php foreach ($Data['agentlist'] as $val) { ?>
+                                            <tr>
+                                                <!--                                            <td><input type="checkbox" name="ID"></td>-->
+                                                <td class="text-left"><?php echo $val['UserName'] ?></td>
+                                                <td class="enfont"><?php echo $val['ContactName'] ? $val['ContactTel'] : '--' ?></td>
+                                                <td class="enfont"><?php echo $val['ContactTel'] ? $val['ContactEmail'] : '--' ?></td>
+                                                <td>
+                                                    <font style="color:#090"><?php echo $val['CusNum'] ? $val['CusNum'] : 0; ?></font>
+                                                </td>
+                                                <td class="text-right pop">
+                                                    <!--                                                    <a href="javascript:;" class="recharge">充值</a>
+                                                                                                        <font class="line">|</font>-->
+                                                    <a href="javascript:;" class="modify">密码修改</a>
+                                                    <?php if ($_SESSION["Level"] == 1) { ?>
+                                                        <a href="javascript:;" class="recharge">充值</a>
+                                                    <?php } ?>
+                                                    <?php if (!$Type) { ?>
                                                         <a href="javascript:;" class="delete">删除</a>
                                                     <?php } ?>
-                                                    </td>
-                                            <input type="hidden" value="<?php echo $val['AgentID']; ?>">
+                                                </td>
+                                                <input type="hidden" value="<?php echo $val['AgentID']; ?>">
                                             </tr>
                                         <?php } ?>
                                         </tbody>
@@ -97,7 +101,8 @@
                                 <p>
                                     <span class="content-l">账号密码</span>
                                     <span>
-                                        <input type="password" name="pwd" placeholder="6-16位字符组合" class="Input" size="12">
+                                        <input type="password" name="pwd" placeholder="6-16位字符组合" class="Input"
+                                               size="12">
                                     </span>
                                     <span class="as">*</span>
                                 </p>
@@ -119,10 +124,10 @@
                                         <input type="text" name="email" class="Input" size="25">
                                     </span>
                                 </p>
-                                <?php if(!$Type){ ?>
-                                <p id="typetag">
-                                    <span class="content-l" style="vertical-align: top;">操作权限</span>
-                                    <span class="powList">
+                                <?php if (!$Type) { ?>
+                                    <p id="typetag">
+                                        <span class="content-l" style="vertical-align: top;">操作权限</span>
+                                        <span class="powList">
                                         <span class="input-wrapper" data="modify">
                                             <span class="checkbox">
                                               <span>客户信息修改</span>
@@ -164,7 +169,7 @@
                                             </span>
                                         </span>
                                     </span>
-                                </p>
+                                    </p>
                                 <?php } ?>
                             </div>
                             <div class="btnDD">
@@ -176,5 +181,5 @@
             </div>
         </div>
     </div>
-</body>
+    </body>
 <?php include 'AgentFoot.php'; ?>

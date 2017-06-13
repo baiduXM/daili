@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="Css/calendar.css">
     <script type="text/javascript" src="Javascripts/jquery1.9.1.min.js"></script>
     <script type="text/javascript" src="Javascripts/control.js"></script>
-    <?php 
+    <?php
     	$action = strtolower($MyAction);
     	$model = strtolower($MyModule);
     	echo $model ? is_file('Javascripts/' . $model . '.js') ? '<script type="text/javascript" src="Javascripts/' . $model . '.js"></script>' : '' : '';
