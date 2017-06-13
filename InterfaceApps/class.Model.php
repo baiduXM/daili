@@ -1,11 +1,15 @@
 <?php
-class Model extends InterfaceVIEWS {
 
-    public function __Public() {
+class Model extends InterfaceVIEWS
+{
+
+    public function __Public()
+    {
         IsLogin();
     }
 
-    public function ModelInit() {
+    public function ModelInit()
+    {
         $result = array('err' => 0, 'data' => '', 'msg' => '');
         //获取所有模板分类样式
         $modelclass = new ModelClassModule;
@@ -17,7 +21,8 @@ class Model extends InterfaceVIEWS {
         return $result;
     }
 
-    public function GetModelNum() {
+    public function GetModelNum()
+    {
         $level = $_SESSION ['Level'];
         $result = array('err' => 0, 'data' => '', 'msg' => '');
         if ($level == 1) {
@@ -30,7 +35,8 @@ class Model extends InterfaceVIEWS {
         return $result;
     }
 
-    public function PkCreate() {
+    public function PkCreate()
+    {
         $level = $_SESSION ['Level'];
         $result = array('err' => 0, 'data' => '', 'msg' => '');
         if ($level == 1) {
@@ -51,13 +57,13 @@ class Model extends InterfaceVIEWS {
             $mobile_sql = 'select * from tb_model where NO="' . $Data['PhoneNum'] . '"';
             $PCModel = $ModelModule->modelQuery($pc_sql);
             $PhoneModel = $ModelModule->modelQuery($mobile_sql);
-            if(!$PCModel || !$PhoneModel){
+            if (!$PCModel || !$PhoneModel) {
                 $result['err'] = 1000;
                 // $result['msg'] = $PCMsg ? '手机模板不存在' : 'PC模板不存在';
                 $result['msg'] = $PCModel ? '手机模板不存在' : 'PC模板不存在';
                 return $result;
             }
-            if($PackModule->GetOneByWhere('where PackagesNum="' . $Data['PackagesNum'] . '"')){
+            if ($PackModule->GetOneByWhere('where PackagesNum="' . $Data['PackagesNum'] . '"')) {
                 $result['err'] = 1000;
                 $result['msg'] = '当前套餐模板已存在，请输入其他模板名';
                 return $result;
@@ -95,7 +101,7 @@ class Model extends InterfaceVIEWS {
                     $result['msg'] = '错误的双站模板名';
                     return $result;
                 }
-            }else{
+            } else {
                 $result['err'] = 1001;
                 $result['msg'] = '请填写双站模板名';
                 return $result;
@@ -125,7 +131,7 @@ class Model extends InterfaceVIEWS {
             $Data['ModelClassID'] = trim($PCModel['ModelClassID'], ',') . ',' . trim($PhoneModel['ModelClassID'], ',');
             $Data['AddTime'] = date("Y-m-d H:i:s", time());
             if ($PackModule->InsertArray($Data, true)) {
-                $this->updateModel(array("PackagesNum"=>$Data['PackagesNum']), "model_packages");
+                $this->updateModel(array("PackagesNum" => $Data['PackagesNum']), "model_packages");
                 $result['err'] = 0;
                 $result['msg'] = '添加双站模板成功';
             } else {
@@ -139,7 +145,8 @@ class Model extends InterfaceVIEWS {
         return $result;
     }
 
-    public function Process() {
+    public function Process()
+    {
         $level = $_SESSION ['Level'];
         $modelID = $this->_POST['num'];
         if ($level == 1 && $modelID) {
@@ -156,7 +163,7 @@ class Model extends InterfaceVIEWS {
             $Data['ModelClassID'] = ',' . trim($this->_POST['typetage']) . ',';
             $Data['Color'] = $this->_POST['colortag'];
             $Model->UpdateArrayByKeyID($Data, $modelID);
-            $this->updateModel(array("ID"=>$modelID), $this->_POST['type'] == 3?"model_package":"model");
+            $this->updateModel(array("ID" => $modelID), $this->_POST['type'] == 3 ? "model_package" : "model");
             $result['err'] = 0;
             $result['msg'] = '模板信息修改成功';
         } else {
@@ -166,7 +173,8 @@ class Model extends InterfaceVIEWS {
         return $result;
     }
 
-    public function Operation() {
+    public function Operation()
+    {
         $level = $_SESSION ['Level'];
         $modelID = $this->_GET['num'];
         $cmd = $this->_GET['cmd'];
@@ -219,7 +227,8 @@ class Model extends InterfaceVIEWS {
     }
 
     //模板状态改变
-    public function StatusChange() {
+    public function StatusChange()
+    {
         $level = $_SESSION ['Level'];
         $modelID = $this->_POST['num'];
         if ($level == 1 && $modelID) {
@@ -232,7 +241,7 @@ class Model extends InterfaceVIEWS {
                 $Model = new ModelModule();
                 $Model->UpdateArrayByKeyID($Data, $modelID);
             }
-            $this->updateModel(array("ID"=>$modelID), $this->_POST['type'] == 3?"model_package":"model");
+            $this->updateModel(array("ID" => $modelID), $this->_POST['type'] == 3 ? "model_package" : "model");
             $result['err'] = 0;
             $result['msg'] = '状态修改成功';
         } else {
@@ -243,7 +252,8 @@ class Model extends InterfaceVIEWS {
     }
 
     //模板列表
-    public function GetModelList() {
+    public function GetModelList()
+    {
         $level = $_SESSION ['Level'];
         if ($level == 1) {
             $type = $this->_GET['type'];
@@ -257,7 +267,8 @@ class Model extends InterfaceVIEWS {
         return $result;
     }
 
-    protected function GetModelByType($type, $page = 1, $num = 5) {
+    protected function GetModelByType($type, $page = 1, $num = 5)
+    {
         $search = '';
         $search_model = $search_package = array();
         if ($this->_GET['name'] != '' || $this->_GET['url'] != '' || $this->_GET['priceL'] != '' || $this->_GET['priceT'] != '') {
@@ -333,7 +344,8 @@ class Model extends InterfaceVIEWS {
         return $data;
     }
 
-    protected function GetModelNumByType($type) {
+    protected function GetModelNumByType($type)
+    {
         $search = '';
         $search_model = $search_package = array();
         if ($this->_GET['name'] != '' || $this->_GET['url'] != '' || $this->_GET['priceL'] != '' || $this->_GET['priceT'] != '') {
@@ -378,13 +390,14 @@ class Model extends InterfaceVIEWS {
     }
 
     //获取模板信息
-    public function GetModel() {
+    public function GetModel()
+    {
         $level = $_SESSION ['Level'];
         if ($level == 1) {
             $modelName = $this->_GET['name'];
             $result = array('err' => 0, 'msg' => '获取成功', 'data' => array());
             //===判断是哪种命名方式，并通过不同的命名获取信息===
-            if(preg_match('/G\d{4}(P|M)(CN|EN|TW|JP)\d{2}/', $modelName) and !preg_match('/G\d{4}(P|M)(CN|EN|TW|JP)\d{4}/', $modelName)){
+            if (preg_match('/G\d{4}(P|M)(CN|EN|TW|JP)\d{2}/', $modelName) and !preg_match('/G\d{4}(P|M)(CN|EN|TW|JP)\d{4}/', $modelName)) {
                 $Model = new ModelModule();
                 $modelMsg = $Model->GetOneByWhere(array('Price', 'Youhui', 'Url', 'TuiJian', 'BaiDuXingPing', 'ModelLan', 'Color', 'ModelClassID'), 'where NO="' . $modelName . '"');
                 if ($modelMsg) {
@@ -401,7 +414,7 @@ class Model extends InterfaceVIEWS {
                     $result['err'] = 1001;
                     $result['msg'] = '错误的模板编号,不存在此模板';
                 }
-            }elseif (preg_match('/[A-Z]{2}[0]*(\d*)/', $modelName)) {
+            } elseif (preg_match('/[A-Z]{2}[0]*(\d*)/', $modelName)) {
                 $Model = new ModelModule();
                 $modelMsg = $Model->GetOneByWhere(array('Price', 'Youhui', 'Url', 'TuiJian', 'BaiDuXingPing', 'ModelLan', 'Color', 'ModelClassID'), 'where NO_bak="' . $modelName . '"');
                 if ($modelMsg) {
@@ -452,7 +465,8 @@ class Model extends InterfaceVIEWS {
     }
 
     //文件接收，流文件或单文件上传
-    public function FileUpload() {
+    public function FileUpload()
+    {
         header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
         header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
         header("Cache-Control: no-store, no-cache, must-revalidate");
@@ -664,7 +678,7 @@ class Model extends InterfaceVIEWS {
                                             foreach ($ModelClassLists as $val) {
                                                 if (strstr($val['CName'], $key)) {
                                                     if (!strstr($Data['ModelClassID'], ',' . $val[ID] . ','))
-                                                        $Data['ModelClassID'] .=$val[ID] . ',';
+                                                        $Data['ModelClassID'] .= $val[ID] . ',';
                                                 }
                                             }
                                         }
@@ -714,8 +728,8 @@ class Model extends InterfaceVIEWS {
                             $Modelname = $this->_REQUEST['msg'] ? $this->_REQUEST['msg'] : false;
                             //===模板名的判断获取===
                             //判断是哪种命名规则
-                            if($Modelname){
-                               if(preg_match('/G\d{4}(P|M)(CN|EN|TW|JP)\d{2}/', $Modelname)){
+                            if ($Modelname) {
+                                if (preg_match('/G\d{4}(P|M)(CN|EN|TW|JP)\d{2}/', $Modelname)) {
                                     //最后两位数超过2位也会匹配，用这条限制到3位，预留1位给可能超出的模板
                                     if (preg_match('/G\d{4}(P|M)(CN|EN|TW|JP)\d{4}/', $Modelname)) {
                                         unlink($configLoad);
@@ -723,7 +737,7 @@ class Model extends InterfaceVIEWS {
                                         $result = array('err' => 1003, 'data' => '', 'msg' => '模板名错误！');
                                         return $result;
                                     }
-                                }elseif(preg_match('/GM\d{4}/', $Modelname) or preg_match('/GP\d{4}/', $Modelname)){
+                                } elseif (preg_match('/GM\d{4}/', $Modelname) or preg_match('/GP\d{4}/', $Modelname)) {
                                     if (preg_match('/GM\d{5}/', $Modelname) or preg_match('/GP\d{5}/', $Modelname)) {
                                         unlink($configLoad);
                                         unlink($uploadPath);
@@ -732,21 +746,21 @@ class Model extends InterfaceVIEWS {
                                     }
                                     //根据旧命名获取对应的新命名
                                     $Modelname_bak = $Modelname;//上传成功后删除备份压缩包用
-                                    $ModelGot = $ModelModule->GetOneInfoByKeyID('\'' . $Modelname_bak . '\'','NO_bak');
-                                    if($ModelGot){//如果数据库里没有旧命名，则使用旧命名为错误的
+                                    $ModelGot = $ModelModule->GetOneInfoByKeyID('\'' . $Modelname_bak . '\'', 'NO_bak');
+                                    if ($ModelGot) {//如果数据库里没有旧命名，则使用旧命名为错误的
                                         $Modelname = $ModelGot['NO'];
-                                    }else{
+                                    } else {
                                         unlink($configLoad);
                                         unlink($uploadPath);
                                         $result = array('err' => 1003, 'data' => '', 'msg' => '错误的模板名，请重新上传！');
                                         return $result;
-                                    }                                    
-                                }else{
+                                    }
+                                } else {
                                     unlink($configLoad);
                                     unlink($uploadPath);
                                     $result = array('err' => 1003, 'data' => '', 'msg' => '错误的模板名，请重新上传！');
                                     return $result;
-                                } 
+                                }
                             } else {
                                 $Modelname = '';
                             }
@@ -856,8 +870,8 @@ class Model extends InterfaceVIEWS {
                                 }
                             }
                             //将模板备份存储	
-                            copy($uploadZip,"tpl/".$filename);
-                            $this->updateModel(array("NO"=>$Modelname), "model");
+                            copy($uploadZip, "tpl/" . $filename);
+                            $this->updateModel(array("NO" => $Modelname), "model");
 
                             unlink($configLoad);
                             unlink($uploadZip);
@@ -982,19 +996,16 @@ class Model extends InterfaceVIEWS {
                         $Data['Interaction'] = $bj_list[$Updata_model[$i]][2] ? $bj_list[$Updata_model[$i]][2] : '';
                         $Data['Features'] = $bj_list[$Updata_model[$i]][3] ? $bj_list[$Updata_model[$i]][3] : '';
                         if ($bj_list[$Updata_model[$i]][7]) {
-                            $Data['Price'] = $bj_list[$Updata_model[$i]][7];
-                            ;
+                            $Data['Price'] = $bj_list[$Updata_model[$i]][7];;
                         }
                         if ($bj_list[$Updata_model[$i]][8]) {
-                            $Data['Youhui'] = $bj_list[$Updata_model[$i]][8];
-                            ;
+                            $Data['Youhui'] = $bj_list[$Updata_model[$i]][8];;
                         }
                         $Data['DesignerScore'] = $bj_list[$Updata_model[$i]][10] ? $bj_list[$Updata_model[$i]][10] : '';
                         $Data['DeveloperScore'] = $bj_list[$Updata_model[$i]][11] ? $bj_list[$Updata_model[$i]][11] : '';
                         $Data['TesterScore'] = $bj_list[$Updata_model[$i]][12] ? $bj_list[$Updata_model[$i]][12] : '';
                         if ($bj_list[$Updata_model[$i]][13]) {
-                            $Data['ModelTese'] = $bj_list[$Updata_model[$i]][13];
-                            ;
+                            $Data['ModelTese'] = $bj_list[$Updata_model[$i]][13];;
                         }
                         if ($ModelModule->UpdateArray($Data, array('NO' => $Updata_model[$i]))) {
                             $success++;
@@ -1022,57 +1033,58 @@ class Model extends InterfaceVIEWS {
         }
     }
 
-    public function updateModel($where,$table){
-        $result=array();
-        $str =" where 1 ";
+    public function updateModel($where, $table)
+    {
+        $result = array();
+        $str = " where 1 ";
         foreach ($where as $key => $value) {
-            $str .="and {$key} = '{$value}'";
+            $str .= "and {$key} = '{$value}'";
         }
-        if($table=="model"){
-            $Model=new ModelModule();
-            $data=$Model->GetOneByWhere(array(),$str);
+        if ($table == "model") {
+            $Model = new ModelModule();
+            $data = $Model->GetOneByWhere(array(), $str);
             if (!$data['Url_status']) {
                 $data['EWM'] = '';
             } else {
-                if($data["Type"]=="PC"){
+                if ($data["Type"] == "PC") {
                     $data['EWM'] = 'http://s.jiathis.com/qrcode.php?url=' . $data['Url'];
-                }else{
+                } else {
                     // if(strpos($data["Url"], 'http://GM')===false){
-                    if(strpos($data["Url"], 'http://G')===false){
+                    if (strpos($data["Url"], 'http://G') === false) {
                         $data['EWM'] = 'http://s.jiathis.com/qrcode.php?url=' . $data['Url'];
-                    }else{
+                    } else {
                         // $data['Url']=str_replace('http://GM', 'http://m.GM', $data['Url']);
-                        $data['Url']=str_replace('http://G', 'http://m.G', $data['Url']);
+                        $data['Url'] = str_replace('http://G', 'http://m.G', $data['Url']);
                         $data['EWM'] = 'http://s.jiathis.com/qrcode.php?url=' . $data['Url'];
                     }
                 }
             }
-            $data["PCNum"]="";
-            $data["PhoneNum"]="";
+            $data["PCNum"] = "";
+            $data["PhoneNum"] = "";
 //            $result["no"]=$data["NO"];
 //            $result["title"]=$data["Name"];
 //            $result["pic"]=$data["Pic"];
-        }else{
-            $modelpack=new ModelPackageModule();
-            $data=$modelpack->GetOneByWhere(array(),$str);
-            
-            $data["Type"]="双站";
+        } else {
+            $modelpack = new ModelPackageModule();
+            $data = $modelpack->GetOneByWhere(array(), $str);
+
+            $data["Type"] = "双站";
             if (!$data['Url_status']) {
                 $data['Url'] = '';
                 $data['EWM'] = '';
             } else {
-                 $data['Url'] = $data['PCUrl'];
+                $data['Url'] = $data['PCUrl'];
                 $data['EWM'] = 'http://s.jiathis.com/qrcode.php?url=' . $data['PhoneUrl'];
             }
-            $data['NO']=$data["PackagesNum"];
-            $data['Name']=$data["PackagesName"];
+            $data['NO'] = $data["PackagesNum"];
+            $data['Name'] = $data["PackagesName"];
 //            $result["no"]=$data["PackagesNum"];
 //            $result["title"]=$data["PackagesName"];
 //            $result["pcnum"]=$data["PCNum"];
 //            $result["mobilenum"]=$data["PhoneNum"];
         }
-        $ModelClassInfo="";
-        $ModelClass=new ModelClassModule();
+        $ModelClassInfo = "";
+        $ModelClass = new ModelClassModule();
         $ModelClassID = explode(',', $data['ModelClassID']);
         foreach ($ModelClassID as $val) {
             if ($val) {
@@ -1103,7 +1115,7 @@ class Model extends InterfaceVIEWS {
                 <no>' . $data['NO'] . '</no>
                 <title>' . $data['Name'] . '</title>
                 <color>' . $data['Color'] . '</color>
-                <tuijian>'. $data['TuiJian'] .'</tuijian>
+                <tuijian>' . $data['TuiJian'] . '</tuijian>
                 <star>' . $data['BaiDuXingPing'] . '</star>
                 <descript>' . $data['Descript'] . '</descript>
                 <price>' . $data['Price'] . '</price>
@@ -1120,12 +1132,12 @@ class Model extends InterfaceVIEWS {
                 <content>' . $data['Content'] . '</content>
                 <modelclassid>' . $data['ModelClassID'] . '</modelclassid>
                 <type>' . $data["Type"] . '</type>
-                <pic>' . ($data["Pic"]?$data["Pic"]:"") . '</pic>
+                <pic>' . ($data["Pic"] ? $data["Pic"] : "") . '</pic>
               </model>
             </main>
             ';
-        $code="data=".  $String;
-        $url = GUANWANG_DOMAIN.'UpdateData.aspx';
+        $code = "data=" . $String;
+        $url = GUANWANG_DOMAIN . 'UpdateData.aspx';
         $Coupons = request_by_other($url, $code);
         return $Coupons;
     }

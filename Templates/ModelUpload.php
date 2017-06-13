@@ -1,24 +1,25 @@
-<?php include 'AgentHead.php'; 
+<?php include 'AgentHead.php';
 ?>
-<body>
+    <body>
     <style>
-        .record{
-            width:400px;
-            height:200px;
-            margin:auto;
+        .record {
+            width: 400px;
+            height: 200px;
+            margin: auto;
             border: 2px solid #1B9DD9;
             overflow: hidden;
             -webkit-box-shadow: 10px 10px 25px #9CC;
             -moz-box-shadow: 10px 10px 25px #9CC;
             box-shadow: 10px 10px 25px #9CC;
-            -moz-border-radius:0 0 7px 7px;
-            -webkit-border-radius:7px 7px 7px 7px;
-            border-radius:7px 7px 7px 7px;
+            -moz-border-radius: 0 0 7px 7px;
+            -webkit-border-radius: 7px 7px 7px 7px;
+            border-radius: 7px 7px 7px 7px;
         }
-        .con{
+
+        .con {
             margin-left: 20px;
             margin-top: 10px;
-            color:red;
+            color: red;
             font-size: 17px;
             line-height: 20px;
         }
@@ -63,7 +64,8 @@
                             </p>
                             <p>
                                 <span>URL：</span>
-                                <span><input type="text" name="url" class="Input" value="" placeholder="填写 > config > 模板编号.n01.5067.org"></span>
+                                <span><input type="text" name="url" class="Input" value=""
+                                             placeholder="填写 > config > 模板编号.n01.5067.org"></span>
                             </p>
                             <p>
                                 <span>推荐</span>
@@ -75,7 +77,8 @@
                                     </select>
                                 </span>
                                 <span>百度星评</span>
-                                <span><input type="number" name="star" class="Input" min="0" max="5" step="0.5" value="3" style="width:80px"></span>
+                                <span><input type="number" name="star" class="Input" min="0" max="5" step="0.5"
+                                             value="3" style="width:80px"></span>
                             </p>
                             <p id="typetag">
                                 <span style="vertical-align: top;">网站标签(必填)</span>
@@ -131,14 +134,14 @@
                     </div>
                 </div>
                 <script src="Javascripts/upload-started.js"></script>
-<!--                    <div class="record">
-                    <p class="con">正在压缩HTML文件....<p>
-                    <p class="con">正在压缩HTML文件....<p>
-                    <p class="con">正在压缩图片文件....<p>
-                </div>
-                <div style="height:20px;"></div>-->
+                <!--                    <div class="record">
+                                    <p class="con">正在压缩HTML文件....<p>
+                                    <p class="con">正在压缩HTML文件....<p>
+                                    <p class="con">正在压缩图片文件....<p>
+                                </div>
+                                <div style="height:20px;"></div>-->
             </div>
         </div>
     </div>
-</body>
+    </body>
 <?php include 'AgentFoot.php'; ?>

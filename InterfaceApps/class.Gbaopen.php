@@ -1442,7 +1442,7 @@ class Gbaopen extends InterfaceVIEWS
                         $Data['G_Ftp_Address'] = $sever_msg['FTP'];
                         $Data['G_Ftp_User'] = $sever_msg['FTPName'];
                         $Data['G_Ftp_Pwd'] = $sever_msg['FTPPassword'];
-						//备用ftp
+                        //备用ftp
 
                         $Data['G_Ftp_Address_B'] = $sever_msg['FTP_B'];
                         $Data['G_Ftp_User_B'] = $sever_msg['FTPName_B'];
@@ -1941,7 +1941,7 @@ class Gbaopen extends InterfaceVIEWS
         $ToString .= '&ftp_address=' . $CustProInfo ['G_Ftp_Address'];
         $ToString .= '&ftp_user=' . $CustProInfo ['G_Ftp_User'];
         $ToString .= '&ftp_pwd=' . $CustProInfo ['G_Ftp_Pwd'];
-		//备用ftp
+        //备用ftp
 
         $ToString .= '&ftp_address_b=' . $CustProInfo ['G_Ftp_Address_B'];
         $ToString .= '&ftp_user_b=' . $CustProInfo ['G_Ftp_User_B'];
@@ -1996,7 +1996,7 @@ class Gbaopen extends InterfaceVIEWS
             }
             $model = new ModelPackageModule();
             $modelmsg = $model->GetOneByWhere(array('PhoneNum', 'PCNum', 'Youhui'), 'where PackagesNum="' . $name . '"');
-            if(!$modelmsg){
+            if (!$modelmsg) {
                 $modelmsg = $model->GetOneByWhere(array('PhoneNum', 'PCNum', 'Youhui'), 'where PackagesNum_bak="' . $name . '"');
             }
             return $modelmsg;
@@ -2007,7 +2007,7 @@ class Gbaopen extends InterfaceVIEWS
             $model = new ModelModule();
             $modelmsg = $model->GetOneByWhere(array('ID', 'Youhui'), 'where NO like "%' . $name . '%"');
             // $modelmsg = $model->modelQuery('select ID,Youhui from tb_model where NO="' . $name . '"');
-            if(!$modelmsg){
+            if (!$modelmsg) {
                 $modelmsg = $model->GetOneByWhere(array('ID', 'Youhui'), 'where NO_bak="' . $name . '"');
             }
             if ($modelmsg)
@@ -2485,8 +2485,9 @@ class Gbaopen extends InterfaceVIEWS
      * 一个参数获取当前拥有的权限，
      * 两个参数判断是否拥有这个权限
      *
-     * @param $power
+     * @param      $power
      * @param bool $type
+     *
      * @return array|bool
      */
     private function Assess($power, $type = false)
@@ -2684,7 +2685,7 @@ class Gbaopen extends InterfaceVIEWS
                 $info["G_Ftp_Duankou"] = $fuwuqi_info["FTPDuankou"];
                 $info["G_Ftp_Mulu"] = $fuwuqi_info["FTPMulu"];
                 $info["FTP"] = 1;
-				//备用ftp
+                //备用ftp
                 $info["G_Ftp_Address_B"] = $fuwuqi_info["FTP_B"];
                 $info["G_Ftp_User_B"] = $fuwuqi_info["FTPName_B"];
                 $info["G_Ftp_Pwd_B"] = $fuwuqi_info["FTPPassword_B"];
@@ -2714,7 +2715,7 @@ class Gbaopen extends InterfaceVIEWS
             $ToString .= '&ftp_pwd=' . $info ['G_Ftp_Pwd'];
             $ToString .= '&ftp_dir=' . $info ['G_Ftp_Mulu'];
 
-			//ftp_b传参
+            //ftp_b传参
             $ToString .= '&ftp_address_b=' . $info ['G_Ftp_Address_B'];
             $ToString .= '&ftp_user_b=' . $info ['G_Ftp_User_B'];
             $ToString .= '&ftp_pwd_b=' . $info ['G_Ftp_Pwd_B'];
@@ -2722,8 +2723,8 @@ class Gbaopen extends InterfaceVIEWS
             $ToString .= '&ftp_flag=' . ($info ['FuwuqiID'] > 0 ? "1" : "0");
 
             //$ToString .= '&ftp_url=' . ($info ['FuwuqiID'] > 0 ? preg_replace("/^http:\/\/c/", "http://" . $cuspro_info["G_name"], $info ['G_Ftp_FwAdress']) : $info ['G_Ftp_FwAdress']);
-			$ToString .= '&ftp_url=' . ($info ['FuwuqiID'] > 0 ? "http://" . $info ['G_Ftp_Address'] . '/' .  $cuspro_info["G_name"]: $info ['G_Ftp_FwAdress'] . '/' .  $cuspro_info["G_name"]);
-            $ToString .= '&ftp_url_b=http://' . $info ['G_Ftp_Address_B'] . '/' .  $cuspro_info["G_name"];
+            $ToString .= '&ftp_url=' . ($info ['FuwuqiID'] > 0 ? "http://" . $info ['G_Ftp_Address'] . '/' . $cuspro_info["G_name"] : $info ['G_Ftp_FwAdress'] . '/' . $cuspro_info["G_name"]);
+            $ToString .= '&ftp_url_b=http://' . $info ['G_Ftp_Address_B'] . '/' . $cuspro_info["G_name"];
 
             //随机文件名开始生成
             $randomLock = getstr();
@@ -2749,7 +2750,7 @@ class Gbaopen extends InterfaceVIEWS
             $ReturnString = request_by_other($TuUrl, $ToString);
             $ReturnArray = json_decode($ReturnString, true);
             //判断迁移动作是否成功，如果不成功，将数据库还原，报错
-            if($ReturnArray[0]['err']==1000){
+            if ($ReturnArray[0]['err'] == 1000) {
                 $IsOk = $this->ToGbaoPenEditInfo($cuspro_info);
                 if ($IsOk['err'] != 1000) {
                     $result['err'] = 1002;
@@ -2761,13 +2762,13 @@ class Gbaopen extends InterfaceVIEWS
                 $result['msg'] = '网站迁移成功';
                 $result['data']['name'] = $customerInfo['CompanyName'];
                 $this->LogsFunction->LogsCusRecord(121, 1, $CustmoersID, $result['msg']);
-            }else{
+            } else {
                 $custpro->UpdateArray($cuspro_old, $CustmoersID);
                 $result['err'] = 1003;
                 $result['msg'] = '网站迁移失败';
                 $this->LogsFunction->LogsCusRecord(121, 0, $CustmoersID, $result['msg']);
             }
-            
+
             return $result;
         } else {
             $result['err'] = 1003;
@@ -3086,6 +3087,7 @@ class Gbaopen extends InterfaceVIEWS
      * 生成登录E推的验证文件
      *
      * @param $data
+     *
      * @return int|mixed
      */
     private function toGshow($data)
@@ -3116,8 +3118,7 @@ class Gbaopen extends InterfaceVIEWS
         $ToString .= '&combo=' . $data['combo']; // E推开通套餐类型
         //随机文件名开始生成
         $randomLock = getstr();
-        $password = md5($randomLock);
-        $password = md5($password);
+        $password = md5(md5($randomLock));
 
         //生成握手密钥
         $text = getstr();
@@ -3144,10 +3145,11 @@ class Gbaopen extends InterfaceVIEWS
      * 扣除余额、更新月消费额和总消费额
      *
      * @param $money    消费金额
-     * @param $type 5-开通微传单,6-续费微传单
+     * @param $type     5-开通微传单,6-续费微传单
      * @param $cus_id   客户ID
      * @param $agentID  操作人员（客服agentid）
      * @param $costID   支付代理商（代理agentid）
+     *
      * @return string
      */
     public function consume($money, $type = 5, $cus_id = 0, $agentID = 0)
