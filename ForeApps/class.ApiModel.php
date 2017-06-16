@@ -69,6 +69,7 @@ class ApiModel extends ForeVIEWS
     {
         if ($this->_GET) {
             $Color = trim($this->_GET['Color']); //颜色
+//            $Order = trim($this->_GET['Order']); //排序
             $Cases = _intval($this->_GET['Cases']); //案例区域号
             $Keyword = trim($this->_GET['Keyword']); //关键字
             $SortID = trim($this->_GET['SortGUID']); //类型标签
