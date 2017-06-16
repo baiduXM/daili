@@ -79,6 +79,7 @@ class ApiModel extends ForeVIEWS
             $Page = $Page == 0 ? 1 : $Page;
             $Number = $Number == 0 ? 1 : $Number;
             $start = ($Page - 1) * $Number;
+            $order = ' ORDER BY CreateTime DESC';
             $limit = ' limit ' . $start . ',' . $Number;
             $DB = new DB();
             $where = $Cases ? ' where Cases like \'' . $Cases . '%\'' : ' where Cases > 0';
@@ -92,13 +93,12 @@ class ApiModel extends ForeVIEWS
                 $where .= $SortID ? ' and CaseImageMobile like \'%,' . $SortID . ',%\'' : '';
                 $where .= ' and CaseImageMobile is not null ';
             }
-
             $where .= ' and (PC_EndTime > NOW() or Mobile_EndTime > now())'; // 判断案例是否过期
             $sql = 'select count(1) as Num from tb_customers_project a inner join tb_customers b on a.CustomersID=b.CustomersID ' . $where;
             $num = $DB->Select($sql);
             $num = $num[0]['Num'];
             $sql = 'select a.PC_domain,a.CustomersID,a.' . $Type . ',b.CompanyName from tb_customers_project a inner join tb_customers b on a.CustomersID=b.CustomersID ';
-            $sql = $sql . $where . $limit;
+            $sql = $sql . $where . $order . $limit;
             $ModelList = $DB->Select($sql);
             $String = '';
             foreach ($ModelList as $Value) {
