@@ -478,13 +478,13 @@ class Model extends InterfaceVIEWS
         if ($level == 1) {
             // 过滤其他的请求
             if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-                return NULL;
+                return null;
             }
             if (!empty($this->_REQUEST['debug'])) {
                 $random = rand(0, intval($this->_REQUEST['debug']));
                 if ($random === 0) {
                     header("HTTP/1.0 500 Internal Server Error");
-                    return NULL;
+                    return null;
                 }
             }
             // 5分钟的响应时长
@@ -527,7 +527,7 @@ class Model extends InterfaceVIEWS
 
             if (!$fileName) {
                 header("HTTP/1.0 500 Internal Server Error");
-                return NULL;
+                return null;
             }
 
             //中文名转码
@@ -628,7 +628,7 @@ class Model extends InterfaceVIEWS
             switch ($filetype) {
                 case 'zip':
                     $zip = new ZipArchive;
-                    if ($zip->open($uploadPath) === TRUE) {
+                    if ($zip->open($uploadPath) === true) {
                         if ($zip->locateName('config.ini', ZIPARCHIVE::FL_NOCASE) !== false) {
                             $config = $zip->getFromName('config.ini');
                             $img = $zip->locateName('screenshot.jpg', ZIPARCHIVE::FL_NOCASE) !== false ? $zip->getFromName('screenshot.jpg') : false;
@@ -699,6 +699,7 @@ class Model extends InterfaceVIEWS
                             } else {
                                 if ($Data['Color']) {
                                     preg_match_all('/\b\w[a-z]*\b/', $Data['Color'], $have);
+                                    $Color = '';
                                     foreach ($have[0] as $val) {
                                         $Color .= $val . ',';
                                     }
@@ -930,24 +931,24 @@ class Model extends InterfaceVIEWS
                 case 'csv':
                     //报价信息格式验证
                     $ModulePriceToken = array(
-                        0 => '模板编号',
-                        1 => '美观度得分',
-                        2 => '交互体验得分',
-                        3 => '功能得分',
-                        4 => '设计经理评分',
-                        5 => '产品经理评分',
-                        6 => '总评分',
-                        7 => '市场价',
-                        8 => '优惠价',
-                        9 => 'BUG扣分',
+                        0  => '模板编号',
+                        1  => '美观度得分',
+                        2  => '交互体验得分',
+                        3  => '功能得分',
+                        4  => '设计经理评分',
+                        5  => '产品经理评分',
+                        6  => '总评分',
+                        7  => '市场价',
+                        8  => '优惠价',
+                        9  => 'BUG扣分',
                         10 => '设计师积分累计',
                         11 => '开发者积分累计',
                         12 => '测试积分累计',
-                        13 => '模板特色'
+                        13 => '模板特色',
                     );
                     $i = 1;
                     //模板上传出现读取不了中文时，开启下面这句
-                    setlocale(LC_ALL, NULL);
+                    setlocale(LC_ALL, null);
 
                     $file = fopen($uploadPath, 'r');
                     while ($data = fgetcsv($file)) {
@@ -1108,6 +1109,7 @@ class Model extends InterfaceVIEWS
 //        $result["content"]=$data["Content"];
 //        $result["modelclassid"]=$data["ModelClassID"];
 //        $result["type"]=$data["Type"];
+        $String = '';
         $String .= '<?xml version="1.0" encoding="utf-8"?>
             <main>
               <model>
