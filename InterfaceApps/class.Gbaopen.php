@@ -2359,13 +2359,13 @@ class Gbaopen extends InterfaceVIEWS
                 $now = date("Y-m-d H:i:s", time());
                 //根据权限来获取客户信息量
                 if ($level == 1) {
-                    $select = 'select d.CustomersID,a.CompanyName,a.Status,d.UserName,d.G_name,d.Cases,d.CPhone,d.PC_StartTime,d.PC_EndTime,d.Mobile_StartTime,d.Mobile_EndTime,a.AgentID,c.PC_domain,c.Mobile_domain from '
-                        . '(select b.UserName,c.CustomersID,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime from tb_account b inner join tb_customers_project c on c.AgentID = b.AgentID and (c.PC_EndTime<"' . $now . '" or c.Mobile_EndTime<"' . $now . '")) as d '
+                    $select = 'select d.CustomersID,a.CompanyName,a.Status,d.UserName,d.G_name,d.Cases,d.CPhone,d.PC_StartTime,d.PC_EndTime,d.Mobile_StartTime,d.Mobile_EndTime,a.AgentID,d.PC_domain,d.Mobile_domain from '
+                        . '(select b.UserName,c.CustomersID,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.PC_domain,c.Mobile_domain from tb_account b inner join tb_customers_project c on c.AgentID = b.AgentID and (c.PC_EndTime<"' . $now . '" or c.Mobile_EndTime<"' . $now . '")) as d '
                         . 'inner join tb_customers a on d.CustomersID=a.CustomersID and a.GOpen = 1 and a.Status>0 ' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 2) {
-                    $select = 'select d.CustomersID,a.CompanyName,a.Status,d.UserName,d.G_name,d.Cases,d.CPhone,d.PC_StartTime,d.PC_EndTime,d.Mobile_StartTime,d.Mobile_EndTime,a.AgentID,c.PC_domain,c.Mobile_domain from '
-                        . '(select c.CustomersID,b.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime from tb_account b inner join tb_customers_project c on c.AgentID = b.AgentID and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ') and (c.PC_EndTime<"' . $now . '" or c.Mobile_EndTime<"' . $now . '")) d '
+                    $select = 'select d.CustomersID,a.CompanyName,a.Status,d.UserName,d.G_name,d.Cases,d.CPhone,d.PC_StartTime,d.PC_EndTime,d.Mobile_StartTime,d.Mobile_EndTime,a.AgentID,d.PC_domain,d.Mobile_domain '
+                        . '(select c.CustomersID,b.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.PC_domain,c.Mobile_domain from tb_account b inner join tb_customers_project c on c.AgentID = b.AgentID and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ') and (c.PC_EndTime<"' . $now . '" or c.Mobile_EndTime<"' . $now . '")) d '
                         . 'inner join tb_customers a on a.CustomersID=d.CustomersID and a.Status>0 ' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 3) {
