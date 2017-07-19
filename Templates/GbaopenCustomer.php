@@ -21,6 +21,7 @@
                             <li class="">未开通代理</li>
                             <li class="">已过期</li>
                             <li class="">30天内过期</li>
+                            <li class="">60天内过期</li>
                             <?php if ($_SESSION["Level"] == 1) { ?>
                                 <li class="">回收站</li>
                             <?php } ?>

@@ -2168,7 +2168,24 @@ class Gbaopen extends InterfaceVIEWS
                 }
                 break;
             case 5:
-                //根据权限来获取客户信息量--快过期
+                $now = date("Y-m-d H:i:s", time());
+                $after = date("Y-m-d H:i:s", strtotime("+60 day"));
+                //根据权限来获取客户信息量--快过期60
+                if ($level == 1) {
+                    $select = 'select count(1) as Num from tb_customers_project c inner join tb_customers a on c.CustomersID=a.CustomersID where ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '")) and a.GOpen = 1 and a.Status>0 ';
+                    $data = $DB->Select($select);
+                } elseif ($level == 2) {
+                    $select = 'select count(1) as Num from tb_customers_project c inner join tb_account b on c.AgentID = b.AgentID inner join tb_customers a on c.CustomersID=a.CustomersID and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ') and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '")) and a.GOpen = 1 and a.Status>0 ';
+                    $data = $DB->Select($select);
+                } elseif ($level == 3) {
+                    $select = 'select count(1) as Num from tb_customers_project c inner join tb_customers a on c.CustomersID=a.CustomersID where ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '")) and c.AgentID=' . $agent_id . ' and a.GOpen = 1 and a.Status>0 ';
+                    $data = $DB->Select($select);
+                } else {
+                    return false;
+                }
+                break;
+            case 6:
+                //回收站
                 if ($level == 1) {
                     $select = 'select count(1) as Num from tb_customers a where a.Status=0 ';
                     $data = $DB->Select($select);
@@ -2433,6 +2450,45 @@ class Gbaopen extends InterfaceVIEWS
                 }
                 break;
             case 5:
+                $now = date("Y-m-d H:i:s", time());
+                $after = date("Y-m-d H:i:s", strtotime("+60 day"));
+                //根据权限来获取客户信息量
+                if ($level == 1) {
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from tb_customers_project c '
+                        . 'inner join (select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on a.AgentID = b.AgentID and a.GOpen = 1 and a.Status>0 ) d '
+                        . 'on c.CustomersID=d.CustomersID and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '"))' . $order . $limit;
+                    $cus = $DB->Select($select);
+                } elseif ($level == 2) {
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from tb_customers_project c '
+                        . 'inner join (select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on a.AgentID = b.AgentID and a.GOpen = 1 and a.Status>0  and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ')) d '
+                        . 'on c.CustomersID=d.CustomersID and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '"))' . $order . $limit;
+                    $cus = $DB->Select($select);
+                } elseif ($level == 3) {
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from tb_customers_project c inner join tb_customers d on c.CustomersID=d.CustomersID and d.Status>0  and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '")) and c.AgentID=' . $agent_id . $order . $limit;
+                    $cus = $DB->Select($select);
+                } else {
+                    return false;
+                }
+                foreach ($cus as $key => $val) {
+
+                    $data[$key]['type'] = $val['CPhone'] ? $val['CPhone'] : false;
+                    $data[$key]['id'] = $val['CustomersID'];
+                    $data[$key]['company'] = $val['CompanyName'];
+                    $data[$key]['agent'] = $val['UserName'];
+                    $data[$key]['name'] = $val['G_name'];
+                    $data[$key]['Status'] = $val['Status'];
+                    $data[$key]['PCTimeStart'] = $val['PC_StartTime'] ? $val['PC_StartTime'] : false;
+                    $data[$key]['PCTimeEnd'] = $val['PC_EndTime'] ? $val['PC_EndTime'] : false;
+                    $data[$key]['MobileTimeStart'] = $val['Mobile_StartTime'] ? $val['Mobile_StartTime'] : false;
+                    $data[$key]['MobileTimeEnd'] = $val['Mobile_EndTime'] ? $val['Mobile_EndTime'] : false;
+                    $data[$key]['domain'] = $val['PC_domain'] ? $val['PC_domain'] : $val['Mobile_domain'];
+                    $cases = explode('-', $val['Cases']);
+                    $data[$key]['PlaceName'] = $cases[0] ? $cases[1] : '关闭';
+                    $data[$key]['Place'] = $cases[0];
+                    $data[$key]['agent_username'] = $usernames[$val["AgentID"]];
+                }
+                break;
+            case 6:
                 //根据权限来获取客户信息量
                 if ($level == 1) {
                     $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from '
