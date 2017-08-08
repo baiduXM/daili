@@ -1,16 +1,19 @@
 <?PHP
 
-class Agent extends InterfaceVIEWS {
+class Agent extends InterfaceVIEWS
+{
 
-    public function __Public() {
+    public function __Public()
+    {
         global $function_config;
         $this->LogsFunction = new LogsFunction;
         $this->function_config = $function_config;
         IsLogin();
     }
 
-    public function UserInfo() {
-        $agent_id = (int) $_SESSION ['AgentID'];
+    public function UserInfo()
+    {
+        $agent_id = (int)$_SESSION ['AgentID'];
         $usermodel = new AccountModule;
         $userinfo = $this->_POST ['userinfo'];
         $user_up['ContactName'] = $userinfo['name'];
@@ -28,11 +31,12 @@ class Agent extends InterfaceVIEWS {
     }
 
     //根据分页获取客服列表
-    public function GetSevList() {
+    public function GetSevList()
+    {
         $level = $_SESSION ['Level'];
         $agent_id = $_SESSION ['AgentID'];
         $result = array('err' => 1000, 'data' => '', 'msg' => '非法请求');
-        $page = (int) $this->_GET['page'];
+        $page = (int)$this->_GET['page'];
         if ($level == 1) {
             $DB = new DB;
             $usermodel = new AccountModule;
@@ -40,17 +44,17 @@ class Agent extends InterfaceVIEWS {
             $where = 'where Level = 2';
             $agentmsg = $usermodel->GetListsByWhere(array('AgentID', 'UserName', 'ContactName', 'ContactTel', 'ContactEmail'), $where . ' limit ' . $start . ',8');
             $num = $DB->Select('select a.BossAgentID,b.AgentID,count(b.AgentID) Num from tb_account a inner join tb_customers_project b on a.AgentID = b.AgentID group by b.AgentID');
-            foreach($agentmsg as $v){
+            foreach ($agentmsg as $v) {
                 $data[$v['AgentID']] = $v;
             }
-            foreach($num as $v){
-                if($v['BossAgentID'] == 0){
-                    if($data[$v['AgentID']]){
+            foreach ($num as $v) {
+                if ($v['BossAgentID'] == 0) {
+                    if ($data[$v['AgentID']]) {
                         $data[$v['AgentID']]['CusNum'] = $data[$v['AgentID']]['CusNum'] ? $data[$v['AgentID']]['CusNum'] : 0;
                         $data[$v['AgentID']]['CusNum'] += $v['Num'];
                     }
-                }else{
-                    if($data[$v['BossAgentID']]){
+                } else {
+                    if ($data[$v['BossAgentID']]) {
                         $data[$v['BossAgentID']]['CusNum'] = $data[$v['BossAgentID']]['CusNum'] ? $data[$v['BossAgentID']]['CusNum'] : 0;
                         $data[$v['BossAgentID']]['CusNum'] += $v['Num'];
                     }
@@ -88,13 +92,14 @@ class Agent extends InterfaceVIEWS {
         return $result;
     }
 
-    public function SearchSevList() {
+    public function SearchSevList()
+    {
         $level = $_SESSION ['Level'];
         $agent_id = $_SESSION ['AgentID'];
         $search = $this->_GET['search'];
         $result = array('err' => 1000, 'data' => '', 'msg' => '非法请求');
         if ($level == 2) {
-            $page = (int) $this->_GET['page'];
+            $page = (int)$this->_GET['page'];
             $sevMsg = $this->GetAgentList('where BossAgentID=' . $agent_id . ' and UserName LIKE \'%' . $search . '%\'', true, $page, 8);
             foreach ($sevMsg['AgentMsg'] as $k => $v) {
                 $sevList['list'][$k]['id'] = $v['AgentID'];
@@ -113,7 +118,8 @@ class Agent extends InterfaceVIEWS {
     }
 
     //删除客服检测
-    public function SevMsg() {
+    public function SevMsg()
+    {
         $level = $_SESSION ['Level'];
         $agent_id = $_SESSION ['AgentID'];
         $usermodel = new AccountModule;
@@ -148,16 +154,18 @@ class Agent extends InterfaceVIEWS {
     }
 
     //密码修改
-    public function Modify() {
-        $agent_id = (int) $_SESSION ['AgentID'];
-        $level = (int) $_SESSION ['Level'];
+    public function Modify()
+    {
+        $agent_id = (int)$_SESSION ['AgentID'];
+        $level = (int)$_SESSION ['Level'];
         $pwd = $this->_POST['data'];
         if (strlen($pwd) > 5 && strlen($pwd) < 17) {
-            $sev_id = (int) $this->_POST['num'];
+            $sev_id = (int)$this->_POST['num'];
             $usermodel = new AccountModule;
-            if($level == 1){
+            if ($level == 1) {
                 $ser_msg = $usermodel->GetOneInfoByKeyID($sev_id);
                 if($ser_msg['Level'] == 2){
+					$Data['PassWord'] = md5($pwd);
                     if ($usermodel->UpdateArrayByKeyID($Data, $sev_id)) {
                         $result['err'] = 0;
                         $result['msg'] = '密码修改成功';
@@ -167,14 +175,14 @@ class Agent extends InterfaceVIEWS {
                         $result['msg'] = '密码修改失败，请重试';
                         $this->LogsFunction->LogsAgentRecord(222, 0, $sev_id, $result['msg']);
                     }
-                }else{
+                } else {
                     $result['err'] = 1001;
                     $result['msg'] = '非法请求';
                     $this->LogsFunction->LogsAgentRecord(222, 2, $sev_id, $result['msg']);
                 }
-            }elseif ($level == 2) {
+            } elseif ($level == 2) {
                 $ser_msg = $usermodel->GetOneInfoByKeyID($sev_id);
-                if($ser_msg['BossAgentID'] == $agent_id){
+                if ($ser_msg['BossAgentID'] == $agent_id) {
                     $Data['PassWord'] = md5($pwd);
                     if ($usermodel->UpdateArrayByKeyID($Data, $sev_id)) {
                         $result['err'] = 0;
@@ -185,7 +193,7 @@ class Agent extends InterfaceVIEWS {
                         $result['msg'] = '密码修改失败，请重试';
                         $this->LogsFunction->LogsAgentRecord(222, 0, $sev_id, $result['msg']);
                     }
-                }else{
+                } else {
                     $result['err'] = 1001;
                     $result['msg'] = '非法请求';
                     $this->LogsFunction->LogsAgentRecord(222, 2, $sev_id, $result['msg']);
@@ -204,11 +212,12 @@ class Agent extends InterfaceVIEWS {
     }
 
     //删除客服
-    public function Delete() {
-        $agent_id = (int) $_SESSION ['AgentID'];
+    public function Delete()
+    {
+        $agent_id = (int)$_SESSION ['AgentID'];
         $level = $_SESSION ['Level'];
-        $del_sev_id = (int) $this->_POST['num'];
-        $tran_sev_id = (int) $this->_POST['id'];
+        $del_sev_id = (int)$this->_POST['num'];
+        $tran_sev_id = (int)$this->_POST['id'];
         $usermodel = new AccountModule;
         $recovermodel = new RecoverModule;
         $result = array('err' => 1000, 'data' => '', 'msg' => '非法请求');
@@ -237,7 +246,8 @@ class Agent extends InterfaceVIEWS {
     }
 
     //创建客服
-    public function CreateUser() {
+    public function CreateUser()
+    {
         $agent_id = $_SESSION ['AgentID'];
         $level = $_SESSION ['Level'];
         $post = $this->_POST['userinfo'];
@@ -264,9 +274,9 @@ class Agent extends InterfaceVIEWS {
                     $ser_id = $agent->InsertArray($agent_Data, true);
                     if ($ser_id) {
                         $power = 0;
-                        if($level == 1){
+                        if ($level == 1) {
                             $power = 127;
-                        }else{
+                        } else {
                             $powList = explode(',', trim($post['list'], ','));
                             if ($powList) {
                                 foreach ($powList as $v) {
@@ -304,7 +314,8 @@ class Agent extends InterfaceVIEWS {
     }
 
     //获取相应客服的客户数量
-    protected function GetAgentCusNum($agent_arr = array()) {
+    protected function GetAgentCusNum($agent_arr = array())
+    {
         $agent_str = is_array($agent_arr) ? implode(',', $agent_arr) : $agent_arr;
         $result = array();
         if ($agent_str) {
@@ -319,7 +330,8 @@ class Agent extends InterfaceVIEWS {
     }
 
     //获取相应页码的客服信息列表
-    protected function GetAgentList($where, $needall = false, $page = 1, $num = 8) {
+    protected function GetAgentList($where, $needall = false, $page = 1, $num = 8)
+    {
         $num = is_bool($needall) ? $num : $page;
         $page = is_bool($needall) ? $page : $needall;
         $needall = is_bool($needall) ? $needall : false;
@@ -346,35 +358,36 @@ class Agent extends InterfaceVIEWS {
     }
 
     //客服充值(接口已关闭)
-    public function Recharge() {
+    public function Recharge()
+    {
         $result = array('err' => 1000, 'data' => '', 'msg' => '非法请求');
-        $boss_id = (int) $_SESSION ['AgentID'];
+        $boss_id = (int)$_SESSION ['AgentID'];
         $power = $_SESSION ['Power'];
-        $agent_id = (int) $this->_POST['num'];
+        $agent_id = (int)$this->_POST['num'];
         $add = (int)$this->_POST['price'];
-        if (($power & CUS_AGENT) && is_numeric($agent_id) && is_numeric($add)&&$_SESSION["Level"]==1) {
-            $account=new AccountModule();
-            $account_info=$account->GetOneInfoByKeyID($agent_id);
-            if($account_info["Level"]==2){
-                $self_update=array();
+        if (($power & CUS_AGENT) && is_numeric($agent_id) && is_numeric($add) && $_SESSION["Level"] == 1) {
+            $account = new AccountModule();
+            $account_info = $account->GetOneInfoByKeyID($agent_id);
+            if ($account_info["Level"] == 2) {
+                $self_update = array();
                 $balancemodel = new BalanceModule;
-                $balance_info=$balancemodel->GetBalance($agent_id);
+                $balance_info = $balancemodel->GetBalance($agent_id);
                 $updatetime = explode('-', $balance_info['UpdateTime']);
                 if (date('m', time()) != $updatetime[1]) {
                     $self_update['UpdateTime'] = date('Y-m-d', time());
                     $self_update['CostMon'] = 0;
                 }
                 $self_update['Balance'] = $balance_info['Balance'] + $add;
-                if($balancemodel->UpdateArrayByAgentID($self_update, $agent_id)){
-                    $logcost_data = array("ip" => $_SERVER["REMOTE_ADDR"], "cost" => $add, "type" => 3, "description" => "账户充值", "adddate" => date('Y-m-d H:i:s', time()), "CustomersID" => "","AgentID"=>$boss_id,"CostID"=>$agent_id,"Balance"=>$self_update['Balance'],"OrderID"=>"");
+                if ($balancemodel->UpdateArrayByAgentID($self_update, $agent_id)) {
+                    $logcost_data = array("ip" => $_SERVER["REMOTE_ADDR"], "cost" => $add, "type" => 3, "description" => "账户充值", "adddate" => date('Y-m-d H:i:s', time()), "CustomersID" => "", "AgentID" => $boss_id, "CostID" => $agent_id, "Balance" => $self_update['Balance'], "OrderID" => "");
                     $logcost = new LogcostModule();
                     $logcost->InsertArray($logcost_data);
-                    $result = array('err' => 0,'data' => array('name' => $account_info['UserName']), 'msg' => '充值成功');
+                    $result = array('err' => 0, 'data' => array('name' => $account_info['UserName']), 'msg' => '充值成功');
                 }
-            }else{
+            } else {
                 $result = array('err' => 1001, 'msg' => '充值对象出错');
             }
-            
+
 //            $balancemodel = new BalanceModule;
 //            $db = new DB;
 //            $sql = 'select a.UserName,b.Balance,b.Pay from tb_account a inner join tb_balance b on a.AgentID=' . $agent_id . ' and a.BossAgentID=' . $boss_id . ' and a.AgentID=b.AgentID';
@@ -407,10 +420,11 @@ class Agent extends InterfaceVIEWS {
 
     /* 删除客户(接口已关闭) */
 
-    public function DeleteCustomer() {
+    public function DeleteCustomer()
+    {
         $result = array('err' => 0, 'data' => '', 'msg' => '');
         $this->MyAction = 'UserInfo';
-        $level=$_SESSION["Level"];
+        $level = $_SESSION["Level"];
         $Agent_id = $_SESSION ['AgentID'];
         $Power = $_SESSION ['Power'];
         $CustomersID = $this->_POST ['num'];
@@ -428,7 +442,7 @@ class Agent extends InterfaceVIEWS {
             $Users[$k] = $v['AgentID'];
         }
         $CustomersInfo = $CustomersModule->GetOneByWhere('where CustomersID=' . $CustomersID);
-        if (!in_array($CustomersInfo['AgentID'], $Users)&&$level!=1) {
+        if (!in_array($CustomersInfo['AgentID'], $Users) && $level != 1) {
             $result['err'] = 1001;
             $result['msg'] = '您没有这个用户的信息';
             $this->LogsFunction->LogsAgentRecord(119, 2, $CustomersID, $result['msg']);
@@ -436,9 +450,9 @@ class Agent extends InterfaceVIEWS {
         }
         $CustProModule = new CustProModule ();
         $CustProInfo = $CustProModule->GetInfoByWhere(' where CustomersID = ' . $CustomersID);
-        if ($CustomersModule->UpdateArray(array("Status"=>0), array("CustomersID"=>$CustomersID))/*$CustomersModule->DeleteInfoByKeyID($CustomersID)*/) {
+        if ($CustomersModule->UpdateArray(array("Status" => 0), array("CustomersID" => $CustomersID))/*$CustomersModule->DeleteInfoByKeyID($CustomersID)*/) {
             if ($CustProInfo) {
-                $CustProModule->UpdateArray(array("status"=>0), array("CustomersID"=>$CustomersID));
+                $CustProModule->UpdateArray(array("status" => 0), array("CustomersID" => $CustomersID));
 //                $CustProModule->DeleteInfoByWhere(' where CustomersID = ' . $CustomersID);
                 $ToString = 'username=' . $CustProInfo['G_name'];
                 $TuUrl = GBAOPEN_DOMAIN . 'api/deleteuser';
@@ -453,7 +467,7 @@ class Agent extends InterfaceVIEWS {
                 //生成dll文件
                 $myfile = @fopen('./token/' . $password . '.dll', "w+");
                 if (!$myfile) {
-                    $CustomersModule->UpdateArray(array("Status"=>1), array("CustomersID"=>$CustomersID));
+                    $CustomersModule->UpdateArray(array("Status" => 1), array("CustomersID" => $CustomersID));
 //                    $CustomersModule->InsertArray($CustomersInfo);
 //                    $CustProModule->InsertArray($CustProInfo);
                     $result['err'] = 1002;
@@ -467,13 +481,13 @@ class Agent extends InterfaceVIEWS {
                 $ToString .= '&timemap=' . $randomLock;
                 $ToString .= '&taget=' . md5($text . $password);
                 $ReturnString = request_by_other($TuUrl, $ToString);
-                $ReturnArray = json_decode($ReturnString, true);				
+                $ReturnArray = json_decode($ReturnString, true);
                 if ($ReturnArray['err'] == 1000) {
                     $result['data'] = array('name' => $CustomersInfo['CompanyName']);
                     $result['msg'] = '删除客户成功';
                     $this->LogsFunction->LogsAgentRecord(119, 1, $CustomersID, $result['msg']);
                 } else {
-                    $CustomersModule->UpdateArray(array("Status"=>1), array("CustomersID"=>$CustomersID));
+                    $CustomersModule->UpdateArray(array("Status" => 1), array("CustomersID" => $CustomersID));
 //                    $CustomersModule->InsertArray($CustomersInfo);
 //                    $CustProModule->InsertArray($CustProInfo);
                     $result['err'] = 1003;
@@ -494,10 +508,12 @@ class Agent extends InterfaceVIEWS {
         }
         return $result;
     }
-    public function reductionCustomer() {
+
+    public function reductionCustomer()
+    {
         $result = array('err' => 0, 'data' => '', 'msg' => '');
         $this->MyAction = 'UserInfo';
-        $level=$_SESSION["Level"];
+        $level = $_SESSION["Level"];
         $Agent_id = $_SESSION ['AgentID'];
         $Power = $_SESSION ['Power'];
         $CustomersID = $this->_POST ['num'];
@@ -515,7 +531,7 @@ class Agent extends InterfaceVIEWS {
             $Users[$k] = $v['AgentID'];
         }
         $CustomersInfo = $CustomersModule->GetOneByWhere('where Status=0 and CustomersID=' . $CustomersID);
-        if (!in_array($CustomersInfo['AgentID'], $Users)&&$level!=1) {
+        if (!in_array($CustomersInfo['AgentID'], $Users) && $level != 1) {
             $result['err'] = 1001;
             $result['msg'] = '您没有这个用户的信息';
             $this->LogsFunction->LogsAgentRecord(120, 2, $CustomersID, $result['msg']);
@@ -523,9 +539,9 @@ class Agent extends InterfaceVIEWS {
         }
         $CustProModule = new CustProModule ();
         $CustProInfo = $CustProModule->GetInfoByWhere(' where CustomersID = ' . $CustomersID);
-        if ($CustomersModule->UpdateArray(array("Status"=>1), array("CustomersID"=>$CustomersID))/*$CustomersModule->DeleteInfoByKeyID($CustomersID)*/) {
+        if ($CustomersModule->UpdateArray(array("Status" => 1), array("CustomersID" => $CustomersID))/*$CustomersModule->DeleteInfoByKeyID($CustomersID)*/) {
             if ($CustProInfo) {
-                $CustProModule->UpdateArray(array("status"=>1), array("CustomersID"=>$CustomersID));
+                $CustProModule->UpdateArray(array("status" => 1), array("CustomersID" => $CustomersID));
 //                $CustProModule->DeleteInfoByWhere(' where CustomersID = ' . $CustomersID);
                 $ToString = 'username=' . $CustProInfo['G_name'];
                 $TuUrl = GBAOPEN_DOMAIN . 'api/reductionCustomer';
@@ -540,7 +556,7 @@ class Agent extends InterfaceVIEWS {
                 //生成dll文件
                 $myfile = @fopen('./token/' . $password . '.dll', "w+");
                 if (!$myfile) {
-                    $CustomersModule->UpdateArray(array("Status"=>0), array("CustomersID"=>$CustomersID));
+                    $CustomersModule->UpdateArray(array("Status" => 0), array("CustomersID" => $CustomersID));
 //                    $CustomersModule->InsertArray($CustomersInfo);
 //                    $CustProModule->InsertArray($CustProInfo);
                     $result['err'] = 1002;
@@ -560,7 +576,7 @@ class Agent extends InterfaceVIEWS {
                     $result['msg'] = '还原客户成功';
                     $this->LogsFunction->LogsAgentRecord(120, 1, $CustomersID, $result['msg']);
                 } else {
-                    $CustomersModule->UpdateArray(array("Status"=>0), array("CustomersID"=>$CustomersID));
+                    $CustomersModule->UpdateArray(array("Status" => 0), array("CustomersID" => $CustomersID));
 //                    $CustomersModule->InsertArray($CustomersInfo);
 //                    $CustProModule->InsertArray($CustProInfo);
                     $result['err'] = 1003;
@@ -581,11 +597,13 @@ class Agent extends InterfaceVIEWS {
         }
         return $result;
     }
+
     //获取余额
-    public function getbalance(){
+    public function getbalance()
+    {
         $Agent_id = $_SESSION ['AgentID'];
-        $balancemodule=new BalanceModule();
-        $balance=$balancemodule->GetBalance($Agent_id);
+        $balancemodule = new BalanceModule();
+        $balance = $balancemodule->GetBalance($Agent_id);
         return json_encode($balance);
     }
 

@@ -1,23 +1,7 @@
 jQuery(document).ready(function () {
     var dataInit,
         /*颜色初始化*/
-        // colorInit = ['white', 'grey', 'black', 'blue', 'green', 'yellow', 'orange', 'pink', 'red', 'purple', 'brown', 'colorful'],
-        // colorData = {
-        //     white: ['white', '白色'],
-        //     grey: ['grey', '灰色'],
-        //     black: ['black', '黑色'],
-        //     blue: ['blue', '蓝色'],
-        //     green: ['green', '绿色'],
-        //     yellow: ['yellow', '黄色'],
-        //     orange: ['orange', '橙色'],
-        //     pink: ['pink', '粉色'],
-        //     red: ['red', '红色'],
-        //     purple: ['purple', '紫色'],
-        //     brown: ['#804000', '棕色'],
-        //     colorful: ['', '彩色']
-        // };
-        //===新颜色初始化===
-        colorInit = ['white',  'black', 'blue', 'green', 'yellow', 'orange', 'red', 'purple', 'colorful'],
+        colorInit = ['white', 'black', 'blue', 'green', 'yellow', 'orange', 'red', 'purple', 'colorful'],
         colorData = {
             white: ['white', '白色'],
             black: ['black', '黑色'],
@@ -29,7 +13,6 @@ jQuery(document).ready(function () {
             purple: ['purple', '紫色'],
             colorful: ['', '彩色']
         };
-        //===初始化end===
     /*翻页*/
     var pagelist = function () {
         /*总共的客户数量*/
@@ -76,11 +59,11 @@ jQuery(document).ready(function () {
         };
         /*加载图标显示*/
         this.onLoad = function (open) {
-            open = open || false;
+            open      = open || false;
             var _this = this;
             clearTimeout(_this.timeSave);
             if (open) {
-                var time = Date.parse(new Date()) - _this.timeLoad,
+                var time     = Date.parse(new Date()) - _this.timeLoad,
                     timeWait = function () {
                         $(".flower-loader").animate({opacity: 0});
                     };
@@ -139,8 +122,8 @@ jQuery(document).ready(function () {
         };
         /*列表信息修改*/
         this.listReset = function () {
-            var _this = this,
-                url = "Apps?module=Gbaopen&action=GetCus",
+            var _this    = this,
+                url      = "Apps?module=Gbaopen&action=GetCus",
                 olistNum = _this.listNum[$(".tonum a").index($(".tonum a.current"))];
             if (_this.timeLoad == 0) {
                 _this.onLoad();
@@ -149,12 +132,12 @@ jQuery(document).ready(function () {
             _this.repStop();
             _this.response = $.get(url, function (result) {
                 if (!result.err) {
-                    var data = result.data;
-                    var cuslist = "",
-                        timeList = "",
-                        nameList = "",
+                    var data      = result.data;
+                    var cuslist   = "",
+                        timeList  = "",
+                        nameList  = "",
                         oper_each = '',
-                        dataNum = data.cus.length;
+                        dataNum   = data.cus.length;
                     $.each(data.cus, function (i, v) {
                         if (v.Status == 0) {
                             oper_each = dataInit.operation[2];
@@ -197,14 +180,15 @@ jQuery(document).ready(function () {
                                                                 <b class="phpicn">◆</b>\
                                                                 <p>所属人员：' + v.agent + '</p>\
                                                             </div></td>';
+                                nameList += '<td>' + v.domain + '</td>';
                             } else {
                                 nameList = '<td>' + v.name + '</td>';
+                                nameList += '<td>' + v.domain + '</td>';
                             }
                             cuslist += '<tr><!--<td><input type="checkbox" name="ID"></td>-->\
                                 <td class="text-left"><a href="javascript:;" class="dName modify">' + v.company + '</a></td>\
                                 ' + nameList + timeList + '\
                                 <td><font style="color:#090">' + v.type + '</font></td>\
-                                <td><div class="a"></div></td>\
                                 <td>' + ((v.name != '--' && v.type != '--' && v.Status == 1) ? '<div class="cases' + (v.Place == 0 ? '"' : ' place" data="' + v.Place + '"') + '><span>' + v.PlaceName + '</span>' + dataInit.area + '</div>' : '--') + '</td>\
                                 <td><font style="color:#090">' + v.agent_username + '</font></td>\
                                 <td class="text-right">' + oper_each + '</td>\
@@ -238,7 +222,7 @@ jQuery(document).ready(function () {
                         });
                     } else if (_this.type == 'li') {
                         var mhLi = parseInt($(".leftbox ul").css("max-height")),
-                            hLi = parseInt($(".leftbox ul li").css("height"));
+                            hLi  = parseInt($(".leftbox ul li").css("height"));
                         (mhLi < (hLi * dataNum)) ? $(".leftbox ul").css("overflow-y", "auto") : "";
                         $(".leftbox ul").html(cuslist);
                     }
@@ -291,7 +275,7 @@ jQuery(document).ready(function () {
             /*页码队列如果小于最大的页码，创建新的页码标签，扩充队列，直至最大页码*/
             if (_this.page.length < _this.pageMax) {
                 var aOne, has = false;
-                aOne = _this.page.eq(_this.page.length - 1);
+                aOne          = _this.page.eq(_this.page.length - 1);
                 if (aOne.hasClass("pon")) {
                     has = true;
                     aOne.removeClass("pon");
@@ -336,8 +320,8 @@ jQuery(document).ready(function () {
         };
         /*根据总数量控制页面标签值数量载入*/
         this.listNumLoad = function () {
-            var _this = this,
-                tonum = $(".tonum a"),
+            var _this   = this,
+                tonum   = $(".tonum a"),
                 listnum = [];
             for (var i = 0; i < tonum.length; i++) {
                 if (Math.ceil(_this.allListNum / $(".tonum a").eq(i).text()) == 1) {
@@ -362,7 +346,7 @@ jQuery(document).ready(function () {
                     _this.onLoad();
                     _this.repStop();
                     _this.response = $.get("Apps?module=Gbaopen&action=GetCusNum&type=-1" + _this.search, function (result) {
-                        result.data = parseInt(result.data);
+                        result.data  = parseInt(result.data);
                         _this.listID = -1;
                         $(".tabList ul li").removeClass();
                         _this.allListNum = result.data > 0 ? result.data : 1;
@@ -392,7 +376,7 @@ jQuery(document).ready(function () {
         };
         /*兼容客户管理列表,对列表数量控制的标签进行初始化*/
         this.msgSet = function () {
-            var _this = this;
+            var _this  = this;
             _this.type = $(".pagebox").prev()[0].tagName.toLowerCase() == 'form' ? "tr" : "li";
             _this.onLoad();
             _this.response = $.get("Apps?module=Gbaopen&action=CusInit&type=" + _this.type, function (result) {
@@ -419,7 +403,7 @@ jQuery(document).ready(function () {
                 });
                 place += '</ul>';
                 /*操作权限初始化*/
-                var operation = ['', '--'];
+                var operation      = ['', '--'];
                 result.data.operat = result.data.operat.split(',');
                 $.each(result.data.operat, function (i2, v2) {
                     if (v2 == 'renew') {
@@ -442,17 +426,17 @@ jQuery(document).ready(function () {
                     }
                 });
                 result.data.operation = operation;
-                result.data.area = place;
-                dataInit = result.data;
-                _this.allListNum = dataInit.num == 0 ? 1 : dataInit.num;
+                result.data.area      = place;
+                dataInit              = result.data;
+                _this.allListNum      = dataInit.num == 0 ? 1 : dataInit.num;
                 if (_this.type == "tr") {
                     _this.tableLiCheck();
                     _this.searchBox();
                 } else {
-                    var ulT = $(".leftbox ul").offset().top,
-                        winH = $(document).height(),
+                    var ulT      = $(".leftbox ul").offset().top,
+                        winH     = $(document).height(),
                         pageboxH = $(".pagebox").outerHeight();
-                    var ulH = Math.ceil(winH - ulT - pageboxH - 100);
+                    var ulH      = Math.ceil(winH - ulT - pageboxH - 100);
                     $(".leftbox ul").css("max-height", ulH + 'px');
                     if (dataInit.overdue >= 0) {
                         $(".otherInfo p:first").html("有" + dataInit.overdue + "个域名需要续费，请尽快续费");
@@ -487,7 +471,7 @@ jQuery(document).ready(function () {
     /*推荐案例模块*/
     $('.leftbox ul,#listtbody').on('click', ".cases", function () {
         var cases = $(this),
-            data = cases.attr("data") ? cases.attr("data") : 0;
+            data  = cases.attr("data") ? cases.attr("data") : 0;
         if (cases.children("ul").is(":hidden")) {
             cases.children("ul").show("slow");
             data == 0 ? cases.children("ul").children("li").show().eq(0).hide() : cases.children("ul").children("li").show();
@@ -498,11 +482,11 @@ jQuery(document).ready(function () {
     $('.leftbox ul,#listtbody').on('click', ".cases li", function (e) {
         e.preventDefault();
         e.stopPropagation();
-        var _this = $(this),
-            load = function (elm) {
+        var _this    = $(this),
+            load     = function (elm) {
                 var curelm = $(elm);
                 var parelm = curelm.parent().parent(),
-                    arr = [curelm.attr("data")];
+                    arr    = [curelm.attr("data")];
                 if (parelm[0].tagName.toLowerCase() == 'li') {
                     $.merge(arr, load(parelm));
                 } else {
@@ -510,13 +494,13 @@ jQuery(document).ready(function () {
                 }
                 return arr;
             };
-        var data = load(_this);
-        var cases = $(data.pop());
+        var data     = load(_this);
+        var cases    = $(data.pop());
         var caselist = data;
-        data = caselist[0];
-        caselist = caselist.reverse().join("-");
+        data         = caselist[0];
+        caselist     = caselist.reverse().join("-");
         if (data.length > 0) {
-            var cus = cases.parent().siblings('input:hidden:last').attr('value');
+            var cus  = cases.parent().siblings('input:hidden:last').attr('value');
             var html = '<div class="userdata-content"><input type="hidden" value="' + cus + '" data="' + data + '"><p style="font-size:20px;">';
             $.get("Apps?module=Gbaopen&action=GetCases&num=" + cus, function (result) {
                 if (!result.err) {
@@ -524,8 +508,8 @@ jQuery(document).ready(function () {
                     if (data != 0) {
                         if (json.type > 2) {
                             var colortag = '';
-                            var simgurl = json.pc.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + json.pc.img[0] + '">如未选择，则默认上次上传的图片：<img src="' + json.pc.img[0] + '" style="width: 100%;"></a></span></span>' : '',
-                                imgurl = json.pc.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + json.pc.img[1] + '">如未选择，则默认上次上传的图片：<img src="' + json.pc.img[1] + '" style="width: 100%;"></a></span></span>' : '';
+                            var simgurl  = json.pc.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + json.pc.img[0] + '">如未选择，则默认上次上传的图片：<img src="' + json.pc.img[0] + '" style="width: 100%;"></a></span></span>' : '',
+                                imgurl   = json.pc.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + json.pc.img[1] + '">如未选择，则默认上次上传的图片：<img src="' + json.pc.img[1] + '" style="width: 100%;"></a></span></span>' : '';
                             $.each(colorInit, function (i1, v1) {
                                 if (json.pc.color == false) {
                                     colortag += '<span data="' + v1 + '"' + (v1 == 'colorful' ? '' : ' style="background-color:' + colorData[v1][0] + ';"') + '>' + colorData[v1][1] + '</span>';
@@ -565,8 +549,8 @@ jQuery(document).ready(function () {
                         } else {
                             if (json.type == 1) {
                                 var colortag = '';
-                                var simgurl = json.pc.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + json.pc.img[0] + '">如未选择，则默认上次上传的图片：<img src="' + json.pc.img[0] + '" style="width: 100%;"></a></span></span>' : '',
-                                    imgurl = json.pc.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + json.pc.img[1] + '">如未选择，则默认上次上传的图片：<img src="' + json.pc.img[1] + '" style="width: 100%;"></a></span></span>' : '';
+                                var simgurl  = json.pc.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + json.pc.img[0] + '">如未选择，则默认上次上传的图片：<img src="' + json.pc.img[0] + '" style="width: 100%;"></a></span></span>' : '',
+                                    imgurl   = json.pc.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + json.pc.img[1] + '">如未选择，则默认上次上传的图片：<img src="' + json.pc.img[1] + '" style="width: 100%;"></a></span></span>' : '';
                                 $.each(colorInit, function (i1, v1) {
                                     if (json.pc.color == false) {
                                         colortag += '<span data="' + v1 + '"' + (v1 == 'colorful' ? '' : ' style="background-color:' + colorData[v1][0] + ';"') + '>' + colorData[v1][1] + '</span>';
@@ -591,8 +575,8 @@ jQuery(document).ready(function () {
                                 });
                             } else {
                                 var colortag = '';
-                                var simgurl = json.mobile.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + json.mobile.img[0] + '">如未选择，则默认上次上传的图片：<img src="' + json.mobile.img[0] + '" style="width: 100%;"></a></span></span>' : '',
-                                    imgurl = json.mobile.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + json.mobile.img[1] + '">如未选择，则默认上次上传的图片：<img src="' + json.mobile.img[1] + '" style="width: 100%;"></a></span></span>' : '';
+                                var simgurl  = json.mobile.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + json.mobile.img[0] + '">如未选择，则默认上次上传的图片：<img src="' + json.mobile.img[0] + '" style="width: 100%;"></a></span></span>' : '',
+                                    imgurl   = json.mobile.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + json.mobile.img[1] + '">如未选择，则默认上次上传的图片：<img src="' + json.mobile.img[1] + '" style="width: 100%;"></a></span></span>' : '';
                                 $.each(colorInit, function (i1, v1) {
                                     if (json.mobile.color == false) {
                                         colortag += '<span data="' + v1 + '"' + (v1 == 'colorful' ? '' : ' style="background-color:' + colorData[v1][0] + ';"') + '>' + colorData[v1][1] + '</span>';
@@ -635,8 +619,8 @@ jQuery(document).ready(function () {
                         }
                     } else {
                         var cho = json.type > 2 ? json.pc.color && json.pc.tag ?
-                                '<p>当前已推荐了PC和手机案例,请选择您要关闭的案例</p><p><span class="content-l">关闭的案例：</span><span class="Input"><input type="checkbox" name="caseCho" value="1">PC<input type="checkbox" name="caseCho" value="2">手机</span></p>'
-                                : '' : '';
+                            '<p>当前已推荐了PC和手机案例,请选择您要关闭的案例</p><p><span class="content-l">关闭的案例：</span><span class="Input"><input type="checkbox" name="caseCho" value="1">PC<input type="checkbox" name="caseCho" value="2">手机</span></p>'
+                            : '' : '';
                         html += '确定将此客户网站从案例列表中移除</p><input type="hidden" value="' + cus + '" data="' + data + '">\n\
                                 ' + cho + '</div>';
                     }
@@ -658,7 +642,7 @@ jQuery(document).ready(function () {
                 $(".dialog-content a.dia-ok").addClass('gorenew');
                 var html = '', price,
                     data = result.data;
-                html = '<div class="userdata-content"><p style="font-size:20px;">确定对<strong style="color:red">' + data.name + '</strong>进行续费操作？</p>';
+                html     = '<div class="userdata-content"><p style="font-size:20px;">确定对<strong style="color:red">' + data.name + '</strong>进行续费操作？</p>';
 //                var secTitle = '', radioCho = '';
 //                switch (parseInt(data.type)) {
 //                    case 4:
@@ -740,7 +724,6 @@ jQuery(document).ready(function () {
                     </p>' : '') + '<p>\n\
                         <span class="content-l">续费空间</span>\
                         <span class="Input">\
-                            <input type="radio" name="capacity" class="capacity" data-money="300" value="100">100M\
                             <input type="radio" name="capacity" class="capacity" data-money="500" value="300">300M\
                             <input type="radio" name="capacity" class="capacity" data-money="800" value="500">500M\
                             <input type="radio" name="capacity" class="capacity" data-money="1500" value="1000">1000M\
@@ -808,7 +791,7 @@ jQuery(document).ready(function () {
             if (!result.err) {
                 $(".dialog-content a.dia-ok").addClass('gomodify');
                 var data = result.data, html, p = '';
-                html = '<div class="userdata-content"><p style="font-size:20px;">确定对' + data.name[1] + '进行修改信息操作？</p>';
+                html     = '<div class="userdata-content"><p style="font-size:20px;">确定对' + data.name[1] + '进行修改信息操作？</p>';
                 $.each(data, function (i, v) {
                     if (i != 'experience') {
                         if (i == 'remark')
@@ -878,16 +861,16 @@ jQuery(document).ready(function () {
         $.get("Apps?module=Gbaopen&action=Operation&type=process&cus=" + cus, function (result) {
             if (!result.err) {
                 $(".dialog-content a.dia-ok").addClass('goprocessing');
-                var data = result.data, html, option = '';
+                var data        = result.data, html, option = '';
                 var domainfocus = '';
                 if (data.domain_def) {
                     var domain_def = encodeURIComponent(data.domain_def);
-                    domain_def = domain_def.split('.');
-                    domain_def[0] = '';
-                    domain_def = domain_def.join('.');
-                    domainfocus = '<span class="notice">域名解析到：c' + domain_def + '</span>'
+                    domain_def     = domain_def.split('.');
+                    domain_def[0]  = '';
+                    domain_def     = domain_def.join('.');
+                    domainfocus    = '<span class="notice">域名解析到：c' + domain_def + '</span>'
                 }
-                html = '<div class="userdata-content"><p style="font-size:20px;">确定对' + data.name + '进行修改信息操作？</p>';
+                html          = '<div class="userdata-content"><p style="font-size:20px;">确定对' + data.name + '进行修改信息操作？</p>';
                 var starttime = data.pc_starttime ? '<p>\
                         <span class="content-l">PC上线时间</span>\
                         <span><input type="text" name="pc_starttime" class="Input" value="' + data.pc_starttime + '"></span>\
@@ -979,19 +962,19 @@ jQuery(document).ready(function () {
 
     /*开通模块*/
     $('.leftbox ul,#listtbody').on('click', ".g-create", function () {
-        var cus = $(this).parent().parent().find('input:hidden').attr('value');
+        var cus              = $(this).parent().parent().find('input:hidden').attr('value');
         window.location.href = '?module=Gbaopen&action=Create&cus=' + cus;
     });
 
     $('.leftbox ul,#listtbody').on('click', ".delete", function () {
-        var cus = $(this).parent().parent().find('input:hidden').attr('value'),
+        var cus  = $(this).parent().parent().find('input:hidden').attr('value'),
             html = '<div class="userdata-content"><p style="font-size:20px;">确定删除此客户？</p>\
                     <input type="hidden" class="Input" value="' + cus + '"></div>';
         $(".dialog-content a.dia-ok").addClass('godelete');
         popup(html);
     });
     $('.leftbox ul,#listtbody').on('click', ".reduction", function () {
-        var cus = $(this).parent().parent().find('input:hidden').attr('value'),
+        var cus  = $(this).parent().parent().find('input:hidden').attr('value'),
             html = '<div class="userdata-content"><p style="font-size:20px;">确定还原此客户？</p>\
                     <input type="hidden" class="Input" value="' + cus + '"></div>';
         $(".dialog-content a.dia-ok").addClass('reduction');
@@ -999,8 +982,8 @@ jQuery(document).ready(function () {
     });
     $('.leftbox ul,#listtbody').on('click', ".sitemove", function () {
         var option_html = "";
-        var cus = $(this).parent().parent().find('input:hidden').attr('value');
-        var fuwuqiid = 0;
+        var cus         = $(this).parent().parent().find('input:hidden').attr('value');
+        var fuwuqiid    = 0;
         $.ajax({
             url: "Apps?module=Gbaopen&action=Operation&type=sitemove&cus=" + cus,
             async: false,
@@ -1028,7 +1011,7 @@ jQuery(document).ready(function () {
                 });
             }
         });
-        var cus = $(this).parent().parent().find('input:hidden').attr('value'),
+        var cus  = $(this).parent().parent().find('input:hidden').attr('value'),
             html = '<div class="userdata-content"><p style="font-size:20px;">确定进行客户迁移？</p>\n\
                             <p>\
                                 <input type="hidden" class="Input" value="' + cus + '">\
@@ -1104,8 +1087,8 @@ jQuery(document).ready(function () {
      * E推
      */
     $('.leftbox ul,#listtbody').on('click', ".g-show", function () {
-        var cus = $(this).parent().parent().find('input:hidden').attr('value');
-        var html = "";
+        var cus    = $(this).parent().parent().find('input:hidden').attr('value');
+        var html   = "";
         var htmljs = "";
         $.ajax({
             url: '/Apps?module=Gbaopen&action=getGshow',
@@ -1115,7 +1098,7 @@ jQuery(document).ready(function () {
             success: function (data) {
                 // console.log(data);
                 if (data.data == false) {
-                    html = '<div class="userdata-content"><p style="font-size:20px;">是否开通该客户E推？</p>\n\
+                    html   = '<div class="userdata-content"><p style="font-size:20px;">是否开通该客户E推？</p>\n\
                         <input type="hidden" class="Input" value="' + cus + '">\n\
                             <p>\n\
                                 <span class="content-l">套餐:</span>\n\
@@ -1169,8 +1152,8 @@ jQuery(document).ready(function () {
                         };\n\
                 </script>';
                 } else {
-                    $(".g-show-manage").prop('display','block');
-                    html = '<div class="userdata-content"><p style="font-size:20px;">是否续费该客户E推？</p>\
+                    $(".g-show-manage").prop('display', 'block');
+                    html   = '<div class="userdata-content"><p style="font-size:20px;">是否续费该客户E推？</p>\
                         <input type="hidden" class="Input" value="' + cus + '">\n\
                             <p>\n\
                                 <span class="content-l">套餐:</span>\n\
@@ -1252,6 +1235,12 @@ jQuery(document).ready(function () {
         popup(html + htmljs);
     });
 
+    /**
+     * 更多容量
+     *
+     * @param months 剩余有效期
+     * @param oldcapacity 当前容量
+     */
     function morecapacity(months, oldcapacity) {
         console.log("month:" + months);
         console.log("oldcapacity:" + oldcapacity);
@@ -1259,20 +1248,19 @@ jQuery(document).ready(function () {
             $(".userdata-content input[name='morecapacity'][value='" + oldcapacity + "']").data("money") : 0);
         // $(".userdata-content input[name='morecapacity'][value='" + oldcapacity + "']").prop("checked", true);
         $(".userdata-content input[name='morecapacity'][value='" + oldcapacity + "']").parent("span").prevAll().hide();
-        $(".userdata-content input[name='morecapacity']").unbind();
-        $(".userdata-content input[name='morecapacity']").change(function () {
+        // $(".userdata-content input[name='morecapacity']").unbind();
+        $(".userdata-content input[name='morecapacity']").unbind().change(function () {
             var new_single_money = $(".userdata-content input[name='morecapacity']:checked").data("money");
             // $(".userdata-content .price").val(((new_single_money - old_single_money) * months / 12).toFixed(0) + "元");
             $(".userdata-content .price").val((new_single_money).toFixed(0) + "元");
             console.log("new_single_money:" + new_single_money);
             console.log("old_single_money:" + old_single_money);
-
         });
     }
 
     /*扩容模块*/
     $('.leftbox ul,#listtbody').on('click', ".morecapacity", function () {
-        var cus = $(this).parent().parent().find('input:hidden').attr('value'),
+        var cus  = $(this).parent().parent().find('input:hidden').attr('value'),
             html = '<div class="userdata-content"><p style="font-size:20px;">确定扩展此客户容量？</p>\
                         <input type="hidden" class="Input" value="' + cus + '">\n\
                             <p>\n\
@@ -1305,7 +1293,7 @@ jQuery(document).ready(function () {
     //案例双站选择效果
     $(".dialog-content").on('click', "#caseCho1 span", function () {
         var _this = this;
-        var num = $(_this).index();
+        var num   = $(_this).index();
         if ($(_this).css("z-index") != 10) {
             $(_this).css("z-index", "10");
             $("#caseCho1 span").animate({width: 66, borderRadius: 33, left: -35}, function () {
@@ -1314,11 +1302,11 @@ jQuery(document).ready(function () {
                     //加载图标动画
                     $(_this).removeClass("cur");
                     //案例页生成
-                    var data = num == 0 ? dataInit.case.pc : dataInit.case.mobile;
-                    var caseType = num == 0 ? 'PC' : '手机';
+                    var data                = num == 0 ? dataInit.case.pc : dataInit.case.mobile;
+                    var caseType            = num == 0 ? 'PC' : '手机';
                     var colortag = '', html = '';
-                    var simgurl = data.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + data.img[0] + '">如未选择，则默认上次上传的图片：<img src="' + data.img[0] + '" style="width: 100%;"></a></span></span>' : '',
-                        imgurl = data.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + data.img[1] + '">如未选择，则默认上次上传的图片：<img src="' + data.img[1] + '" style="width: 100%;"></a></span></span>' : '';
+                    var simgurl             = data.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + data.img[0] + '">如未选择，则默认上次上传的图片：<img src="' + data.img[0] + '" style="width: 100%;"></a></span></span>' : '',
+                        imgurl              = data.img.length == 2 ? '<span class="popfrm" style="top: initial;left: 45px;"><b class="phpicn">◆</b><span><a target="_blank" href="' + data.img[1] + '">如未选择，则默认上次上传的图片：<img src="' + data.img[1] + '" style="width: 100%;"></a></span></span>' : '';
                     $.each(colorInit, function (i1, v1) {
                         if (data.color == false) {
                             colortag += '<span data="' + v1 + '"' + (v1 == 'colorful' ? '' : ' style="background-color:' + colorData[v1][0] + ';"') + '>' + colorData[v1][1] + '</span>';
@@ -1380,9 +1368,9 @@ jQuery(document).ready(function () {
     $(".dialog-content a.dia-ok").click(function () {
         var number = $(".userdata-content input[type='hidden']").val();
         if ($(this).hasClass("gorenew")) {
-            var year = $(".userdata-content select").children("option:selected").val(),
+            var year     = $(".userdata-content select").children("option:selected").val(),
                 capacity = $(".userdata-content input[name='capacity']:checked").val(),
-                money = $(".userdata-content input[name='money']").val();
+                money    = $(".userdata-content input[name='money']").val();
             $.post("Apps?module=Gbaopen&action=Renew", {
                 num: number,
                 capacity: capacity,
@@ -1398,7 +1386,7 @@ jQuery(document).ready(function () {
             $(".dialog-content a.dia-ok").removeClass('gorenew');
         } else if ($(this).hasClass("gomodify")) {
             var input = $(".userdata-content input[type!='hidden']"), data = {};
-            data.num = number;
+            data.num  = number;
             $.each(input, function (i, v) {
                 data[v.name] = v.value;
             })
@@ -1427,7 +1415,7 @@ jQuery(document).ready(function () {
             $(".dialog-content a.dia-ok").removeClass('gocustransfer');
         } else if ($(this).hasClass("goprocessing")) {
             var input = $(".userdata-content input[type!='hidden'][type='text']"),
-                data = '{';
+                data  = '{';
             $.each(input, function (i, v) {
                 data += '"' + v.name + '":"' + v.value + '",';
             })
@@ -1464,7 +1452,7 @@ jQuery(document).ready(function () {
             });
             $(".dialog-content a.dia-ok").removeClass('reduction');
         } else if ($(this).hasClass("sitemove")) {
-            var data = {};
+            var data    = {};
 //            var FTP=$('input[name=FTP]:checked').val();
             data["FTP"] = $('.userdata-content input[name=FTP]:checked').val();
             data["num"] = number;
@@ -1472,11 +1460,11 @@ jQuery(document).ready(function () {
                 data["FuwuqiID"] = $('.userdata-content #FuwuqiID').val();
             } else {
                 data["address"] = $('.userdata-content #address').val();
-                data["user"] = $('.userdata-content #user').val();
-                data["pwd"] = $('.userdata-content #pwd').val();
+                data["user"]    = $('.userdata-content #user').val();
+                data["pwd"]     = $('.userdata-content #pwd').val();
                 data["ftp_url"] = $('.userdata-content #ftp_url').val();
-                data["port"] = $('.userdata-content #port').val();
-                data["dir"] = $('.userdata-content #dir').val();
+                data["port"]    = $('.userdata-content #port').val();
+                data["dir"]     = $('.userdata-content #dir').val();
             }
             Msg(1, '<span>正在处理，请稍等...</span><span class="flower-loader" style="opacity: 1;"></span>');
             $.post("Apps?module=Gbaopen&action=SiteMove", data, function (result) {
@@ -1488,9 +1476,9 @@ jQuery(document).ready(function () {
             });
             $(".dialog-content a.dia-ok").removeClass('sitemove');
         } else if ($(this).hasClass("morecapacity")) {
-            var data = {};
+            var data             = {};
             data["morecapacity"] = $('.userdata-content input[name=morecapacity]:checked').val();
-            data["num"] = number;
+            data["num"]          = number;
             Msg(1, '<span>正在处理，请稍等...</span><span class="flower-loader" style="opacity: 1;"></span>');
             $.post("Apps?module=Gbaopen&action=morecapacity", data, function (result) {
                 if (!result.err) {
@@ -1501,11 +1489,11 @@ jQuery(document).ready(function () {
             });
             $(".dialog-content a.dia-ok").removeClass('morecapacity');
         } else if ($(this).hasClass("g-show")) { //===E推提交
-            var data = {};
-            data["year"] = $('.userdata-content [name="e-year"]:checked').val();//开通年限
+            var data      = {};
+            data["year"]  = $('.userdata-content [name="e-year"]:checked').val();//开通年限
             data["combo"] = $('.userdata-content [name="e-combo"]:checked').val();//开通版本
             data["money"] = $('.userdata-content .combo-year-money').text();//开通价格
-            data["num"] = number;//？
+            data["num"]   = number;//？
             Msg(1, '<span>正在处理，请稍等...</span><span class="flower-loader" style="opacity: 1;"></span>');
             $.post("Apps?module=Gbaopen&action=Gshow", data, function (result) {
                 if (!result.err) {
@@ -1516,11 +1504,11 @@ jQuery(document).ready(function () {
             });
             $(".dialog-content a.dia-ok").removeClass('g-show');
         } else if ($(this).hasClass("goimgupload")) {
-            var cases = $("#listtbody .cases.current");
-            var area = $(".userdata-content input[type='hidden']").attr("data");
+            var cases    = $("#listtbody .cases.current");
+            var area     = $(".userdata-content input[type='hidden']").attr("data");
             var caseType = 0;
-            var tag = '';
-            var color = '';
+            var tag      = '';
+            var color    = '';
             if (area == 0) {
                 if ($(".userdata-content input[name='caseCho']").length > 0) {
                     if ($(".userdata-content input[name='caseCho']:checked").length != 0) {
@@ -1532,8 +1520,8 @@ jQuery(document).ready(function () {
                 } else
                     caseType = 0;
             } else {
-                caseType = $("#caseCho2 .case_type span");
-                caseType = caseType.length > 0 ? caseType.text() == 'PC' ? 1 : 2 : 0;
+                caseType    = $("#caseCho2 .case_type span");
+                caseType    = caseType.length > 0 ? caseType.text() == 'PC' ? 1 : 2 : 0;
                 var typetag = $("#typetag .tag span.cur"), typecolor = $("#colortag .tag span.cur");
                 if (typetag.length == 0 || typecolor.length == 0) {
                     Msg(1, "<span style=\"color:red;\">网站标签和颜色标签必填</span>");

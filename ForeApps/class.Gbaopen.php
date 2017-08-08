@@ -39,7 +39,7 @@ class Gbaopen extends ForeVIEWS
         $data["ExperienceCount"] = $account->GetExperienceCount($agent_id);
         if ($this->Assess($power, $this->create)) {
             $fuwuqi = new FuwuqiModule();
-            $fuwuqiinfo = $fuwuqi->GetListsByWhere(array('ID', 'FuwuqiName', 'CName'), ' order by ID asc');
+            $fuwuqiinfo = $fuwuqi->GetListsByWhere(array('ID', 'FuwuqiName', 'CName'), ' order by ID desc');
             $data['power'] = true;
             $cusmodel = new CustomersModule;
             $cuspromodel = new CustProModule;

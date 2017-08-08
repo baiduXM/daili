@@ -4,8 +4,7 @@ include './ExpressPHP.Init.php';
 $GbpenApps = new InterfaceApps();
 $module = $_GET['module'];
 $action = $_GET['action'];
-if($module=='')
-{
+if ($module == '') {
     header("HTTP/1.0 500 Internal Server Error");
     exit;
 }

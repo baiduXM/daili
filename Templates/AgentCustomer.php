@@ -36,27 +36,34 @@
                </div>
             </div>
             <div class="moneyInfo">
-               <div class="info-inner">
+               <div class="info-inner" style="padding:6px 20px 0 20px;">
                   <div class="money-left">
                      <p>
                         <?php
-                        if ($Data['power'] & CUS_AGENT)
-                            echo '客户总量：'.$Data['count'].'个客户';
-                        elseif($Data['power'] & CUS_PROCESS)
-                            echo '余额： <b>￥'.$Data['user']['balance'].'</b><a href="">充值</a>';
+                        // if ($Data['power'] & CUS_AGENT)
+                        //     echo '客户总量：'.$Data['count'].'个客户';
+                        // elseif($Data['power'] & CUS_PROCESS)
+                        //     echo '余额： <b>￥'.$Data['user']['balance'].'</b><a href="">充值</a>';
+                        
                         ?>
                      </p>
                      <p>
-                        <?php if ($Data['power'] & CUS_AGENT)
-                           echo '已开通G宝盆的客户：'.$Data['user']['pcnum'].'个客户';
-                        elseif($Data['power'] & CUS_PROCESS)
-                            echo ' 本月消费： <i>￥'.$Data['user']['consumption'].'</i>';
+                        <?php 
+                        // if ($Data['power'] & CUS_AGENT)
+                        //    echo '已开通G宝盆的客户：'.$Data['user']['pcnum'].'个客户';
+                        // elseif($Data['power'] & CUS_PROCESS)
+                        //     echo ' 本月消费： <i>￥'.$Data['user']['consumption'].'</i>';
+                        
                         ?>
                      </p>
                      <p>
-                     <?php if ($Data['power'] & CUS_AGENT)echo '未开通G宝盆的客户：'.$Data['user']['phonenum'].'个客户';
-                     elseif($Data['power'] & CUS_PROCESS)echo ' 本月开通：<i>'.$Data['user']['pcnum'].'</i><span>个PC站和</span><i>'.$Data['user']['phonenum'].'</i><span>个手机站</span>';?>
+                     <?php 
+                     // if ($Data['power'] & CUS_AGENT)echo '未开通G宝盆的客户：'.$Data['user']['phonenum'].'个客户';
+                     // elseif($Data['power'] & CUS_PROCESS)echo ' 本月开通：<i>'.$Data['user']['pcnum'].'</i><span>个PC站和</span><i>'.$Data['user']['phonenum'].'</i><span>个手机站</span>';
+                        
+                     ?>
                      </p>
+                     
                   </div>
                   <div class="infoRight">
                      <i class="iconfont">&#xe62b;</i>
