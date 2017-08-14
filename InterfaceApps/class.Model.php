@@ -1119,7 +1119,7 @@ class Model extends InterfaceVIEWS
             default:
                 $isOrder = 1;
         }
-        $data["Pic"] = $data["Pic"] ? $data["Pic"] : "";
+        $data["Pic"] = '/'.$data["Pic"] ? $data["Pic"] : "";
         $String = '';
         $String.='productName='.$data['Name'];//模板名
         $String.='&model='.$data['NO'];//模板编号
@@ -1144,6 +1144,7 @@ class Model extends InterfaceVIEWS
 
         $url = GUANWANG_DOMAIN . 'fgkSQL.php';
         $Coupons = request_by_other($url, $String);
+        //返回值：1000-成功；1001-修改记录失败；1002-新建记录失败；1003-未接收到post数据
         return $Coupons;
     }
 }
