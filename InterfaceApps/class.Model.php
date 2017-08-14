@@ -1119,7 +1119,7 @@ class Model extends InterfaceVIEWS
             default:
                 $isOrder = 1;
         }
-        $data["Pic"] = '/'.$data["Pic"] ? $data["Pic"] : "";
+        $data["Pic"] = $data["Pic"] ? '/'.$data["Pic"] : "";
         $String = '';
         $String.='productName='.$data['Name'];//模板名
         $String.='&model='.$data['NO'];//模板编号
