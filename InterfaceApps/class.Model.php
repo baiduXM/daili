@@ -1109,6 +1109,16 @@ class Model extends InterfaceVIEWS
 //        $result["content"]=$data["Content"];
 //        $result["modelclassid"]=$data["ModelClassID"];
 //        $result["type"]=$data["Type"];
+        switch ($data["Type"]){
+            case 'PC':
+                $isOrder = 2;
+                break;
+            case '手机':
+                $isOrder = 3;
+                break;
+            default:
+                $isOrder = 1;
+        }
         $data["Pic"] = $data["Pic"] ? $data["Pic"] : "";
         $String = '';
         $String.='productName='.$data['Name'];//模板名
@@ -1120,7 +1130,7 @@ class Model extends InterfaceVIEWS
         $String.='&taxisGUID='.$data["ID"];//模板原id
         $String.='&isRead='.$data['BaiDuXingPing'];//百度星评
         $String.='&ReleaseData='.$data['AddTime'];//创建时间
-        $String.='&isOrder='.$data["Type"] ;//类型
+        $String.='&isOrder='.$isOrder ;//类型
         $String.='&canSu1='.$data["Color"] ;//颜色1
         $String.='&canSu2='.$data["ZhuSeDiao"] ;//颜色2
         $String.='&canSu3='.$data["Language"] ;//网站语言
