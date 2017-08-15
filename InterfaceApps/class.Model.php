@@ -1083,6 +1083,17 @@ class Model extends InterfaceVIEWS
 //            $result["title"]=$data["PackagesName"];
 //            $result["pcnum"]=$data["PCNum"];
 //            $result["mobilenum"]=$data["PhoneNum"];
+            if (preg_match('/GP\d{4}/', $data["PCNum"])){
+                $Model = new ModelModule();
+                $NO = $Model->GetOneByWhere(array('NO'), 'where NO_bak = "'.$data["PCNum"].'"');
+                $data["PCNum"] = $NO['NO'];
+            }
+            if(preg_match('/GM\d{4}/', $data["PhoneNum"])){
+                $Model = new ModelModule();
+                $NO = $Model->GetOneByWhere(array('NO'), 'where NO_bak = "'.$data["PhoneNum"].'"');
+                $data["PhoneNum"] = $NO['NO'];
+            }
+
         }
         $ModelClassInfo = "";
         $ModelClass = new ModelClassModule();
