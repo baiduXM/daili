@@ -2227,22 +2227,22 @@ class Gbaopen extends InterfaceVIEWS
                     $search_cuspro .= $this->_GET['domain'] != '' ? '(PC_domain LIKE \'%' . $this->_GET['domain'] . '%\' or Mobile_domain LIKE \'%' . $this->_GET['domain'] . '%\')' : '';
                     //查询优化
                     $sel1 = $search_cus ? '(select AgentID,CustomersID,CompanyName,CustomersName,Status from tb_customers where ' . $search_cus . ')' : 'tb_customers';
-                    $sel2 = $search_cuspro ? 'inner join (select CustomersID,G_name,Cases,CPhone,PC_StartTime,PC_EndTime,Mobile_StartTime,Mobile_EndTime,AgentID from tb_customers_project where ' . $search_cuspro . ')' : 'left join tb_customers_project';
+                    $sel2 = $search_cuspro ? 'inner join (select CustomersID,G_name,Cases,CPhone,PC_domain,Mobile_domain,PC_StartTime,PC_EndTime,Mobile_StartTime,Mobile_EndTime,AgentID from tb_customers_project where ' . $search_cuspro . ')' : 'left join tb_customers_project';
                     $search_cus = $search_cus ? ' and (' . $search_cus . ')' : '';
                     //根据权限来获取客户信息量
                     if ($level == 1) {
-                        $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID from '
+                        $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.PC_domain,c.Mobile_domain,c.AgentID from '
                             . '(select a.CustomersID,a.CompanyName,a.CustomersName,b.UserName,a.Status from tb_account b inner join ' . $sel1 . ' a on a.AgentID = b.AgentID) as d '
                             . $sel2 . ' c on d.CustomersID = c.CustomersID ' . $limit;
                         $cus = $DB->Select($select);
                     } elseif ($level == 2) {
-                        $select = 'select d.CustomersID,d.CompanyName,d.UserName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID from '
+                        $select = 'select d.CustomersID,d.CompanyName,d.UserName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.PC_domain,c.Mobile_domain,c.AgentID from '
                             . '(select a.CustomersID,a.CompanyName,a.CustomersName,b.UserName,a.Status from '
                             . '(select AgentID,UserName from tb_account where BossAgentID=' . $agent_id . ' or AgentID=' . $agent_id . ') as b inner join ' . $sel1 . ' a on a.AgentID = b.AgentID and a.Status>0) as d '
                             . $sel2 . ' c on d.CustomersID = c.CustomersID ' . $order . $limit;
                         $cus = $DB->Select($select);
                     } elseif ($level == 3) {
-                        $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID from '
+                        $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.PC_domain,c.Mobile_domain,c.AgentID from '
                             . '(select CustomersID,CompanyName,Status from tb_customers where Status>0 and AgentID=' . $agent_id . $search_cus . ') as d '
                             . $sel2 . ' c on d.CustomersID = c.CustomersID' . $order . $limit;
                         $cus = $DB->Select($select);
@@ -2263,6 +2263,7 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['MobileTimeStart'] = $val['Mobile_StartTime'] ? $val['Mobile_StartTime'] : false;
                     $data[$key]['MobileTimeEnd'] = $val['Mobile_EndTime'] ? $val['Mobile_EndTime'] : false;
                     $cases = explode('-', $val['Cases']);
+                    $data[$key]['domain'] = $val['PC_domain'] ? trim($val['PC_domain'],'http://') : trim($val['Mobile_domain'],'http://');
                     $data[$key]['PlaceName'] = $cases[0] ? $cases[1] : '关闭';
                     $data[$key]['Place'] = $cases[0];
                     $data[$key]['agent_username'] = $usernames[$val["AgentID"]];
