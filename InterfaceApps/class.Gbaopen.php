@@ -2169,8 +2169,8 @@ class Gbaopen extends InterfaceVIEWS
                 break;
             case 5:
                 $now = date("Y-m-d H:i:s", time());
-                $after = date("Y-m-d H:i:s", strtotime("+60 day"));
-                //根据权限来获取客户信息量--快过期60
+                $after = date("Y-m-d H:i:s", strtotime("+75 day"));
+                //根据权限来获取客户信息量--快过期75
                 if ($level == 1) {
                     $select = 'select count(1) as Num from tb_customers_project c inner join tb_customers a on c.CustomersID=a.CustomersID where ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '")) and a.GOpen = 1 and a.Status>0 ';
                     $data = $DB->Select($select);
@@ -2299,7 +2299,7 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['PCTimeEnd'] = $val['PC_EndTime'] ? $val['PC_EndTime'] : false;
                     $data[$key]['MobileTimeStart'] = $val['Mobile_StartTime'] ? $val['Mobile_StartTime'] : false;
                     $data[$key]['MobileTimeEnd'] = $val['Mobile_EndTime'] ? $val['Mobile_EndTime'] : false;
-                    $data[$key]['domain'] = $val['PC_domain'] ? $val['PC_domain'] : $val['Mobile_domain'];
+                    $data[$key]['domain'] = $val['PC_domain'] ? trim($val['PC_domain'],'http://') : trim($val['Mobile_domain'],'http://');
                     $cases = explode('-', $val['Cases']);
                     $data[$key]['PlaceName'] = $cases[0] ? $cases[1] : '关闭';
                     $data[$key]['Place'] = $cases[0];
@@ -2336,7 +2336,7 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['PCTimeEnd'] = $val['PC_EndTime'] ? $val['PC_EndTime'] : false;
                     $data[$key]['MobileTimeStart'] = $val['Mobile_StartTime'] ? $val['Mobile_StartTime'] : false;
                     $data[$key]['MobileTimeEnd'] = $val['Mobile_EndTime'] ? $val['Mobile_EndTime'] : false;
-                    $data[$key]['domain'] = $val['PC_domain'] ? $val['PC_domain'] : $val['Mobile_domain'];
+                    $data[$key]['domain'] = $val['PC_domain'] ? trim($val['PC_domain'],'http://') : trim($val['Mobile_domain'],'http://');
                     $cases = explode('-', $val['Cases']);
                     $data[$key]['PlaceName'] = $cases[0] ? $cases[1] : '关闭';
                     $data[$key]['Place'] = $cases[0];
@@ -2403,7 +2403,7 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['PCTimeEnd'] = $val['PC_EndTime'] ? $val['PC_EndTime'] : false;
                     $data[$key]['MobileTimeStart'] = $val['Mobile_StartTime'] ? $val['Mobile_StartTime'] : false;
                     $data[$key]['MobileTimeEnd'] = $val['Mobile_EndTime'] ? $val['Mobile_EndTime'] : false;
-                    $data[$key]['domain'] = $val['PC_domain'] ? $val['PC_domain'] : $val['Mobile_domain'];
+                    $data[$key]['domain'] = $val['PC_domain'] ? trim($val['PC_domain'],'http://') : trim($val['Mobile_domain'],'http://');
                     $cases = explode('-', $val['Cases']);
                     $data[$key]['PlaceName'] = $cases[0] ? $cases[1] : '关闭';
                     $data[$key]['Place'] = $cases[0];
@@ -2442,7 +2442,7 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['PCTimeEnd'] = $val['PC_EndTime'] ? $val['PC_EndTime'] : false;
                     $data[$key]['MobileTimeStart'] = $val['Mobile_StartTime'] ? $val['Mobile_StartTime'] : false;
                     $data[$key]['MobileTimeEnd'] = $val['Mobile_EndTime'] ? $val['Mobile_EndTime'] : false;
-                    $data[$key]['domain'] = $val['PC_domain'] ? $val['PC_domain'] : $val['Mobile_domain'];
+                    $data[$key]['domain'] = $val['PC_domain'] ? trim($val['PC_domain'],'http://') : trim($val['Mobile_domain'],'http://');
                     $cases = explode('-', $val['Cases']);
                     $data[$key]['PlaceName'] = $cases[0] ? $cases[1] : '关闭';
                     $data[$key]['Place'] = $cases[0];
@@ -2451,7 +2451,7 @@ class Gbaopen extends InterfaceVIEWS
                 break;
             case 5:
                 $now = date("Y-m-d H:i:s", time());
-                $after = date("Y-m-d H:i:s", strtotime("+60 day"));
+                $after = date("Y-m-d H:i:s", strtotime("+75 day"));
                 //根据权限来获取客户信息量
                 if ($level == 1) {
                     $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from tb_customers_project c '
@@ -2481,7 +2481,7 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['PCTimeEnd'] = $val['PC_EndTime'] ? $val['PC_EndTime'] : false;
                     $data[$key]['MobileTimeStart'] = $val['Mobile_StartTime'] ? $val['Mobile_StartTime'] : false;
                     $data[$key]['MobileTimeEnd'] = $val['Mobile_EndTime'] ? $val['Mobile_EndTime'] : false;
-                    $data[$key]['domain'] = $val['PC_domain'] ? $val['PC_domain'] : $val['Mobile_domain'];
+                    $data[$key]['domain'] = $val['PC_domain'] ? trim($val['PC_domain'],'http://') : trim($val['Mobile_domain'],'http://');
                     $cases = explode('-', $val['Cases']);
                     $data[$key]['PlaceName'] = $cases[0] ? $cases[1] : '关闭';
                     $data[$key]['Place'] = $cases[0];
@@ -2509,7 +2509,7 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['PCTimeEnd'] = $val['PC_EndTime'] ? $val['PC_EndTime'] : false;
                     $data[$key]['MobileTimeStart'] = $val['Mobile_StartTime'] ? $val['Mobile_StartTime'] : false;
                     $data[$key]['MobileTimeEnd'] = $val['Mobile_EndTime'] ? $val['Mobile_EndTime'] : false;
-                    $data[$key]['domain'] = $val['PC_domain'] ? $val['PC_domain'] : $val['Mobile_domain'];
+                    $data[$key]['domain'] = $val['PC_domain'] ? trim($val['PC_domain'],'http://') : trim($val['Mobile_domain'],'http://');
                     $cases = explode('-', $val['Cases']);
                     $data[$key]['PlaceName'] = $cases[0] ? $cases[1] : '关闭';
                     $data[$key]['Place'] = $cases[0];
