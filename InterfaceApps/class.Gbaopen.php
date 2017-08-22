@@ -2227,22 +2227,22 @@ class Gbaopen extends InterfaceVIEWS
                     $search_cuspro .= $this->_GET['domain'] != '' ? '(PC_domain LIKE \'%' . $this->_GET['domain'] . '%\' or Mobile_domain LIKE \'%' . $this->_GET['domain'] . '%\')' : '';
                     //查询优化
                     $sel1 = $search_cus ? '(select AgentID,CustomersID,CompanyName,CustomersName,Status from tb_customers where ' . $search_cus . ')' : 'tb_customers';
-                    $sel2 = $search_cuspro ? 'inner join (select CustomersID,G_name,Cases,CPhone,PC_domain,Mobile_domain,PC_StartTime,PC_EndTime,Mobile_StartTime,Mobile_EndTime,AgentID from tb_customers_project where ' . $search_cuspro . ')' : 'left join tb_customers_project';
+                    $sel2 = $search_cuspro ? 'inner join (select CustomersID,G_name,Cases,CPhone,PC_domain,Mobile_domain,PC_StartTime,PC_EndTime,Mobile_StartTime,Mobile_EndTime,AgentID,G_Ftp_FwAdress from tb_customers_project where ' . $search_cuspro . ')' : 'left join tb_customers_project';
                     $search_cus = $search_cus ? ' and (' . $search_cus . ')' : '';
                     //根据权限来获取客户信息量
                     if ($level == 1) {
-                        $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.PC_domain,c.Mobile_domain,c.AgentID from '
+                        $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.PC_domain,c.Mobile_domain,c.AgentID,c.G_Ftp_FwAdress from '
                             . '(select a.CustomersID,a.CompanyName,a.CustomersName,b.UserName,a.Status from tb_account b inner join ' . $sel1 . ' a on a.AgentID = b.AgentID) as d '
                             . $sel2 . ' c on d.CustomersID = c.CustomersID ' . $limit;
                         $cus = $DB->Select($select);
                     } elseif ($level == 2) {
-                        $select = 'select d.CustomersID,d.CompanyName,d.UserName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.PC_domain,c.Mobile_domain,c.AgentID from '
+                        $select = 'select d.CustomersID,d.CompanyName,d.UserName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.PC_domain,c.Mobile_domain,c.AgentID,c.G_Ftp_FwAdress from '
                             . '(select a.CustomersID,a.CompanyName,a.CustomersName,b.UserName,a.Status from '
                             . '(select AgentID,UserName from tb_account where BossAgentID=' . $agent_id . ' or AgentID=' . $agent_id . ') as b inner join ' . $sel1 . ' a on a.AgentID = b.AgentID and a.Status>0) as d '
                             . $sel2 . ' c on d.CustomersID = c.CustomersID ' . $order . $limit;
                         $cus = $DB->Select($select);
                     } elseif ($level == 3) {
-                        $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.PC_domain,c.Mobile_domain,c.AgentID from '
+                        $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.PC_domain,c.Mobile_domain,c.AgentID,c.G_Ftp_FwAdress from '
                             . '(select CustomersID,CompanyName,Status from tb_customers where Status>0 and AgentID=' . $agent_id . $search_cus . ') as d '
                             . $sel2 . ' c on d.CustomersID = c.CustomersID' . $order . $limit;
                         $cus = $DB->Select($select);
@@ -2264,6 +2264,7 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['MobileTimeEnd'] = $val['Mobile_EndTime'] ? $val['Mobile_EndTime'] : false;
                     $cases = explode('-', $val['Cases']);
                     $data[$key]['domain'] = $val['PC_domain'] ? trim($val['PC_domain'],'http://') : trim($val['Mobile_domain'],'http://');
+                    $data[$key]['fuwu'] = $val['G_Ftp_FwAdress'] ? trim($val['G_Ftp_FwAdress'],'http://') : '';
                     $data[$key]['PlaceName'] = $cases[0] ? $cases[1] : '关闭';
                     $data[$key]['Place'] = $cases[0];
                     $data[$key]['agent_username'] = $usernames[$val["AgentID"]];
@@ -2272,17 +2273,17 @@ class Gbaopen extends InterfaceVIEWS
             case 0:
                 //根据权限来获取客户信息量
                 if ($level == 1) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.UserName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from '
+                    $select = 'select d.CustomersID,d.CompanyName,d.UserName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from '
                         . '(select a.CustomersID,a.CompanyName,b.UserName,a.Status from tb_account b inner join tb_customers a on b.AgentID = a.AgentID and a.Status>0 ' . $limit . ') as d '
                         . 'left join tb_customers_project c on d.CustomersID = c.CustomersID';
                     $cus = $DB->Select($select);
                 } elseif ($level == 2) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from '
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from '
                         . '(select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ') and b.AgentID = a.AgentID  and a.Status>0 ' . $limit . ') as d '
                         . 'left join tb_customers_project c on d.CustomersID = c.CustomersID' . $order;
                     $cus = $DB->Select($select);
                 } elseif ($level == 3) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from '
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from '
                         . '(select CustomersID,CompanyName,Status from tb_customers where AgentID=' . $agent_id . ' and Status>0 ' . $limit . ') as d '
                         . 'left join tb_customers_project c on d.CustomersID = c.CustomersID' . $order;
                     $cus = $DB->Select($select);
@@ -2301,6 +2302,7 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['MobileTimeStart'] = $val['Mobile_StartTime'] ? $val['Mobile_StartTime'] : false;
                     $data[$key]['MobileTimeEnd'] = $val['Mobile_EndTime'] ? $val['Mobile_EndTime'] : false;
                     $data[$key]['domain'] = $val['PC_domain'] ? trim($val['PC_domain'],'http://') : trim($val['Mobile_domain'],'http://');
+                    $data[$key]['fuwu'] = $val['G_Ftp_FwAdress'] ? trim($val['G_Ftp_FwAdress'],'http://') : '';
                     $cases = explode('-', $val['Cases']);
                     $data[$key]['PlaceName'] = $cases[0] ? $cases[1] : '关闭';
                     $data[$key]['Place'] = $cases[0];
@@ -2310,17 +2312,17 @@ class Gbaopen extends InterfaceVIEWS
             case 1:
                 //根据权限来获取客户信息量
                 if ($level == 1) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from '
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from '
                         . '(select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on b.AgentID = a.AgentID and a.GOpen = 1 and a.Status>0 ) as d '
                         . 'inner join tb_customers_project c on d.CustomersID = c.CustomersID' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 2) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from '
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from '
                         . '(select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on b.AgentID = a.AgentID and a.GOpen = 1 and a.Status>0  and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ')' . ') as d '
                         . 'inner join tb_customers_project c on d.CustomersID = c.CustomersID' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 3) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from tb_customers d '
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from tb_customers d '
                         . 'inner join tb_customers_project c on d.CustomersID = c.CustomersID and d.GOpen = 1 and d.Status>0  and d.AgentID=' . $agent_id . $order . $limit;
                     $cus = $DB->Select($select);
                 } else {
@@ -2338,6 +2340,7 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['MobileTimeStart'] = $val['Mobile_StartTime'] ? $val['Mobile_StartTime'] : false;
                     $data[$key]['MobileTimeEnd'] = $val['Mobile_EndTime'] ? $val['Mobile_EndTime'] : false;
                     $data[$key]['domain'] = $val['PC_domain'] ? trim($val['PC_domain'],'http://') : trim($val['Mobile_domain'],'http://');
+                    $data[$key]['fuwu'] = $val['G_Ftp_FwAdress'] ? trim($val['G_Ftp_FwAdress'],'http://') : '';
                     $cases = explode('-', $val['Cases']);
                     $data[$key]['PlaceName'] = $cases[0] ? $cases[1] : '关闭';
                     $data[$key]['Place'] = $cases[0];
@@ -2370,6 +2373,7 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['MobileTimeStart'] = false;
                     $data[$key]['MobileTimeEnd'] = false;
                     $data[$key]['domain'] = false;
+                    $data[$key]['fuwu'] = false;
                     $data[$key]['agent_username'] = $usernames[$val["AgentID"]];
                 }
                 break;
@@ -2377,17 +2381,17 @@ class Gbaopen extends InterfaceVIEWS
                 $now = date("Y-m-d H:i:s", time());
                 //根据权限来获取客户信息量
                 if ($level == 1) {
-                    $select = 'select d.CustomersID,a.CompanyName,a.Status,d.UserName,d.G_name,d.Cases,d.CPhone,d.PC_StartTime,d.PC_EndTime,d.Mobile_StartTime,d.Mobile_EndTime,a.AgentID,d.PC_domain,d.Mobile_domain from '
-                        . '(select b.UserName,c.CustomersID,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.PC_domain,c.Mobile_domain from tb_account b inner join tb_customers_project c on c.AgentID = b.AgentID and (c.PC_EndTime<"' . $now . '" or c.Mobile_EndTime<"' . $now . '")) as d '
+                    $select = 'select d.CustomersID,a.CompanyName,a.Status,d.UserName,d.G_name,d.Cases,d.CPhone,d.PC_StartTime,d.PC_EndTime,d.Mobile_StartTime,d.Mobile_EndTime,a.AgentID,d.PC_domain,d.Mobile_domain,d.G_Ftp_FwAdress from '
+                        . '(select b.UserName,c.CustomersID,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from tb_account b inner join tb_customers_project c on c.AgentID = b.AgentID and (c.PC_EndTime<"' . $now . '" or c.Mobile_EndTime<"' . $now . '")) as d '
                         . 'inner join tb_customers a on d.CustomersID=a.CustomersID and a.GOpen = 1 and a.Status>0 ' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 2) {
-                    $select = 'select d.CustomersID,a.CompanyName,a.Status,d.UserName,d.G_name,d.Cases,d.CPhone,d.PC_StartTime,d.PC_EndTime,d.Mobile_StartTime,d.Mobile_EndTime,a.AgentID,d.PC_domain,d.Mobile_domain from'
-                        . '(select c.CustomersID,b.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.PC_domain,c.Mobile_domain from tb_account b inner join tb_customers_project c on c.AgentID = b.AgentID and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ') and (c.PC_EndTime<"' . $now . '" or c.Mobile_EndTime<"' . $now . '")) d '
+                    $select = 'select d.CustomersID,a.CompanyName,a.Status,d.UserName,d.G_name,d.Cases,d.CPhone,d.PC_StartTime,d.PC_EndTime,d.Mobile_StartTime,d.Mobile_EndTime,a.AgentID,d.PC_domain,d.Mobile_domain,d.G_Ftp_FwAdress from'
+                        . '(select c.CustomersID,b.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from tb_account b inner join tb_customers_project c on c.AgentID = b.AgentID and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ') and (c.PC_EndTime<"' . $now . '" or c.Mobile_EndTime<"' . $now . '")) d '
                         . 'inner join tb_customers a on a.CustomersID=d.CustomersID and a.Status>0 ' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 3) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from '
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from '
                         . 'tb_customers_project c inner join tb_customers d on c.CustomersID=d.CustomersID and d.Status>0  and c.AgentID = ' . $agent_id . ' and (c.PC_EndTime<"' . $now . '" or c.Mobile_EndTime<"' . $now . '")' . $order . $limit;
                     $cus = $DB->Select($select);
                 } else {
@@ -2405,6 +2409,7 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['MobileTimeStart'] = $val['Mobile_StartTime'] ? $val['Mobile_StartTime'] : false;
                     $data[$key]['MobileTimeEnd'] = $val['Mobile_EndTime'] ? $val['Mobile_EndTime'] : false;
                     $data[$key]['domain'] = $val['PC_domain'] ? trim($val['PC_domain'],'http://') : trim($val['Mobile_domain'],'http://');
+                    $data[$key]['fuwu'] = $val['G_Ftp_FwAdress'] ? trim($val['G_Ftp_FwAdress'],'http://') : '';
                     $cases = explode('-', $val['Cases']);
                     $data[$key]['PlaceName'] = $cases[0] ? $cases[1] : '关闭';
                     $data[$key]['Place'] = $cases[0];
@@ -2416,17 +2421,17 @@ class Gbaopen extends InterfaceVIEWS
                 $after = date("Y-m-d H:i:s", strtotime("+30 day"));
                 //根据权限来获取客户信息量
                 if ($level == 1) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from tb_customers_project c '
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from tb_customers_project c '
                         . 'inner join (select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on a.AgentID = b.AgentID and a.GOpen = 1 and a.Status>0 ) d '
                         . 'on c.CustomersID=d.CustomersID and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '"))' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 2) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from tb_customers_project c '
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from tb_customers_project c '
                         . 'inner join (select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on a.AgentID = b.AgentID and a.GOpen = 1 and a.Status>0  and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ')) d '
                         . 'on c.CustomersID=d.CustomersID and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '"))' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 3) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from tb_customers_project c inner join tb_customers d on c.CustomersID=d.CustomersID and d.Status>0  and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '")) and c.AgentID=' . $agent_id . $order . $limit;
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from tb_customers_project c inner join tb_customers d on c.CustomersID=d.CustomersID and d.Status>0  and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '")) and c.AgentID=' . $agent_id . $order . $limit;
                     $cus = $DB->Select($select);
                 } else {
                     return false;
@@ -2444,6 +2449,7 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['MobileTimeStart'] = $val['Mobile_StartTime'] ? $val['Mobile_StartTime'] : false;
                     $data[$key]['MobileTimeEnd'] = $val['Mobile_EndTime'] ? $val['Mobile_EndTime'] : false;
                     $data[$key]['domain'] = $val['PC_domain'] ? trim($val['PC_domain'],'http://') : trim($val['Mobile_domain'],'http://');
+                    $data[$key]['fuwu'] = $val['G_Ftp_FwAdress'] ? trim($val['G_Ftp_FwAdress'],'http://') : '';
                     $cases = explode('-', $val['Cases']);
                     $data[$key]['PlaceName'] = $cases[0] ? $cases[1] : '关闭';
                     $data[$key]['Place'] = $cases[0];
@@ -2455,17 +2461,17 @@ class Gbaopen extends InterfaceVIEWS
                 $after = date("Y-m-d H:i:s", strtotime("+75 day"));
                 //根据权限来获取客户信息量
                 if ($level == 1) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from tb_customers_project c '
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from tb_customers_project c '
                         . 'inner join (select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on a.AgentID = b.AgentID and a.GOpen = 1 and a.Status>0 ) d '
                         . 'on c.CustomersID=d.CustomersID and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '"))' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 2) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from tb_customers_project c '
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from tb_customers_project c '
                         . 'inner join (select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on a.AgentID = b.AgentID and a.GOpen = 1 and a.Status>0  and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ')) d '
                         . 'on c.CustomersID=d.CustomersID and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '"))' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 3) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from tb_customers_project c inner join tb_customers d on c.CustomersID=d.CustomersID and d.Status>0  and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '")) and c.AgentID=' . $agent_id . $order . $limit;
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from tb_customers_project c inner join tb_customers d on c.CustomersID=d.CustomersID and d.Status>0  and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '")) and c.AgentID=' . $agent_id . $order . $limit;
                     $cus = $DB->Select($select);
                 } else {
                     return false;
@@ -2483,6 +2489,7 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['MobileTimeStart'] = $val['Mobile_StartTime'] ? $val['Mobile_StartTime'] : false;
                     $data[$key]['MobileTimeEnd'] = $val['Mobile_EndTime'] ? $val['Mobile_EndTime'] : false;
                     $data[$key]['domain'] = $val['PC_domain'] ? trim($val['PC_domain'],'http://') : trim($val['Mobile_domain'],'http://');
+                    $data[$key]['fuwu'] = $val['G_Ftp_FwAdress'] ? trim($val['G_Ftp_FwAdress'],'http://') : '';
                     $cases = explode('-', $val['Cases']);
                     $data[$key]['PlaceName'] = $cases[0] ? $cases[1] : '关闭';
                     $data[$key]['Place'] = $cases[0];
@@ -2492,7 +2499,7 @@ class Gbaopen extends InterfaceVIEWS
             case 6:
                 //根据权限来获取客户信息量
                 if ($level == 1) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from '
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from '
                         . '(select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on b.AgentID = a.AgentID and a.Status=0 ) as d '
                         . 'inner join tb_customers_project c on d.CustomersID = c.CustomersID' . $order . $limit;
                     $cus = $DB->Select($select);
@@ -2511,6 +2518,7 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['MobileTimeStart'] = $val['Mobile_StartTime'] ? $val['Mobile_StartTime'] : false;
                     $data[$key]['MobileTimeEnd'] = $val['Mobile_EndTime'] ? $val['Mobile_EndTime'] : false;
                     $data[$key]['domain'] = $val['PC_domain'] ? trim($val['PC_domain'],'http://') : trim($val['Mobile_domain'],'http://');
+                    $data[$key]['fuwu'] = $val['G_Ftp_FwAdress'] ? trim($val['G_Ftp_FwAdress'],'http://') : '';
                     $cases = explode('-', $val['Cases']);
                     $data[$key]['PlaceName'] = $cases[0] ? $cases[1] : '关闭';
                     $data[$key]['Place'] = $cases[0];

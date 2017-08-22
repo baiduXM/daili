@@ -57,6 +57,7 @@
                                             <th class="text-left">公司名称</th>
                                             <th>用户名</th>
                                             <th>域名</th>
+                                            <th>CName</th>
                                             <th>开启时间</th>
                                             <th>到期时间</th>
                                             <th>网站服务</th>

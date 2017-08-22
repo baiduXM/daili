@@ -181,9 +181,11 @@ jQuery(document).ready(function () {
                                                                 <p>所属人员：' + v.agent + '</p>\
                                                             </div></td>';
                                 nameList += '<td>' + v.domain + '</td>';
+                                nameList += '<td>' + v.fuwu + '</td>';
                             } else {
                                 nameList = '<td>' + v.name + '</td>';
                                 nameList += '<td>' + v.domain + '</td>';
+                                nameList += '<td>' + v.fuwu + '</td>';
                             }
                             cuslist += '<tr><!--<td><input type="checkbox" name="ID"></td>-->\
                                 <td class="text-left"><a href="javascript:;" class="dName modify">' + v.company + '</a></td>\
