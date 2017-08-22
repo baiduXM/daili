@@ -213,7 +213,7 @@
                                 <span class="as">
                                 </span>
                             </p>
-                            <span style="padding-left: 25px;color: red;">注:默认年限为1年并赠送1个月,除体验用户，体验用户默认为一个月试用期;默认空间为300M</span>
+                            <span style="padding-left: 25px;color: red;">注:默认年限为1年并赠送1个月,除体验用户，体验用户默认为一个月试用期;默认空间为100M</span>
                         </div>
                         <div class="btnDD" style="text-align:center;">
                             <input type="submit" class="Btn2" value="下一页">

@@ -724,6 +724,7 @@ jQuery(document).ready(function () {
                     </p>' : '') + '<p>\n\
                         <span class="content-l">续费空间</span>\
                         <span class="Input">\
+                            <input type="radio" name="capacity" class="capacity" data-money="300" value="100">100M\
                             <input type="radio" name="capacity" class="capacity" data-money="500" value="300">300M\
                             <input type="radio" name="capacity" class="capacity" data-money="800" value="500">500M\
                             <input type="radio" name="capacity" class="capacity" data-money="1500" value="1000">1000M\

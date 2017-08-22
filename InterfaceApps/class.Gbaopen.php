@@ -1419,7 +1419,7 @@ class Gbaopen extends InterfaceVIEWS
                 $this->LogsFunction->LogsCusRecord(111, 1, 0, $result['msg']);
             } elseif ($post['type'] == 'cuspro') {
                 //默认值设置
-                $Data['Capacity'] = 300 * 1024 * 1024;//$post['capacity'] * 1024 * 1024;默认300M
+                $Data['Capacity'] = 100 * 1024 * 1024;//$post['capacity'] * 1024 * 1024;默认100M
                 $Data['Link_Cus'] = '0';
                 $Data['status'] = 1;
 
