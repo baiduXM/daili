@@ -145,19 +145,34 @@ class ApiModel extends ForeVIEWS
             $cuspro = new CustProModule;
             $cus = new CustomersModule;
             $pc = new ModelModule;
-            $cuspromsg = $cuspro->GetOneByWhere(array('PC_domain', 'CaseImagePC', 'PC_model', 'CustomersProjectID'), 'where CustomersID=' . $cusid);
+            $cuspromsg = $cuspro->GetOneByWhere(array('PC_domain', 'Mobile_domain', 'CaseImagePC', 'CaseImageMobile', 'PC_model', 'Mobile_model', 'CPhone', 'CustomersProjectID'), 'where CustomersID=' . $cusid);
             if ($cuspromsg) {
                 $cusmsg = $cus->GetOneByWhere(array('CompanyName'), 'where CustomersID=' . $cusid);
                 $BackInfo = $cuspro->GetOneByWhere(array('CustomersID'), 'where CustomersProjectID>' . $cuspromsg['CustomersProjectID'] . ' and Cases > 0');
                 $NextInfo = $cuspro->GetOneByWhere(array('CustomersID'), 'where CustomersProjectID<' . $cuspromsg['CustomersProjectID'] . ' and Cases > 0 order by CustomersProjectID desc');
                 // $pcmsg = $pc->GetOneByWhere(array('ModelLan', 'Language', 'Price', 'Youhui'), 'where NO=\'' . $cuspromsg['PC_model'] . '\'');
-                if (preg_match('/G\d{4}P(CN|EN|TW|JP)\d{2}/', $cuspromsg['PC_model'])) {
-                    $pcmsg = $pc->GetOneByWhere(array('ModelLan', 'Language', 'Price', 'Youhui'), 'where NO=\'' . $cuspromsg['PC_model'] . '\'');
-                } else {
-                    $pcmsg = $pc->GetOneByWhere(array('NO', 'ModelLan', 'Language', 'Price', 'Youhui'), 'where NO_bak=\'' . $cuspromsg['PC_model'] . '\'');
-                    $cuspromsg['PC_model'] = $pcmsg['NO'];
+                if($cuspromsg['CPhone']==1){
+                    if (preg_match('/G\d{4}P(CN|EN|TW|JP)\d{2}/', $cuspromsg['PC_model'])) {
+                        $msg = $pc->GetOneByWhere(array('ModelLan', 'Language', 'Price', 'Youhui'), 'where NO=\'' . $cuspromsg['PC_model'] . '\'');
+                        $Model = $cuspromsg['PC_model'];
+                    } else {
+                        $msg = $pc->GetOneByWhere(array('NO', 'ModelLan', 'Language', 'Price', 'Youhui'), 'where NO_bak=\'' . $cuspromsg['PC_model'] . '\'');
+                        $Model = $msg['NO'];
+                    }
+                    $domain = $cuspromsg['PC_domain'];
+                    $casedata = explode(',', $cuspromsg['CaseImagePC']);
+                }elseif($cuspromsg['CPhone']==2){
+                    if (preg_match('/G\d{4}P(CN|EN|TW|JP)\d{2}/', $cuspromsg['Mobile_model'])) {
+                        $msg = $pc->GetOneByWhere(array('ModelLan', 'Language', 'Price', 'Youhui'), 'where NO=\'' . $cuspromsg['Mobile_model'] . '\'');
+                        $Model = $cuspromsg['Mobile_model'];
+                    } else {
+                        $msg = $pc->GetOneByWhere(array('NO', 'ModelLan', 'Language', 'Price', 'Youhui'), 'where NO_bak=\'' . $cuspromsg['Mobile_model'] . '\'');
+                        $Model = $msg['NO'];
+                    }
+                    $domain = 'http://s.jiathis.com/qrcode.php?url='.trim($cuspromsg['Mobile_domain'],'http://');
+                    $casedata = explode(',', $cuspromsg['CaseImageMobile']);
                 }
-                $casedata = explode(',', $cuspromsg['CaseImagePC']);
+                
                 for ($i = 0, $count = count($casedata), $type = 1; $i < $count; $i++) {
                     if ($casedata[$i]) {
                         /* type类型：1为颜色，2为行业标签号，3为图片 */
@@ -195,12 +210,12 @@ class ApiModel extends ForeVIEWS
                             <model>
 				<id>' . $cusid . '</id>
 				<name>' . $cusmsg['CompanyName'] . '</name>
-				<url>' . $cuspromsg['PC_domain'] . '</url>
+				<url>' . $domain . '</url>
 				<img>' . $img . '</img>
 				<color>' . $color . '</color>
-				<lang>' . $pcmsg['Language'] . '</lang>
-				<type>' . $pcmsg['ModelLan'] . '</type>
-				<code>' . $cuspromsg['PC_model'] . '</code>
+				<lang>' . $msg['Language'] . '</lang>
+				<type>' . $msg['ModelLan'] . '</type>
+				<code>' . $Model . '</code>
                                 <prev>' . $BackInfo['CustomersID'] . '</prev>
                                 <next>' . $NextInfo['CustomersID'] . '</next>
                             </model>
