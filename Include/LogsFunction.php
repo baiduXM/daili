@@ -45,7 +45,7 @@ class LogsFunction {
             $line['CustomersID'] = $CustomersID;
             $line['IP'] = GetIP();
             $line['Time'] = date ( "Y-m-d H:i:s" );
-            $line['AgentID'] = $_SESSION['AgentID'];
+            $line['AgentID'] = $_SESSION['AgentID']?$_SESSION['AgentID']:0;
             $line['Remark'] = $remark;
             $DB = new DB ();
             $DB ->insertArray('tbl_logscus', $line);

@@ -726,17 +726,21 @@ class Api extends ForeVIEWS {
         $ins_info["combo"] = 0;
         $gshow = new GshowModule();
         $ret = $gshow->InsertArray($ins_info);
+        $LogsFunction = new LogsFunction;
         //E推接口
         if ($ret) {
             $ret = $this->toGshow($ins_info);
             if ($ret["code"] != 200) {
                 $gshow->DeleteInfo(' where CustomersID=' . $cusprodata["CustomersID"]);
                 $result = 1;//微传单同步数据失败
+                $LogsFunction->LogsCusRecord(123, 5, $cusprodata["CustomersID"], '统一平台开通E推同步失败');
             } else {
                 $result = 0;//微传单操作成功
+                $LogsFunction->LogsCusRecord(123, 1, $cusprodata["CustomersID"], '统一平台开通E推成功');
             }
         } else {
             $result = 2;//微传单数据更新失败
+            $LogsFunction->LogsCusRecord(123, 0, $cusprodata["CustomersID"], '统一平台开通E推插入数据库失败');
         }
         //返回值
         echo $result;
