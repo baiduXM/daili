@@ -1430,6 +1430,7 @@ jQuery(document).ready(function () {
             })
             data += '"pc_mobile":"' + $("input[type=\'radio\'][name=\'pc_mobile\']:checked").val() + '",';
             data += '"senior":"' + $("input[type=\'radio\'][name=\'senior\']:checked").val() + '",';
+            data += '"column_on":"' + $("input[type=\'radio\'][name=\'column_on\']:checked").val() + '",';
             data += '"outmobile_add":"' + $("input[type=\'checkbox\'][name=\'outmobile_add\']").is(':checked') + '",';
             data += '"outpc_add":"' + $("input[type=\'checkbox\'][name=\'outpc_add\']").is(':checked') + '",';
             data += '"num":' + number + '}';

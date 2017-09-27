@@ -1056,7 +1056,7 @@ class Gbaopen extends InterfaceVIEWS
             $linkcus = $post['othercus'] ? $post['othercus'] : 0;
             $Data['Link_Cus'] = $linkcus ? $cuspromodel->GetOneByWhere('where G_name=\'' . $linkcus . '\'') ? $linkcus : 0 : 0;
             //是否允许客户自定义栏目
-            $Data['column_on'] = $post['column_on'] ? $post['column_on'] : 1;
+            $Data['column_on'] = $post['column_on'];
             //模板号域名处理
             $Model = new ModelModule();
             $Data['CPhone'] = $post['pc_mobile'];
