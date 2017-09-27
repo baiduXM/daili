@@ -486,7 +486,7 @@ class Gbaopen extends InterfaceVIEWS
                     if ($this->Assess($power, $this->process)) {
                         $cuspromodel = new CustProModule;
                         $fuwuqi = new FuwuqiModule();
-                        $lists = array('G_name', 'CPhone', 'PK_model', 'PC_model', 'Mobile_model', 'Link_Cus', 'PC_AddTime', 'Mobile_AddTime', 'PC_StartTime', 'Mobile_StartTime', 'PC_domain', 'Mobile_domain', 'Customization', 'FuwuqiID');
+                        $lists = array('G_name', 'CPhone', 'PK_model', 'PC_model', 'Mobile_model', 'Link_Cus', 'PC_AddTime', 'Mobile_AddTime', 'PC_StartTime', 'Mobile_StartTime', 'PC_domain', 'Mobile_domain', 'Customization', 'FuwuqiID' , 'column_on');
                         $cuspro = $cuspromodel->GetOneByWhere($lists, 'where CustomersID=' . $cus_id);
                         if ($cuspro) {
                             if ($cuspro['FuwuqiID']) {
@@ -526,6 +526,7 @@ class Gbaopen extends InterfaceVIEWS
                                           'pcdomain'         => $cuspro['PC_domain'] ? $cuspro['PC_domain'] : '',
                                           'mobiledomain'     => $cuspro['Mobile_domain'] ? $cuspro['Mobile_domain'] : '',
                                           'senior'           => $cuspro['Customization'],
+                                          'column_on'        => $cuspro['column_on'],
                                           'othercus'         => $cuspro['Link_Cus']);
                             $result['data'] = $data;
                         } else {
@@ -1054,6 +1055,8 @@ class Gbaopen extends InterfaceVIEWS
             //中英关联			
             $linkcus = $post['othercus'] ? $post['othercus'] : 0;
             $Data['Link_Cus'] = $linkcus ? $cuspromodel->GetOneByWhere('where G_name=\'' . $linkcus . '\'') ? $linkcus : 0 : 0;
+            //是否允许客户自定义栏目
+            $Data['column_on'] = $post['column_on'] ? $post['column_on'] : 1;
             //模板号域名处理
             $Model = new ModelModule();
             $Data['CPhone'] = $post['pc_mobile'];
@@ -1957,6 +1960,7 @@ class Gbaopen extends InterfaceVIEWS
         $ToString .= '&mobile_endtime=' . $CustProInfo ['Mobile_EndTime'];
         $ToString .= '&switch_cus_name=' . $CustProInfo ['Link_Cus'];
         $ToString .= '&status=' . $CustProInfo ['status'];
+        $ToString .= '&column_on=' . $CustProInfo ['column_on'];
         if (isset($_POST["password"]) && !empty($_POST["password"])) {
             $ToString .= '&password=' . $_POST["password"];
         }

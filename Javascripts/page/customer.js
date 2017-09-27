@@ -896,6 +896,11 @@ jQuery(document).ready(function () {
                            <input type="radio" name="pc_mobile" value="3">套餐\
                            <input type="radio" name="pc_mobile" value="4">双站</span>\
                     </p>\
+                    <p><span class="content-l">栏目自定义</span>\
+                       <span class="Input">\
+                           <input type="radio" name="column_on" value="1">开启\
+                           <input type="radio" name="column_on" value="0">关闭\
+                    </p>\
                     <p>\
                         <span class="content-l">中英关联账号</span>\
                         <span><input type="text" name="othercus" class="Input" placeholder="无关联不需填写" value="' + data.othercus + '"></span>\
@@ -944,6 +949,7 @@ jQuery(document).ready(function () {
                         var dialogscr = function(){\
                         $("#dialog-message input[type=\'radio\'][name=\'senior\'][value=\'' + data.senior + '\']").attr("checked","true");\
                         $("#dialog-message input[type=\'radio\'][name=\'pc_mobile\'][value=\'' + data.pc_mobile + '\']").attr("checked","true");\
+                        $("#dialog-message input[type=\'radio\'][name=\'column_on\'][value=\'' + data.column_on + '\']").attr("checked","true");\
                         changetext(' + data.pc_mobile + ');\
                         $("#dialog-message input[type=\'radio\'][name=\'pc_mobile\']").change(function(){changetext($(this).val())});\
                         $("#dialog-message input[type=\'checkbox\']").click(function(){\
