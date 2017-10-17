@@ -113,13 +113,24 @@ jQuery(document).ready(function() {
     
     //模板选择
     $("input[name='pcdomain']").focus(function() {
-        $(this).val("http://" + $("input[name='account']").val() + $("#companyFTP option:selected").attr("content"));
+        var ftp_c = $("input[name='ftp_c']:checked").val();
+        if(ftp_c == 1){
+            $(this).val("http://" + $("input[name='account']").val() + $("#companyFTP option:selected").attr("content"));
+        }        
     });
     $("input[name='mobiledomain']").focus(function() {
-        $(this).val("http://m." + $("input[name='account']").val() + $("#companyFTP option:selected").attr("content"));
+        var ftp_c = $("input[name='ftp_c']:checked").val();
+        if(ftp_c == 1){
+            $(this).val("http://m." + $("input[name='account']").val() + $("#companyFTP option:selected").attr("content"));
+        }        
     });
     $("input[type='radio'][name='pc_mobile']").change(function() {
         changetype($(this).val());
+    });
+
+    $("input[name='ftp_c']").change(function(){
+        $("input[name='pcdomain']").val('');
+        $("input[name='mobiledomain']").val('');
     });
 
     $("#companyFTP").change(function() {
@@ -137,9 +148,15 @@ jQuery(document).ready(function() {
         if ($(this).val() == 1) {
             $("#companyFTP").show();
             $(".ownftp").hide();
-        } else {
+            $(".35ftp").hide();
+        } else if($(this).val() == 0) {
             $(".ownftp").show();
             $("#companyFTP").hide();
+            $(".35ftp").hide();
+        } else if($(this).val() == 2){
+            $(".35ftp").show();
+            $("#companyFTP").hide();
+            $(".ownftp").hide();
         }
     });
     $("#companyFTP select").change(function() {
@@ -198,6 +215,18 @@ jQuery(document).ready(function() {
             if(/^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$/.test($(".userdata-content input[name='account']").val()) == false){
                 Msg(1, '账号只能由数字，字母，分隔号构成。首字符和尾字符只能是数字或字母');
                 return false;
+            }
+            //35开户判断域名总数有没有超过九个
+            var ftp = $("input[name=ftp]:checked").val();
+            if(ftp == 2){
+                var mobile35 = $("input[name=mobiledomain]").val();
+                var pc35 = $("input[name=pcdomain]").val();
+                var m_length = mobile35.split(",").length;
+                var p_length = pc35.split(",").length;
+                if(m_length + p_length > 9){
+                    Msg(1,'PC站和手机站的域名共计超过九个');
+                    return false;
+                }
             }
             html += '<p><span>邮箱地址：</span><span class="major">' + $(".userdata-content input[name='email']").val() + '</span></p>\n';
             html += '<p><span>客户账号：</span><span class="major">' + $(".userdata-content input[name='account']").val() + '</span></p></div>';

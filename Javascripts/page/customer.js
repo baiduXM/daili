@@ -181,9 +181,11 @@ jQuery(document).ready(function () {
                                                                 <p>所属人员：' + v.agent + '</p>\
                                                             </div></td>';
                                 nameList += '<td>' + v.domain + '</td>';
+                                nameList += '<td>' + v.fuwu + '</td>';
                             } else {
                                 nameList = '<td>' + v.name + '</td>';
                                 nameList += '<td>' + v.domain + '</td>';
+                                nameList += '<td>' + v.fuwu + '</td>';
                             }
                             cuslist += '<tr><!--<td><input type="checkbox" name="ID"></td>-->\
                                 <td class="text-left"><a href="javascript:;" class="dName modify">' + v.company + '</a></td>\
@@ -724,6 +726,7 @@ jQuery(document).ready(function () {
                     </p>' : '') + '<p>\n\
                         <span class="content-l">续费空间</span>\
                         <span class="Input">\
+                            <input type="radio" name="capacity" class="capacity" data-money="300" value="100">100M\
                             <input type="radio" name="capacity" class="capacity" data-money="500" value="300">300M\
                             <input type="radio" name="capacity" class="capacity" data-money="800" value="500">500M\
                             <input type="radio" name="capacity" class="capacity" data-money="1500" value="1000">1000M\
@@ -893,6 +896,11 @@ jQuery(document).ready(function () {
                            <input type="radio" name="pc_mobile" value="3">套餐\
                            <input type="radio" name="pc_mobile" value="4">双站</span>\
                     </p>\
+                    <p><span class="content-l">栏目自定义</span>\
+                       <span class="Input">\
+                           <input type="radio" name="column_on" value="1">开启\
+                           <input type="radio" name="column_on" value="0">关闭\
+                    </p>\
                     <p>\
                         <span class="content-l">中英关联账号</span>\
                         <span><input type="text" name="othercus" class="Input" placeholder="无关联不需填写" value="' + data.othercus + '"></span>\
@@ -941,6 +949,7 @@ jQuery(document).ready(function () {
                         var dialogscr = function(){\
                         $("#dialog-message input[type=\'radio\'][name=\'senior\'][value=\'' + data.senior + '\']").attr("checked","true");\
                         $("#dialog-message input[type=\'radio\'][name=\'pc_mobile\'][value=\'' + data.pc_mobile + '\']").attr("checked","true");\
+                        $("#dialog-message input[type=\'radio\'][name=\'column_on\'][value=\'' + data.column_on + '\']").attr("checked","true");\
                         changetext(' + data.pc_mobile + ');\
                         $("#dialog-message input[type=\'radio\'][name=\'pc_mobile\']").change(function(){changetext($(this).val())});\
                         $("#dialog-message input[type=\'checkbox\']").click(function(){\
@@ -1421,6 +1430,7 @@ jQuery(document).ready(function () {
             })
             data += '"pc_mobile":"' + $("input[type=\'radio\'][name=\'pc_mobile\']:checked").val() + '",';
             data += '"senior":"' + $("input[type=\'radio\'][name=\'senior\']:checked").val() + '",';
+            data += '"column_on":"' + $("input[type=\'radio\'][name=\'column_on\']:checked").val() + '",';
             data += '"outmobile_add":"' + $("input[type=\'checkbox\'][name=\'outmobile_add\']").is(':checked') + '",';
             data += '"outpc_add":"' + $("input[type=\'checkbox\'][name=\'outpc_add\']").is(':checked') + '",';
             data += '"num":' + number + '}';

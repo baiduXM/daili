@@ -102,6 +102,7 @@
                                 <span class="Input">
                                     <input type="radio" name="ftp_c" value="1" checked>公司FTP
                                     <input type="radio" name="ftp_c" value="0">客户FTP
+                                    <input type="radio" name="ftp_c" value="2">35
                                 </span>
 <!--                                <span class="content-l">容量</span>
                                 <span class="Input">
@@ -163,6 +164,21 @@
                                     <input type="text" value="./www/" class="Input" name="ftp_mulu">
                                 </span>
                             </p>
+                            <!--35开户-->
+                            <p class="35ftp" style="display:none;">
+                                <span class="content-l">FTP用户名</span>
+                                <span>
+                                    <input type="text" value="" class="Input" name="vhostName">
+                                    <span class="as">不能与绑定的域名同名</span>
+                                </span>
+                            </p>
+                            <p class="35ftp" style="display:none;">
+                                <span class="content-l">FTP密码</span>
+                                <span>
+                                    <input type="text" value="" class="Input" name="vhostPwd">
+                                </span>
+                                <span class="as">同时包含大写和小写字母，数字以及特殊符号（~!@#$%^&*()），8到20位</span>
+                            </p>
                             <p>
                                 <span class="content-l">高级定制</span>
                                 <span class="Input">
@@ -188,12 +204,14 @@
                                 <span><input type="text" name="pcmodel" class="Input"></span>
                                 <span class="content-l">PC域名</span>
                                 <span><input type="text" name="pcdomain" class="Input"></span>
+                                <span class="as 35ftp" style="display:none;">多个域名请用英文半角逗号分开， PC站和手机站共计不超过9个域名，且必须使用已备案的域名</span>
                             </p>
                             <p class="modelchoose" id="mobile" style="display:none;">
                                 <span class="content-l">手机模板</span>
                                 <span><input type="text" name="mobilemodel" class="Input"></span>
                                 <span class="content-l">手机域名</span>
                                 <span><input type="text" name="mobiledomain" class="Input"></span>
+                                <span class="as 35ftp" style="display:none;">多个域名请用英文半角逗号分开， PC站和手机站共计不超过9个域名，且必须使用已备案的域名</span>
                             </p>
                             <p class="modelchoose" id="domain_outpc" style="display:none;">
                                 <input name="outpc_add" type="checkbox">
@@ -213,7 +231,7 @@
                                 <span class="as">
                                 </span>
                             </p>
-                            <span style="padding-left: 25px;color: red;">注:默认年限为1年并赠送1个月,除体验用户，体验用户默认为一个月试用期;默认空间为300M</span>
+                            <span style="padding-left: 25px;color: red;">注:默认年限为1年并赠送1个月,除体验用户，体验用户默认为一个月试用期;默认空间为100M</span>
                         </div>
                         <div class="btnDD" style="text-align:center;">
                             <input type="submit" class="Btn2" value="下一页">

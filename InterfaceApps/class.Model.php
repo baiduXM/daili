@@ -1051,7 +1051,7 @@ class Model extends InterfaceVIEWS
                     $data['EWM'] = 'http://s.jiathis.com/qrcode.php?url=' . $data['Url'];
                 } else {
                     // if(strpos($data["Url"], 'http://GM')===false){
-                    if (strpos($data["Url"], 'http://G') === false) {
+                    if (strpos($data["Url"], 'MCN') === false or strpos($data["Url"], 'MEN') === false) {
                         $data['EWM'] = 'http://s.jiathis.com/qrcode.php?url=' . $data['Url'];
                     } else {
                         // $data['Url']=str_replace('http://GM', 'http://m.GM', $data['Url']);
@@ -1083,6 +1083,17 @@ class Model extends InterfaceVIEWS
 //            $result["title"]=$data["PackagesName"];
 //            $result["pcnum"]=$data["PCNum"];
 //            $result["mobilenum"]=$data["PhoneNum"];
+            if (preg_match('/GP\d{4}/', $data["PCNum"])){
+                $Model = new ModelModule();
+                $NO = $Model->GetOneByWhere(array('NO'), 'where NO_bak = "'.$data["PCNum"].'"');
+                $data["PCNum"] = $NO['NO'];
+            }
+            if(preg_match('/GM\d{4}/', $data["PhoneNum"])){
+                $Model = new ModelModule();
+                $NO = $Model->GetOneByWhere(array('NO'), 'where NO_bak = "'.$data["PhoneNum"].'"');
+                $data["PhoneNum"] = $NO['NO'];
+            }
+
         }
         $ModelClassInfo = "";
         $ModelClass = new ModelClassModule();
@@ -1109,38 +1120,42 @@ class Model extends InterfaceVIEWS
 //        $result["content"]=$data["Content"];
 //        $result["modelclassid"]=$data["ModelClassID"];
 //        $result["type"]=$data["Type"];
+        switch ($data["Type"]){
+            case 'PC':
+                $isOrder = 2;
+                break;
+            case '手机':
+                $isOrder = 3;
+                break;
+            default:
+                $isOrder = 1;
+        }
+        $data["Pic"] = $data["Pic"] ? '/'.$data["Pic"] : "";
         $String = '';
-        $String .= '<?xml version="1.0" encoding="utf-8"?>
-            <main>
-              <model>
-                <id>' . $data['ID'] . '</id>
-                <no>' . $data['NO'] . '</no>
-                <title>' . $data['Name'] . '</title>
-                <color>' . $data['Color'] . '</color>
-                <tuijian>' . $data['TuiJian'] . '</tuijian>
-                <star>' . $data['BaiDuXingPing'] . '</star>
-                <descript>' . $data['Descript'] . '</descript>
-                <price>' . $data['Price'] . '</price>
-                <pcnum>' . $data['PCNum'] . '</pcnum>
-                <mobilenum>' . $data['PhoneNum'] . '</mobilenum>
-                <youhui>' . $data['Youhui'] . '</youhui>
-                <sort>' . $ModelClassInfo . '</sort>
-                <tone>' . $data['ZhuSeDiao'] . '</tone>
-                <pl>' . $data['Language'] . '</pl>
-                <website>' . $data['Url'] . '</website>
-                <time>' . $data['AddTime'] . '</time>
-                <ewm>' . $data['EWM'] . '</ewm>
-                <modellan>' . $data['ModelLan'] . '</modellan>
-                <content>' . $data['Content'] . '</content>
-                <modelclassid>' . $data['ModelClassID'] . '</modelclassid>
-                <type>' . $data["Type"] . '</type>
-                <pic>' . ($data["Pic"] ? $data["Pic"] : "") . '</pic>
-              </model>
-            </main>
-            ';
-        $code = "data=" . $String;
-        $url = GUANWANG_DOMAIN . 'UpdateData.aspx';
-        $Coupons = request_by_other($url, $code);
+        $String.='productName='.$data['Name'];//模板名
+        $String.='&model='.$data['NO'];//模板编号
+        $String.='&price='.$data['Price'];//价格
+        $String.='&isShow='.$data['TuiJian'];//推荐
+        $String.='&sortName='.$ModelClassInfo;//行业
+        $String.='&smallAddress='.$data["Pic"];//模板截图URL
+        $String.='&taxisGUID='.$data["ID"];//模板原id
+        $String.='&isRead='.$data['BaiDuXingPing'];//百度星评
+        $String.='&ReleaseData='.$data['AddTime'];//创建时间
+        $String.='&isOrder='.$isOrder ;//类型
+        $String.='&canSu1='.$data["Color"] ;//颜色1
+        $String.='&canSu2='.$data["ZhuSeDiao"] ;//颜色2
+        $String.='&canSu3='.$data["Language"] ;//网站语言
+        $String.='&canSu4='.$data["Url"] ;//案例地址
+        $String.='&canSu5='.$data["EWM"] ;//案例二维码
+        $String.='&Discount='.$data["Youhui"] ;//优惠价格
+        $String.='&canSu6='.$data["PCNum"] ;//双站的PC模板编号
+        $String.='&canSu7='.$data["PhoneNum"] ;//双站的手机模板编号
+        $String.='&canSu8='.$data["ModelLan"] ;//中英文
+        $String.='&canSu9='.$data["ModelClassID"] ;//分类id
+
+        $url = GUANWANG_DOMAIN . 'fgkSQL.php';
+        $Coupons = request_by_other($url, $String);
+        //返回值：1000-成功；1001-修改记录失败；1002-新建记录失败；1003-未接收到post数据
         return $Coupons;
     }
 }

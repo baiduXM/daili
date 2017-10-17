@@ -705,4 +705,99 @@ class Api extends ForeVIEWS {
         exit();
     }
 
+    /**
+     *统一平台开通E推
+     */
+    public function TyGshow(){
+        header('Access-Control-Allow-Origin:*');
+        //通过用户名获取用户ID和邮箱信息
+        $post=$this->_GET;
+        $custpro=new CustProModule();
+        $cusprodata=$custpro->GetInfoByWhere(" where G_name = '".$post["name"]."'");
+        $cust = new CustomersModule();
+        $cust_info = $cust->GetOneByWhere(array(), " where CustomersID = " . $cusprodata["CustomersID"]);
+        //E推信息插入数据库，免费版一年
+        $ins_info = array();
+        $ins_info["EndTime"] = (date('Y', time()) + 1) . '-' . date('m-d H:i:s', time());
+        $ins_info["UpdateTime"] = date('Y-m-d H:i:s', time());
+        $ins_info["StartTime"] = date('Y-m-d H:i:s', time());
+        $ins_info["Email"] = $cust_info["Email"];
+        $ins_info["CustomersID"] = $cusprodata["CustomersID"];
+        $ins_info["combo"] = 0;
+        $gshow = new GshowModule();
+        $ret = $gshow->InsertArray($ins_info);
+        $LogsFunction = new LogsFunction;
+        //E推接口
+        if ($ret) {
+            $ret = $this->toGshow($ins_info);
+            if ($ret["code"] != 200) {
+                $gshow->DeleteInfo(' where CustomersID=' . $cusprodata["CustomersID"]);
+                $result = 1;//微传单同步数据失败
+                $LogsFunction->LogsCusRecord(123, 5, $cusprodata["CustomersID"], '统一平台开通E推同步失败');
+            } else {
+                $result = 0;//微传单操作成功
+                $LogsFunction->LogsCusRecord(123, 1, $cusprodata["CustomersID"], '统一平台开通E推成功');
+            }
+        } else {
+            $result = 2;//微传单数据更新失败
+            $LogsFunction->LogsCusRecord(123, 0, $cusprodata["CustomersID"], '统一平台开通E推插入数据库失败');
+        }
+        //返回值
+        echo $result;
+        exit();
+    }
+    /**
+     * 生成登录E推的验证文件
+     *
+     * @param $data
+     * @return int|mixed
+     */
+    private function toGshow($data)
+    {
+        if (!$data) {
+            return 0;
+        }
+        $cust = new CustomersModule();
+        $cust_info = $cust->GetOneByWhere(array(), " where CustomersID = " . $data["CustomersID"]);
+        if (!$cust_info) {
+            return 0;
+        }
+        $TuUrl = WEICD_DOMAIN . 'index.php?c=user&a=dlregister';
+        $ToString = '';
+        $ToString .= 'uname=' . $cust_info ['CompanyName'];
+
+        $ToString .= '&email_varchar=' . $data ['Email'];
+        $ToString .= '&tel=' . $cust_info ['Tel'];
+        $ToString .= '&allow_nums=10';
+        $ToString .= '&end_time=' . $data ['EndTime'];
+        $ToString .= '&type=1';
+        $ToString .= '&level_int=0';
+        $ToString .= '&status_int=1';
+        $ToString .= '&password_varchar=passwords';
+        $ToString .= '&phone=';
+        $ToString .= '&qq=';
+        $ToString .= '&id=';
+        $ToString .= '&combo=' . $data['combo']; // E推开通套餐类型
+        //随机文件名开始生成
+        $randomLock = getstr();
+        $password = md5(md5($randomLock));
+
+        //生成握手密钥
+        $text = getstr();
+
+        //生成dll文件
+        $myfile = @fopen('./token/' . $password . '.dll', "w+");
+        if (!$myfile) {
+            return 0;
+        }
+        fwrite($myfile, $text);
+        fclose($myfile);
+
+        $ToString .= '&timemap=' . $randomLock;
+        $ToString .= '&taget=' . md5($text . $password);
+        $ReturnString = request_by_other($TuUrl, $ToString);
+        $ReturnArray = json_decode($ReturnString, true);
+        return $ReturnArray;
+    }
+
 }

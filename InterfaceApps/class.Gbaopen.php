@@ -27,6 +27,8 @@ class Gbaopen extends InterfaceVIEWS
         $this->transfer = 'transfer';
         $this->manage = 'manage';
         $this->delete = 'delete';
+        //35服务器其他域名
+        $this->mobile_domain;
     }
 
     //客户列表页面初始化
@@ -486,7 +488,7 @@ class Gbaopen extends InterfaceVIEWS
                     if ($this->Assess($power, $this->process)) {
                         $cuspromodel = new CustProModule;
                         $fuwuqi = new FuwuqiModule();
-                        $lists = array('G_name', 'CPhone', 'PK_model', 'PC_model', 'Mobile_model', 'Link_Cus', 'PC_AddTime', 'Mobile_AddTime', 'PC_StartTime', 'Mobile_StartTime', 'PC_domain', 'Mobile_domain', 'Customization', 'FuwuqiID');
+                        $lists = array('G_name', 'CPhone', 'PK_model', 'PC_model', 'Mobile_model', 'Link_Cus', 'PC_AddTime', 'Mobile_AddTime', 'PC_StartTime', 'Mobile_StartTime', 'PC_domain', 'Mobile_domain', 'Customization', 'FuwuqiID' , 'column_on');
                         $cuspro = $cuspromodel->GetOneByWhere($lists, 'where CustomersID=' . $cus_id);
                         if ($cuspro) {
                             if ($cuspro['FuwuqiID']) {
@@ -526,6 +528,7 @@ class Gbaopen extends InterfaceVIEWS
                                           'pcdomain'         => $cuspro['PC_domain'] ? $cuspro['PC_domain'] : '',
                                           'mobiledomain'     => $cuspro['Mobile_domain'] ? $cuspro['Mobile_domain'] : '',
                                           'senior'           => $cuspro['Customization'],
+                                          'column_on'        => $cuspro['column_on'],
                                           'othercus'         => $cuspro['Link_Cus']);
                             $result['data'] = $data;
                         } else {
@@ -1054,6 +1057,8 @@ class Gbaopen extends InterfaceVIEWS
             //中英关联			
             $linkcus = $post['othercus'] ? $post['othercus'] : 0;
             $Data['Link_Cus'] = $linkcus ? $cuspromodel->GetOneByWhere('where G_name=\'' . $linkcus . '\'') ? $linkcus : 0 : 0;
+            //是否允许客户自定义栏目
+            $Data['column_on'] = $post['column_on'];
             //模板号域名处理
             $Model = new ModelModule();
             $Data['CPhone'] = $post['pc_mobile'];
@@ -1419,7 +1424,7 @@ class Gbaopen extends InterfaceVIEWS
                 $this->LogsFunction->LogsCusRecord(111, 1, 0, $result['msg']);
             } elseif ($post['type'] == 'cuspro') {
                 //默认值设置
-                $Data['Capacity'] = 300 * 1024 * 1024;//$post['capacity'] * 1024 * 1024;默认300M
+                $Data['Capacity'] = 100 * 1024 * 1024;//$post['capacity'] * 1024 * 1024;默认100M
                 $Data['Link_Cus'] = '0';
                 $Data['status'] = 1;
 
@@ -1434,39 +1439,6 @@ class Gbaopen extends InterfaceVIEWS
                     $result['err'] = 1004;
                     $result['msg'] = 'G宝盆账号只能由数字，字母，分隔号构成。首字符和尾字符只能是数字或字母';
                     return $result;
-                }
-                //FTP处理
-                if ($post['ftp_c']) {
-                    $FuwiqiModule = new FuwuqiModule ();
-                    $sever_msg = $FuwiqiModule->GetOneByIDorWhere($post['ftp']);
-                    $Data['FTP'] = 1;
-                    $Data['FuwuqiID'] = $sever_msg['ID'];
-                    if ($sever_msg['State']) {
-                        $Data['G_Ftp_Address'] = $sever_msg['FTP'];
-                        $Data['G_Ftp_User'] = $sever_msg['FTPName'];
-                        $Data['G_Ftp_Pwd'] = $sever_msg['FTPPassword'];
-                        //备用ftp
-
-                        $Data['G_Ftp_Address_B'] = $sever_msg['FTP_B'];
-                        $Data['G_Ftp_User_B'] = $sever_msg['FTPName_B'];
-                        $Data['G_Ftp_Pwd_B'] = $sever_msg['FTPPassword_B'];
-
-                        $Data['G_Ftp_FwAdress'] = $sever_msg['FwAdress'];
-                        $Data['G_Ftp_Duankou'] = $sever_msg['FTPDuankou'];
-                        $Data['G_Ftp_Mulu'] = $sever_msg['FTPMulu'];
-                    } else {
-                        $result['err'] = 1002;
-                        $result['msg'] = $sever_msg['FuwuqiName'] . '已停用';
-                        $this->LogsFunction->LogsCusRecord(113, 2, 0, $result['msg']);
-                        return $result;
-                    }
-                } else {
-                    $Data['G_Ftp_Address'] = $post['ftp_address'];
-                    $Data['G_Ftp_User'] = $post['ftp_user'];
-                    $Data['G_Ftp_Pwd'] = $post['ftp_pwd'];
-                    $Data['G_Ftp_FwAdress'] = $post['ftp_fwaddress'];
-                    $Data['G_Ftp_Duankou'] = $post['ftp_duankou'];
-                    $Data['G_Ftp_Mulu'] = $post['ftp_mulu'];
                 }
                 //模板号域名处理,费用计算
                 $Data['CPhone'] = $post['pc_mobile'];
@@ -1483,8 +1455,21 @@ class Gbaopen extends InterfaceVIEWS
                     $modelMsg = $this->GetModleIDByName($Data['PC_model']);
                     if (is_array($modelMsg)) {
                         if ($post['pcdomain']) {
-                            $Data['PC_domain'] = 'http://' . str_replace('http://', '', $post['pcdomain']);
-                            $Data['PC_domain'] = str_replace(' ', '', $Data['PC_domain']);
+                            //判断是否是35开户
+                            if($post['ftp_c'] != 2){
+                                $Data['PC_domain'] = 'http://' . str_replace('http://', '', $post['pcdomain']);
+                                $Data['PC_domain'] = str_replace(' ', '', $Data['PC_domain']);
+                            }else{
+                                $Data['PC_domain'] = str_replace('http://', '', $post['pcdomain']);
+                                $pc_domain = str_replace(' ', '', $Data['PC_domain']);//PC所有域名
+                                if(strpos($pc_domain,',')){//判断是否有多条域名
+                                    $Data['PC_domain'] = 'http://' . strstr($pc_domain, ',', true);//PC第一条域名
+                                }else{
+                                    $Data['PC_domain'] = 'http://' . $pc_domain;
+                                }
+                                $this->mobile_domain = '';
+                            }
+                            
                         } else {
                             $result['err'] = 1004;
                             $result['msg'] = '请填写 PC域名';
@@ -1518,8 +1503,20 @@ class Gbaopen extends InterfaceVIEWS
                             $Data['PC_domain'] = str_replace(' ', '', $Data['PC_domain']);
                         }
                         if ($post['mobiledomain']) {
-                            $Data['Mobile_domain'] = 'http://' . str_replace('http://', '', $post['mobiledomain']);
-                            $Data['Mobile_domain'] = str_replace(' ', '', $Data['Mobile_domain']);
+                            if($post['ftp_c'] != 2){
+                                $Data['Mobile_domain'] = 'http://' . str_replace('http://', '', $post['mobiledomain']);
+                                $Data['Mobile_domain'] = str_replace(' ', '', $Data['Mobile_domain']);
+                            }else{
+                                $Data['Mobile_domain'] = str_replace('http://', '', $post['mobiledomain']);
+                                $this->mobile_domain = str_replace(' ', '', $Data['Mobile_domain']);//mobile所有域名
+                                if(strpos($this->mobile_domain,',')){//判断是否有多个域名
+                                    $Data['Mobile_domain'] = 'http://' . strstr($this->mobile_domain, ',', true);//mobile第一条域名
+                                }else{
+                                    $Data['Mobile_domain'] = 'http://' . $this->mobile_domain;
+                                }                                 
+                                $pc_domain = '';
+                            }
+                            
                         } else {
                             $result['err'] = 1004;
                             $result['msg'] = '请填写 手机域名';
@@ -1536,9 +1533,19 @@ class Gbaopen extends InterfaceVIEWS
                     $Data['PC_model'] = $post['pcmodel'];
                     $modelMsg = $this->GetModleIDByName($Data['PC_model']);
                     if (is_array($modelMsg)) {
-                        if ($post['pcdomain']) {
-                            $Data['PC_domain'] = 'http://' . str_replace('http://', '', $post['pcdomain']);
-                            $Data['PC_domain'] = str_replace(' ', '', $Data['PC_domain']);
+                        if ($post['pcdomain']) {                            
+                            if($post['ftp_c'] != 2){
+                                $Data['PC_domain'] = 'http://' . str_replace('http://', '', $post['pcdomain']);
+                                $Data['PC_domain'] = str_replace(' ', '', $Data['PC_domain']);
+                            }else{
+                                $Data['PC_domain'] = str_replace('http://', '', $post['pcdomain']);
+                                $pc_domain = str_replace(' ', '', $Data['PC_domain']);//PC所有域名
+                                if(strpos($pc_domain,',')){//判断是否有多条域名
+                                    $Data['PC_domain'] = 'http://' . strstr($pc_domain, ',', true);//PC第一条域名
+                                }else{
+                                    $Data['PC_domain'] = 'http://' . $pc_domain;
+                                }                               
+                            }
                         } else {
                             $result['err'] = 1004;
                             $result['msg'] = '请填写 PC域名';
@@ -1555,9 +1562,19 @@ class Gbaopen extends InterfaceVIEWS
 
                     $modelMsg = $this->GetModleIDByName($Data['Mobile_model']);
                     if (is_array($modelMsg)) {
-                        if ($post['mobiledomain']) {
-                            $Data['Mobile_domain'] = 'http://' . str_replace('http://', '', $post['mobiledomain']);
-                            $Data['Mobile_domain'] = str_replace(' ', '', $Data['Mobile_domain']);
+                        if ($post['mobiledomain']) {                            
+                            if($post['ftp_c'] != 2){
+                                $Data['Mobile_domain'] = 'http://' . str_replace('http://', '', $post['mobiledomain']);
+                                $Data['Mobile_domain'] = str_replace(' ', '', $Data['Mobile_domain']); 
+                            }else{
+                                $Data['Mobile_domain'] = str_replace('http://', '', $post['mobiledomain']);
+                                $this->mobile_domain = str_replace(' ', '', $Data['Mobile_domain']);//mobile所有域名
+                                if(strpos($this->mobile_domain,',')){//判断是否有多个域名
+                                    $Data['Mobile_domain'] = 'http://' . strstr($this->mobile_domain, ',', true);//mobile第一条域名
+                                }else{
+                                    $Data['Mobile_domain'] = 'http://' . $this->mobile_domain;
+                                }                                
+                            }
                         } else {
                             $result['err'] = 1004;
                             $result['msg'] = '请填写 手机域名';
@@ -1588,17 +1605,37 @@ class Gbaopen extends InterfaceVIEWS
                           $result['msg'] = '当前选择的套餐中包含的手机模板不存在';
                           return $result;
                           } */
-                        if ($post['pcdomain']) {
-                            $Data['PC_domain'] = 'http://' . str_replace('http://', '', $post['pcdomain']);
-                            $Data['PC_domain'] = str_replace(' ', '', $Data['PC_domain']);
+                        if ($post['pcdomain']) {                            
+                            if($post['ftp_c'] != 2){
+                                $Data['PC_domain'] = 'http://' . str_replace('http://', '', $post['pcdomain']);
+                                $Data['PC_domain'] = str_replace(' ', '', $Data['PC_domain']);
+                            }else{
+                                $Data['PC_domain'] = str_replace('http://', '', $post['pcdomain']);
+                                $pc_domain = str_replace(' ', '', $Data['PC_domain']);//PC所有域名
+                                if(strpos($pc_domain,',')){//判断是否有多条域名
+                                    $Data['PC_domain'] = 'http://' . strstr($pc_domain, ',', true);//PC第一条域名
+                                }else{
+                                    $Data['PC_domain'] = 'http://' . $pc_domain;
+                                }
+                            }
                         } else {
                             $result['err'] = 1004;
                             $result['msg'] = '请填写 PC域名';
                             return $result;
                         }
-                        if ($post['mobiledomain']) {
-                            $Data['Mobile_domain'] = 'http://' . str_replace('http://', '', $post['mobiledomain']);
-                            $Data['Mobile_domain'] = str_replace(' ', '', $Data['Mobile_domain']);
+                        if ($post['mobiledomain']) {                            
+                            if($post['ftp_c'] != 2){
+                                $Data['Mobile_domain'] = 'http://' . str_replace('http://', '', $post['mobiledomain']);
+                                $Data['Mobile_domain'] = str_replace(' ', '', $Data['Mobile_domain']);
+                            }else{
+                                $Data['Mobile_domain'] = str_replace('http://', '', $post['mobiledomain']);
+                                $this->mobile_domain = str_replace(' ', '', $Data['Mobile_domain']);//mobile所有域名
+                                if(strpos($this->mobile_domain,',')){//判断是否有多个域名
+                                    $Data['Mobile_domain'] = 'http://' . strstr($this->mobile_domain, ',', true);//mobile第一条域名
+                                }else{
+                                    $Data['Mobile_domain'] = 'http://' . $this->mobile_domain;
+                                } 
+                            }
                         } else {
                             $result['err'] = 1004;
                             $result['msg'] = '请填写 手机域名';
@@ -1612,6 +1649,70 @@ class Gbaopen extends InterfaceVIEWS
                     //模板价格
                     $price = $modelMsg['Youhui'];
                 }
+                //FTP处理
+                if ($post['ftp_c'] == 1) {
+                    $FuwiqiModule = new FuwuqiModule ();
+                    $sever_msg = $FuwiqiModule->GetOneByIDorWhere($post['ftp']);
+                    $Data['FTP'] = 1;
+                    $Data['FuwuqiID'] = $sever_msg['ID'];
+                    if ($sever_msg['State']) {
+                        $Data['G_Ftp_Address'] = $sever_msg['FTP'];
+                        $Data['G_Ftp_User'] = $sever_msg['FTPName'];
+                        $Data['G_Ftp_Pwd'] = $sever_msg['FTPPassword'];
+                        //备用ftp
+
+                        $Data['G_Ftp_Address_B'] = $sever_msg['FTP_B'];
+                        $Data['G_Ftp_User_B'] = $sever_msg['FTPName_B'];
+                        $Data['G_Ftp_Pwd_B'] = $sever_msg['FTPPassword_B'];
+
+                        $Data['G_Ftp_FwAdress'] = $sever_msg['FwAdress'];
+                        $Data['G_Ftp_Duankou'] = $sever_msg['FTPDuankou'];
+                        $Data['G_Ftp_Mulu'] = $sever_msg['FTPMulu'];
+                    } else {
+                        $result['err'] = 1002;
+                        $result['msg'] = $sever_msg['FuwuqiName'] . '已停用';
+                        $this->LogsFunction->LogsCusRecord(113, 2, 0, $result['msg']);
+                        return $result;
+                    }
+                } elseif($post['ftp_c'] == 0) {
+                    $Data['FTP'] = 0;
+                    $Data['G_Ftp_Address'] = $post['ftp_address'];
+                    $Data['G_Ftp_User'] = $post['ftp_user'];
+                    $Data['G_Ftp_Pwd'] = $post['ftp_pwd'];
+                    $Data['G_Ftp_FwAdress'] = $post['ftp_fwaddress'];
+                    $Data['G_Ftp_Duankou'] = $post['ftp_duankou'];
+                    $Data['G_Ftp_Mulu'] = $post['ftp_mulu'];
+                } elseif($post['ftp_c'] == 2) {
+                    //35服务器开户
+                    $Data['FTP'] = 2;
+                    $Data['G_Ftp_User'] = $post['vhostName'];
+                    $Data['G_Ftp_Pwd'] = $post['vhostPwd'];
+                    $Data['G_Ftp_Duankou'] = 21;
+                    $Data['G_Ftp_Mulu'] = './www';
+
+                    $res = $this->vhostCreate($Data['G_Ftp_User'],$Data['G_Ftp_Pwd'],$pc_domain,$this->mobile_domain);
+                    if($res){
+                        if($res['err']==1000){
+                            $Data['G_Ftp_Address'] = $res['hostip'];
+                            $Data['G_Ftp_FwAdress'] = $Data['G_Ftp_User'].'.'.$res['hostdomain'];
+                        }else{
+                            $result['err'] = $res['code'];
+                            $result['msg'] = $res['msg'].'-'.$res['value'];
+                            $this->LogsFunction->LogsCusRecord(113, 2, 0, $result['msg']);
+                            return $result; 
+                        }
+                    }else{
+                        $result['err'] = 2001;
+                        $result['msg'] = '请求超时';
+                        $this->LogsFunction->LogsCusRecord(113, 2, 0, $result['msg']);
+                        return $result;
+                    }
+                    // $Data['G_Ftp_Address'] = '103.236.254.134';
+                    // $Data['G_Ftp_FwAdress'] = 'bind2.sy01.host.35.com';
+
+                }
+                //模板号域名处理,费用计算(原位置)
+                
 //                if ($Data["Capacity"] == (300 * 1024 * 1024)) {
 //                    $price+=500;
 //                } elseif($Data["Capacity"] == (500 * 1024 * 1024)){
@@ -1957,6 +2058,8 @@ class Gbaopen extends InterfaceVIEWS
         $ToString .= '&mobile_endtime=' . $CustProInfo ['Mobile_EndTime'];
         $ToString .= '&switch_cus_name=' . $CustProInfo ['Link_Cus'];
         $ToString .= '&status=' . $CustProInfo ['status'];
+        $ToString .= '&column_on=' . $CustProInfo ['column_on'];
+        $ToString .= '&mobile_other=' . $this->mobile_domain;
         if (isset($_POST["password"]) && !empty($_POST["password"])) {
             $ToString .= '&password=' . $_POST["password"];
         }
@@ -2169,8 +2272,8 @@ class Gbaopen extends InterfaceVIEWS
                 break;
             case 5:
                 $now = date("Y-m-d H:i:s", time());
-                $after = date("Y-m-d H:i:s", strtotime("+60 day"));
-                //根据权限来获取客户信息量--快过期60
+                $after = date("Y-m-d H:i:s", strtotime("+75 day"));
+                //根据权限来获取客户信息量--快过期75
                 if ($level == 1) {
                     $select = 'select count(1) as Num from tb_customers_project c inner join tb_customers a on c.CustomersID=a.CustomersID where ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '")) and a.GOpen = 1 and a.Status>0 ';
                     $data = $DB->Select($select);
@@ -2227,22 +2330,22 @@ class Gbaopen extends InterfaceVIEWS
                     $search_cuspro .= $this->_GET['domain'] != '' ? '(PC_domain LIKE \'%' . $this->_GET['domain'] . '%\' or Mobile_domain LIKE \'%' . $this->_GET['domain'] . '%\')' : '';
                     //查询优化
                     $sel1 = $search_cus ? '(select AgentID,CustomersID,CompanyName,CustomersName,Status from tb_customers where ' . $search_cus . ')' : 'tb_customers';
-                    $sel2 = $search_cuspro ? 'inner join (select CustomersID,G_name,Cases,CPhone,PC_StartTime,PC_EndTime,Mobile_StartTime,Mobile_EndTime,AgentID from tb_customers_project where ' . $search_cuspro . ')' : 'left join tb_customers_project';
+                    $sel2 = $search_cuspro ? 'inner join (select CustomersID,G_name,Cases,CPhone,PC_domain,Mobile_domain,PC_StartTime,PC_EndTime,Mobile_StartTime,Mobile_EndTime,AgentID,G_Ftp_FwAdress from tb_customers_project where ' . $search_cuspro . ')' : 'left join tb_customers_project';
                     $search_cus = $search_cus ? ' and (' . $search_cus . ')' : '';
                     //根据权限来获取客户信息量
                     if ($level == 1) {
-                        $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID from '
+                        $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.PC_domain,c.Mobile_domain,c.AgentID,c.G_Ftp_FwAdress from '
                             . '(select a.CustomersID,a.CompanyName,a.CustomersName,b.UserName,a.Status from tb_account b inner join ' . $sel1 . ' a on a.AgentID = b.AgentID) as d '
                             . $sel2 . ' c on d.CustomersID = c.CustomersID ' . $limit;
                         $cus = $DB->Select($select);
                     } elseif ($level == 2) {
-                        $select = 'select d.CustomersID,d.CompanyName,d.UserName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID from '
+                        $select = 'select d.CustomersID,d.CompanyName,d.UserName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.PC_domain,c.Mobile_domain,c.AgentID,c.G_Ftp_FwAdress from '
                             . '(select a.CustomersID,a.CompanyName,a.CustomersName,b.UserName,a.Status from '
                             . '(select AgentID,UserName from tb_account where BossAgentID=' . $agent_id . ' or AgentID=' . $agent_id . ') as b inner join ' . $sel1 . ' a on a.AgentID = b.AgentID and a.Status>0) as d '
                             . $sel2 . ' c on d.CustomersID = c.CustomersID ' . $order . $limit;
                         $cus = $DB->Select($select);
                     } elseif ($level == 3) {
-                        $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID from '
+                        $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.PC_domain,c.Mobile_domain,c.AgentID,c.G_Ftp_FwAdress from '
                             . '(select CustomersID,CompanyName,Status from tb_customers where Status>0 and AgentID=' . $agent_id . $search_cus . ') as d '
                             . $sel2 . ' c on d.CustomersID = c.CustomersID' . $order . $limit;
                         $cus = $DB->Select($select);
@@ -2263,6 +2366,8 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['MobileTimeStart'] = $val['Mobile_StartTime'] ? $val['Mobile_StartTime'] : false;
                     $data[$key]['MobileTimeEnd'] = $val['Mobile_EndTime'] ? $val['Mobile_EndTime'] : false;
                     $cases = explode('-', $val['Cases']);
+                    $data[$key]['domain'] = $val['PC_domain'] ? trim($val['PC_domain'],'http://') : trim($val['Mobile_domain'],'http://');
+                    $data[$key]['fuwu'] = $val['G_Ftp_FwAdress'] ? trim($val['G_Ftp_FwAdress'],'http://') : '';
                     $data[$key]['PlaceName'] = $cases[0] ? $cases[1] : '关闭';
                     $data[$key]['Place'] = $cases[0];
                     $data[$key]['agent_username'] = $usernames[$val["AgentID"]];
@@ -2271,17 +2376,17 @@ class Gbaopen extends InterfaceVIEWS
             case 0:
                 //根据权限来获取客户信息量
                 if ($level == 1) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.UserName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from '
+                    $select = 'select d.CustomersID,d.CompanyName,d.UserName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from '
                         . '(select a.CustomersID,a.CompanyName,b.UserName,a.Status from tb_account b inner join tb_customers a on b.AgentID = a.AgentID and a.Status>0 ' . $limit . ') as d '
                         . 'left join tb_customers_project c on d.CustomersID = c.CustomersID';
                     $cus = $DB->Select($select);
                 } elseif ($level == 2) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from '
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from '
                         . '(select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ') and b.AgentID = a.AgentID  and a.Status>0 ' . $limit . ') as d '
                         . 'left join tb_customers_project c on d.CustomersID = c.CustomersID' . $order;
                     $cus = $DB->Select($select);
                 } elseif ($level == 3) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from '
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from '
                         . '(select CustomersID,CompanyName,Status from tb_customers where AgentID=' . $agent_id . ' and Status>0 ' . $limit . ') as d '
                         . 'left join tb_customers_project c on d.CustomersID = c.CustomersID' . $order;
                     $cus = $DB->Select($select);
@@ -2299,7 +2404,8 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['PCTimeEnd'] = $val['PC_EndTime'] ? $val['PC_EndTime'] : false;
                     $data[$key]['MobileTimeStart'] = $val['Mobile_StartTime'] ? $val['Mobile_StartTime'] : false;
                     $data[$key]['MobileTimeEnd'] = $val['Mobile_EndTime'] ? $val['Mobile_EndTime'] : false;
-                    $data[$key]['domain'] = $val['PC_domain'] ? $val['PC_domain'] : $val['Mobile_domain'];
+                    $data[$key]['domain'] = $val['PC_domain'] ? trim($val['PC_domain'],'http://') : trim($val['Mobile_domain'],'http://');
+                    $data[$key]['fuwu'] = $val['G_Ftp_FwAdress'] ? trim($val['G_Ftp_FwAdress'],'http://') : '';
                     $cases = explode('-', $val['Cases']);
                     $data[$key]['PlaceName'] = $cases[0] ? $cases[1] : '关闭';
                     $data[$key]['Place'] = $cases[0];
@@ -2309,17 +2415,17 @@ class Gbaopen extends InterfaceVIEWS
             case 1:
                 //根据权限来获取客户信息量
                 if ($level == 1) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from '
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from '
                         . '(select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on b.AgentID = a.AgentID and a.GOpen = 1 and a.Status>0 ) as d '
                         . 'inner join tb_customers_project c on d.CustomersID = c.CustomersID' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 2) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from '
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from '
                         . '(select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on b.AgentID = a.AgentID and a.GOpen = 1 and a.Status>0  and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ')' . ') as d '
                         . 'inner join tb_customers_project c on d.CustomersID = c.CustomersID' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 3) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from tb_customers d '
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from tb_customers d '
                         . 'inner join tb_customers_project c on d.CustomersID = c.CustomersID and d.GOpen = 1 and d.Status>0  and d.AgentID=' . $agent_id . $order . $limit;
                     $cus = $DB->Select($select);
                 } else {
@@ -2336,7 +2442,8 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['PCTimeEnd'] = $val['PC_EndTime'] ? $val['PC_EndTime'] : false;
                     $data[$key]['MobileTimeStart'] = $val['Mobile_StartTime'] ? $val['Mobile_StartTime'] : false;
                     $data[$key]['MobileTimeEnd'] = $val['Mobile_EndTime'] ? $val['Mobile_EndTime'] : false;
-                    $data[$key]['domain'] = $val['PC_domain'] ? $val['PC_domain'] : $val['Mobile_domain'];
+                    $data[$key]['domain'] = $val['PC_domain'] ? trim($val['PC_domain'],'http://') : trim($val['Mobile_domain'],'http://');
+                    $data[$key]['fuwu'] = $val['G_Ftp_FwAdress'] ? trim($val['G_Ftp_FwAdress'],'http://') : '';
                     $cases = explode('-', $val['Cases']);
                     $data[$key]['PlaceName'] = $cases[0] ? $cases[1] : '关闭';
                     $data[$key]['Place'] = $cases[0];
@@ -2369,6 +2476,7 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['MobileTimeStart'] = false;
                     $data[$key]['MobileTimeEnd'] = false;
                     $data[$key]['domain'] = false;
+                    $data[$key]['fuwu'] = false;
                     $data[$key]['agent_username'] = $usernames[$val["AgentID"]];
                 }
                 break;
@@ -2376,17 +2484,17 @@ class Gbaopen extends InterfaceVIEWS
                 $now = date("Y-m-d H:i:s", time());
                 //根据权限来获取客户信息量
                 if ($level == 1) {
-                    $select = 'select d.CustomersID,a.CompanyName,a.Status,d.UserName,d.G_name,d.Cases,d.CPhone,d.PC_StartTime,d.PC_EndTime,d.Mobile_StartTime,d.Mobile_EndTime,a.AgentID,d.PC_domain,d.Mobile_domain from '
-                        . '(select b.UserName,c.CustomersID,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.PC_domain,c.Mobile_domain from tb_account b inner join tb_customers_project c on c.AgentID = b.AgentID and (c.PC_EndTime<"' . $now . '" or c.Mobile_EndTime<"' . $now . '")) as d '
+                    $select = 'select d.CustomersID,a.CompanyName,a.Status,d.UserName,d.G_name,d.Cases,d.CPhone,d.PC_StartTime,d.PC_EndTime,d.Mobile_StartTime,d.Mobile_EndTime,a.AgentID,d.PC_domain,d.Mobile_domain,d.G_Ftp_FwAdress from '
+                        . '(select b.UserName,c.CustomersID,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from tb_account b inner join tb_customers_project c on c.AgentID = b.AgentID and (c.PC_EndTime<"' . $now . '" or c.Mobile_EndTime<"' . $now . '")) as d '
                         . 'inner join tb_customers a on d.CustomersID=a.CustomersID and a.GOpen = 1 and a.Status>0 ' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 2) {
-                    $select = 'select d.CustomersID,a.CompanyName,a.Status,d.UserName,d.G_name,d.Cases,d.CPhone,d.PC_StartTime,d.PC_EndTime,d.Mobile_StartTime,d.Mobile_EndTime,a.AgentID,d.PC_domain,d.Mobile_domain from'
-                        . '(select c.CustomersID,b.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.PC_domain,c.Mobile_domain from tb_account b inner join tb_customers_project c on c.AgentID = b.AgentID and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ') and (c.PC_EndTime<"' . $now . '" or c.Mobile_EndTime<"' . $now . '")) d '
+                    $select = 'select d.CustomersID,a.CompanyName,a.Status,d.UserName,d.G_name,d.Cases,d.CPhone,d.PC_StartTime,d.PC_EndTime,d.Mobile_StartTime,d.Mobile_EndTime,a.AgentID,d.PC_domain,d.Mobile_domain,d.G_Ftp_FwAdress from'
+                        . '(select c.CustomersID,b.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from tb_account b inner join tb_customers_project c on c.AgentID = b.AgentID and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ') and (c.PC_EndTime<"' . $now . '" or c.Mobile_EndTime<"' . $now . '")) d '
                         . 'inner join tb_customers a on a.CustomersID=d.CustomersID and a.Status>0 ' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 3) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from '
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from '
                         . 'tb_customers_project c inner join tb_customers d on c.CustomersID=d.CustomersID and d.Status>0  and c.AgentID = ' . $agent_id . ' and (c.PC_EndTime<"' . $now . '" or c.Mobile_EndTime<"' . $now . '")' . $order . $limit;
                     $cus = $DB->Select($select);
                 } else {
@@ -2403,7 +2511,8 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['PCTimeEnd'] = $val['PC_EndTime'] ? $val['PC_EndTime'] : false;
                     $data[$key]['MobileTimeStart'] = $val['Mobile_StartTime'] ? $val['Mobile_StartTime'] : false;
                     $data[$key]['MobileTimeEnd'] = $val['Mobile_EndTime'] ? $val['Mobile_EndTime'] : false;
-                    $data[$key]['domain'] = $val['PC_domain'] ? $val['PC_domain'] : $val['Mobile_domain'];
+                    $data[$key]['domain'] = $val['PC_domain'] ? trim($val['PC_domain'],'http://') : trim($val['Mobile_domain'],'http://');
+                    $data[$key]['fuwu'] = $val['G_Ftp_FwAdress'] ? trim($val['G_Ftp_FwAdress'],'http://') : '';
                     $cases = explode('-', $val['Cases']);
                     $data[$key]['PlaceName'] = $cases[0] ? $cases[1] : '关闭';
                     $data[$key]['Place'] = $cases[0];
@@ -2415,17 +2524,17 @@ class Gbaopen extends InterfaceVIEWS
                 $after = date("Y-m-d H:i:s", strtotime("+30 day"));
                 //根据权限来获取客户信息量
                 if ($level == 1) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from tb_customers_project c '
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from tb_customers_project c '
                         . 'inner join (select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on a.AgentID = b.AgentID and a.GOpen = 1 and a.Status>0 ) d '
                         . 'on c.CustomersID=d.CustomersID and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '"))' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 2) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from tb_customers_project c '
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from tb_customers_project c '
                         . 'inner join (select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on a.AgentID = b.AgentID and a.GOpen = 1 and a.Status>0  and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ')) d '
                         . 'on c.CustomersID=d.CustomersID and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '"))' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 3) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from tb_customers_project c inner join tb_customers d on c.CustomersID=d.CustomersID and d.Status>0  and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '")) and c.AgentID=' . $agent_id . $order . $limit;
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from tb_customers_project c inner join tb_customers d on c.CustomersID=d.CustomersID and d.Status>0  and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '")) and c.AgentID=' . $agent_id . $order . $limit;
                     $cus = $DB->Select($select);
                 } else {
                     return false;
@@ -2442,7 +2551,8 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['PCTimeEnd'] = $val['PC_EndTime'] ? $val['PC_EndTime'] : false;
                     $data[$key]['MobileTimeStart'] = $val['Mobile_StartTime'] ? $val['Mobile_StartTime'] : false;
                     $data[$key]['MobileTimeEnd'] = $val['Mobile_EndTime'] ? $val['Mobile_EndTime'] : false;
-                    $data[$key]['domain'] = $val['PC_domain'] ? $val['PC_domain'] : $val['Mobile_domain'];
+                    $data[$key]['domain'] = $val['PC_domain'] ? trim($val['PC_domain'],'http://') : trim($val['Mobile_domain'],'http://');
+                    $data[$key]['fuwu'] = $val['G_Ftp_FwAdress'] ? trim($val['G_Ftp_FwAdress'],'http://') : '';
                     $cases = explode('-', $val['Cases']);
                     $data[$key]['PlaceName'] = $cases[0] ? $cases[1] : '关闭';
                     $data[$key]['Place'] = $cases[0];
@@ -2451,20 +2561,20 @@ class Gbaopen extends InterfaceVIEWS
                 break;
             case 5:
                 $now = date("Y-m-d H:i:s", time());
-                $after = date("Y-m-d H:i:s", strtotime("+60 day"));
+                $after = date("Y-m-d H:i:s", strtotime("+75 day"));
                 //根据权限来获取客户信息量
                 if ($level == 1) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from tb_customers_project c '
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from tb_customers_project c '
                         . 'inner join (select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on a.AgentID = b.AgentID and a.GOpen = 1 and a.Status>0 ) d '
                         . 'on c.CustomersID=d.CustomersID and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '"))' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 2) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from tb_customers_project c '
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from tb_customers_project c '
                         . 'inner join (select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on a.AgentID = b.AgentID and a.GOpen = 1 and a.Status>0  and (b.BossAgentID=' . $agent_id . ' or b.AgentID=' . $agent_id . ')) d '
                         . 'on c.CustomersID=d.CustomersID and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '"))' . $order . $limit;
                     $cus = $DB->Select($select);
                 } elseif ($level == 3) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from tb_customers_project c inner join tb_customers d on c.CustomersID=d.CustomersID and d.Status>0  and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '")) and c.AgentID=' . $agent_id . $order . $limit;
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from tb_customers_project c inner join tb_customers d on c.CustomersID=d.CustomersID and d.Status>0  and ((c.PC_EndTime<"' . $after . '" and c.PC_EndTime>"' . $now . '") or (c.Mobile_EndTime<"' . $after . '" and c.Mobile_EndTime>"' . $now . '")) and c.AgentID=' . $agent_id . $order . $limit;
                     $cus = $DB->Select($select);
                 } else {
                     return false;
@@ -2481,7 +2591,8 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['PCTimeEnd'] = $val['PC_EndTime'] ? $val['PC_EndTime'] : false;
                     $data[$key]['MobileTimeStart'] = $val['Mobile_StartTime'] ? $val['Mobile_StartTime'] : false;
                     $data[$key]['MobileTimeEnd'] = $val['Mobile_EndTime'] ? $val['Mobile_EndTime'] : false;
-                    $data[$key]['domain'] = $val['PC_domain'] ? $val['PC_domain'] : $val['Mobile_domain'];
+                    $data[$key]['domain'] = $val['PC_domain'] ? trim($val['PC_domain'],'http://') : trim($val['Mobile_domain'],'http://');
+                    $data[$key]['fuwu'] = $val['G_Ftp_FwAdress'] ? trim($val['G_Ftp_FwAdress'],'http://') : '';
                     $cases = explode('-', $val['Cases']);
                     $data[$key]['PlaceName'] = $cases[0] ? $cases[1] : '关闭';
                     $data[$key]['Place'] = $cases[0];
@@ -2491,7 +2602,7 @@ class Gbaopen extends InterfaceVIEWS
             case 6:
                 //根据权限来获取客户信息量
                 if ($level == 1) {
-                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain from '
+                    $select = 'select d.CustomersID,d.CompanyName,d.Status,d.UserName,c.G_name,c.Cases,c.CPhone,c.PC_StartTime,c.PC_EndTime,c.Mobile_StartTime,c.Mobile_EndTime,c.AgentID,c.PC_domain,c.Mobile_domain,c.G_Ftp_FwAdress from '
                         . '(select a.CustomersID,a.CompanyName,a.Status,b.UserName from tb_account b inner join tb_customers a on b.AgentID = a.AgentID and a.Status=0 ) as d '
                         . 'inner join tb_customers_project c on d.CustomersID = c.CustomersID' . $order . $limit;
                     $cus = $DB->Select($select);
@@ -2509,7 +2620,8 @@ class Gbaopen extends InterfaceVIEWS
                     $data[$key]['PCTimeEnd'] = $val['PC_EndTime'] ? $val['PC_EndTime'] : false;
                     $data[$key]['MobileTimeStart'] = $val['Mobile_StartTime'] ? $val['Mobile_StartTime'] : false;
                     $data[$key]['MobileTimeEnd'] = $val['Mobile_EndTime'] ? $val['Mobile_EndTime'] : false;
-                    $data[$key]['domain'] = $val['PC_domain'] ? $val['PC_domain'] : $val['Mobile_domain'];
+                    $data[$key]['domain'] = $val['PC_domain'] ? trim($val['PC_domain'],'http://') : trim($val['Mobile_domain'],'http://');
+                    $data[$key]['fuwu'] = $val['G_Ftp_FwAdress'] ? trim($val['G_Ftp_FwAdress'],'http://') : '';
                     $cases = explode('-', $val['Cases']);
                     $data[$key]['PlaceName'] = $cases[0] ? $cases[1] : '关闭';
                     $data[$key]['Place'] = $cases[0];
@@ -3278,5 +3390,153 @@ class Gbaopen extends InterfaceVIEWS
             $result['msg'] = '消费扣款失败';
         }
         return $result;
+    }
+
+    //35创建主机接口
+    public function vhostCreate($username,$passwd,$pc_domain,$mobile_domain){
+        if($pc_domain != '' && $mobile_domain != ''){
+            $domain = $pc_domain . ',' . $mobile_domain;
+        }elseif($pc_domain != '' && $mobile_domain == ''){
+            $domain = $pc_domain;
+        }elseif($pc_domain == '' && $mobile_domain != ''){
+            $domain = $mobile_domain;
+        }
+
+        $hyname = '10260';//会员账号
+        $hypwd = 'XM12tUyr3#';//会员密码
+        if($fp =fsockopen('cp.35.com',30008,$errno,$errstr,30)){
+            $data = fread($fp,2000);
+            $data = simplexml_load_string($data);
+            if($data->code==1000){//TCP建立
+                $pwd = md5($hypwd);
+
+                //建立会话，登录               
+                $clitrid = time().uniqid().uniqid();//交易系列号     
+                $chksum = md5($hyname.$pwd.$clitrid.'login');
+                //登录命令
+                $login_data = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+                            <request>
+                            <category>client</category>
+                            <action>Login</action>
+                            <params>
+                            <param name="clid">'.$hyname.'</param>
+                            </params>
+                            <cltrid>'.$clitrid.'</cltrid>
+                            <chksum>'.$chksum.'</chksum>
+                            </request>';        
+                fwrite($fp, $login_data);//发送命令到服务端     
+                $login = fread($fp,2000);//读取返回     
+                $login = simplexml_load_string($login);//字符串转XML对象
+
+                if($login->code==1000){//会话建立
+                    //开始创建主机请求
+                    $clitrid = time().uniqid().uniqid();
+                    $chksum = md5($hyname.$pwd.$clitrid.'CreateVhost1002'.$username);
+                    $key = md5($pwd.'password');
+                    $password = $this->pass_encode($username,$passwd,$key);
+                    //创建主机命令
+                    $vhost_data = '<?xml version="1.0"?>
+                                <request>
+                                <category>vhost</category>
+                                <action>CreateVhost</action>
+                                <params>
+                                <param name="flag">1002</param>
+                                <param name="vhostname">'.$username.'</param>
+                                <param name="domain">'.$domain.'</param>
+                                <param name="year">1</param>
+                                <param name="place">4</param>
+                                <param name="os">WINDOWS2003</param>
+                                <param name="password">'.$password.'</param>
+                                <param name="typeID">1027</param>
+                                </params>
+                                <cltrid>'.$clitrid.'</cltrid>
+                                <chksum>'.$chksum.'</chksum>
+                                </request>';
+                    fwrite($fp, $vhost_data);
+                    $vhost = fread($fp,2000);
+                    $this->swLog($vhost,$username);
+                    $vhost = simplexml_load_string($vhost);
+                    if($vhost->code==1000){
+                        $res['err'] = $vhost->code;
+                        $res['msg'] = $vhost->msg;
+                        $res['value'] = $vhost->value;
+                        $res['hostip'] = (string)$vhost->resData->data[2];
+                        $res['hostdomain'] = (string)$vhost->resData->data[3];
+                        return $res;
+                    }else{
+                        $res['err'] = $vhost->code;
+                        $res['msg'] = $vhost->msg;
+                        $res['value'] = $vhost->value;
+                        return $res;
+                    }
+
+                    //请求结束，结束会话断开连接
+                    $clitrid = time().uniqid().uniqid();
+                    $chksum = md5($hyname.$pwd.$clitrid.'logout');
+                    //登出命令
+                    $logout_data = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+                                <request>
+                                <category>client</category>
+                                <action>Logout</action>
+                                <params>
+                                <param name="clid">'.$hyname.'</param>
+                                </params>
+                                <cltrid>'.$clitrid.'</cltrid>
+                                <chksum>'.$chksum.'</chksum>
+                                </request>';
+                    fwrite($fp, $logout_data);
+                    $logout = fread($fp,2000);
+                }else{
+                    $res['err'] = $login->code;
+                    $res['msg'] = $login->msg;
+                    $res['value'] = $login->value;
+                    return $res;
+                }
+            }else{
+                $res['err'] = $data->code;
+                $res['msg'] = $data->msg;
+                $res['value'] = $data->value;
+                return $res;
+            }
+        }else{
+           $res['err'] = 2001;
+           $res['msg'] = '35连接失败';
+           return $res;
+        }
+    }
+    //35密码密文
+    public function pass_encode($user, $passwd, $key)
+    {
+        return $this->unc_pass_encode($this->unc_pass_encode($user, $key), $passwd);
+    }
+    //35密文加密方式
+    public function unc_pass_encode($user, $passwd)
+    {
+        $userlen = strlen($user); //strlen()取字串长度—取主机名长度
+        $passlen = strlen($passwd); //
+        $userpos = 0;
+        $passpos = 0;
+        $encodedpasswd = "";
+        while ($passpos < $passlen) {
+            $en1 = ord(substr($passwd, $passpos, 1)); //ord()取字符的序号 10 进制substr()取字串的子串
+            $en2 = ord(substr($user, $userpos, 1)); //substr()本例中依次取一个字符
+            $encodedpasswd .= dechex($en1 + $en2); //dechex()十进制 转成 16 进制 .号表示字串相加
+            $userpos ++;
+            if ($userpos >= $userlen) $userpos = 0;
+                $passpos ++;
+        }
+        return strtoupper($encodedpasswd); //strtoupper() 将小写字母转成大写字母
+    }
+    //35日志
+    public function swLog($data,$username)
+    {
+        $root = DocumentRoot.'/../';
+        if (!is_dir($root.'dl-log')){
+            mkdir($root.'dl-log/');
+        }
+        if (!is_dir($root.'dl-log/'.date("Ym"))){
+            mkdir($root.'dl-log/'.date("Ym"));
+        }
+        @file_put_contents($root.'dl-log/'.date("Ym").'/35.log', '['.$username.']'.PHP_EOL.$data.PHP_EOL, FILE_APPEND);
     }
 }
