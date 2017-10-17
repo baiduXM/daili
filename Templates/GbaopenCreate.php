@@ -204,14 +204,14 @@
                                 <span><input type="text" name="pcmodel" class="Input"></span>
                                 <span class="content-l">PC域名</span>
                                 <span><input type="text" name="pcdomain" class="Input"></span>
-                                <span class="as 35ftp" style="display:none;">多个域名请用英文半角逗号分开， PC站和手机站共计不超过9个域名</span>
+                                <span class="as 35ftp" style="display:none;">多个域名请用英文半角逗号分开， PC站和手机站共计不超过9个域名，且必须使用已备案的域名</span>
                             </p>
                             <p class="modelchoose" id="mobile" style="display:none;">
                                 <span class="content-l">手机模板</span>
                                 <span><input type="text" name="mobilemodel" class="Input"></span>
                                 <span class="content-l">手机域名</span>
                                 <span><input type="text" name="mobiledomain" class="Input"></span>
-                                <span class="as 35ftp" style="display:none;">多个域名请用英文半角逗号分开， PC站和手机站共计不超过9个域名</span>
+                                <span class="as 35ftp" style="display:none;">多个域名请用英文半角逗号分开， PC站和手机站共计不超过9个域名，且必须使用已备案的域名</span>
                             </p>
                             <p class="modelchoose" id="domain_outpc" style="display:none;">
                                 <input name="outpc_add" type="checkbox">
