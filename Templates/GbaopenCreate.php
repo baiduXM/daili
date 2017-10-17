@@ -169,6 +169,7 @@
                                 <span class="content-l">FTP用户名</span>
                                 <span>
                                     <input type="text" value="" class="Input" name="vhostName">
+                                    <span class="as">不能与绑定的域名同名</span>
                                 </span>
                             </p>
                             <p class="35ftp" style="display:none;">
@@ -176,7 +177,7 @@
                                 <span>
                                     <input type="text" value="" class="Input" name="vhostPwd">
                                 </span>
-                                <span class="as">同时包含大小写字母，数字和特殊符号（~!@#$%^&*()），8到20位</span>
+                                <span class="as">同时包含大写和小写字母，数字以及特殊符号（~!@#$%^&*()），8到20位</span>
                             </p>
                             <p>
                                 <span class="content-l">高级定制</span>
