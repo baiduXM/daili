@@ -1,4 +1,5 @@
 $(function() {
+    /*获取公告*/
     $.post("Apps?module=Gbaopen&action=GetNotice",function(data){
         var data = data.msg;
         if(!data.err){
@@ -16,6 +17,7 @@ $(function() {
         }        
     });
 
+    /*发布公告*/
     $('.Btn1').click(function(){
         var editor = UE.getEditor('editor');
         var data = {};
