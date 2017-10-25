@@ -3539,4 +3539,114 @@ class Gbaopen extends InterfaceVIEWS
         }
         @file_put_contents($root.'dl-log/'.date("Ym").'/35.log', '['.$username.']'.PHP_EOL.$data.PHP_EOL, FILE_APPEND);
     }
+
+    //公告获取
+    public function GetNotice(){
+        $level = $_SESSION ['Level'];
+        // $id = $this->_POST['id'] ? $this->_POST['id'] : 1;
+        if($level == 1){
+            $noticemodel = new NoticeModule();
+            $notice = $noticemodel->GetOneByWhere();
+            if($notice){
+                $result['err'] = 0;
+                $result['msg'] = $notice;
+            }else{
+                $result['err'] = 1;
+                $result['msg'] = '获取失败';
+            }
+        }else{
+            $result['err'] = 1002;
+            $result['msg'] = '非法请求';
+        }
+        return $result;
+    }
+
+    //发布公告
+    public function ModifyNotice(){
+        $result = array('err' => 0, 'data' => '', 'msg' => '');
+        $post = $this->_POST['data'];
+        $data['title'] = $post['title'];
+        $data['is_on'] = $post['is_on'];
+        $data['content'] = $post['content'];
+        $data['content'] = stripslashes($data['content']);
+        $data['content'] = str_replace('&nbsp;', '', $data['content']);
+
+        $data['updatetime'] = date('Y-m-d H:i:s' , time());
+        $data['type'] = 0;
+
+        $level = $_SESSION ['Level'];
+        if($level == 1){
+            $noticemodel = new NoticeModule();
+
+            $id = $post['id'];
+            if($post['uid']){
+                $data['uid'] = $post['uid'];
+            } else {
+                $data['uid'] = uniqid('nt',true);
+            }
+
+            $res = $this->toGbpen($data);
+            if($res[0]['err'] != 1000){
+                $result['err'] = 1;
+                $result['msg'] = '统一平台发布失败';
+                return $result;
+            }
+
+            //判断修改或者插入
+            if($id){
+                $notice = $noticemodel->UpdateArrayByKeyID($data , $id);
+            }else{
+                $notice = $noticemodel->InsertArray($data);                
+            }
+            if($notice){
+                $result['err'] = 0;
+                $result['msg'] = '发布成功';
+            }else{
+                $result['err'] = 1;
+                $result['msg'] = '发布失败';
+            }
+        }else{
+            $result['err'] = 1002;
+            $result['msg'] = '非法请求';
+        }
+        
+        return $result;
+    }
+
+    //公告信息同步到G宝盆
+    protected function toGbpen($data , $id){
+        if(!$data){
+            return 0;
+        }
+
+        $TuUrl = GBAOPEN_DOMAIN . 'api/modifynotice';
+        $str = 'uid=' . $data['uid'];
+        $str .= '&title=' . $data['title'];
+        $str .= '&content=' . $data['content'];
+        $str .= '&is_on=' . $data['is_on'];
+        $str .= '&updatetime=' . $data['updatetime'];
+        $str .= '&type=' . $data['type'];
+
+        //随机文件名开始生成
+        $randomLock = getstr();
+        $password = md5($randomLock);
+        $password = md5($password);
+
+        //生成握手密钥
+        $text = getstr();
+
+        //生成dll文件
+        $myfile = @fopen('./token/' . $password . '.dll', "w+");
+        if (!$myfile) {
+            return 0;
+        }
+        fwrite($myfile, $text);
+        fclose($myfile);
+
+        $str .= '&timemap=' . $randomLock;
+        $str .= '&taget=' . md5($text . $password);
+        $ReturnString = request_by_other($TuUrl, $str);
+        $ReturnArray = json_decode($ReturnString, true);
+        return $ReturnArray;
+    }
 }

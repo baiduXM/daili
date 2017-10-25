@@ -204,4 +204,18 @@ class Agent extends ForeVIEWS {
         $this->Data = $user;
     }
 
+    //统一平台发布公告
+    public function Notice() {
+        $this->MyAction = 'Notice';
+        $level = $_SESSION ['Level'];
+        if($level == 1){
+            
+        }else{
+            $result['err'] = 1001;
+            $result['msg'] = '非法请求';
+            echo jsonp($result);
+            exit();
+        }
+    }
+
 }

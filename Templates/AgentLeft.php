@@ -38,6 +38,12 @@
                     <span>代理商管理</span>
                 </a>
             </li>
+            <li <?PHP if ($MyModule == 'Agent' && $MyAction == 'Notice') { ?>class="on"<?php } ?>>
+                <a href="<?php echo UrlRewriteSimple('Agent', 'Notice', true); ?>">
+                    <i class="fa fa-calendar"></i>
+                    <span>公告发布</span>
+                </a>
+            </li>
         <?PHP } elseif ($_SESSION['Level'] == 2) { ?>
             <li <?PHP if ($MyModule == 'Agent' && $MyAction == 'Process') { ?>class="on"<?php } ?>>
                 <a href="<?php echo UrlRewriteSimple('Agent', 'Process', true); ?>">
