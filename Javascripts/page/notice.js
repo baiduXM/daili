@@ -1,6 +1,6 @@
 $(function() {
     /*获取公告*/
-    $.post("Apps?module=Gbaopen&action=GetNotice",function(data){
+    $.get("Apps?module=Gbaopen&action=GetNotice",function(data){
         var data = data.msg;
         if(!data.err){
             $('.shbox input[name=id]').val(data.id);

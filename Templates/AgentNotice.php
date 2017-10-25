@@ -43,6 +43,10 @@
                                 </div>                                
                                 <!-- 编辑器 -->
                                 <script id="editor" type="text/plain" style="width:1024px;height:500px;"></script>
+                                <script type="text/javascript">
+                                    //实例化编辑器
+                                    var ue = UE.getEditor('editor');
+                                </script>
                                 <div style='position: absolute;right:550px;bottom: 156px;font-size: 12pt;color: red;'>*暂不支持上传图片到统一平台</div>
                             </div>
                         </div>
@@ -54,9 +58,6 @@
             </div>
         </div>
     </div>
-<script type="text/javascript">
-    //实例化编辑器
-    var ue = UE.getEditor('editor');
-</script>
+
 </body>
 <?php include 'AgentFoot.php'; ?>
