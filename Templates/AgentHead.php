@@ -9,6 +9,9 @@
     <link rel="stylesheet" type="text/css" href="Css/calendar.css">
     <script type="text/javascript" src="Javascripts/jquery1.9.1.min.js"></script>
     <script type="text/javascript" src="Javascripts/control.js"></script>
+    <!-- 引入编辑器 -->
+    <script type="text/javascript" charset="utf-8" src="ueditor/ueditor.config.js"></script>
+    <script type="text/javascript" charset="utf-8" src="ueditor/ueditor.all.min.js"> </script>
     <?php
     	$action = strtolower($MyAction);
     	$model = strtolower($MyModule);
