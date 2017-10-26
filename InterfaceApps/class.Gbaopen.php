@@ -3543,10 +3543,16 @@ class Gbaopen extends InterfaceVIEWS
     //公告获取
     public function GetNotice(){
         $level = $_SESSION ['Level'];
-        // $id = $this->_POST['id'] ? $this->_POST['id'] : 1;
+        $id = $this->_GET['id'];
+        if(!$id){
+            $result['err'] = 1001;
+            $result['msg'] = '参数缺失';
+            return $result;
+        }
         if($level == 1){
             $noticemodel = new NoticeModule();
-            $notice = $noticemodel->GetOneByWhere();
+            // $notice = $noticemodel->GetOneByWhere();
+            $notice = $noticemodel->GetOneInfoByKeyID($id);
             if($notice){
                 $result['err'] = 0;
                 $result['msg'] = $notice;

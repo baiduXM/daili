@@ -209,13 +209,19 @@ class Agent extends ForeVIEWS {
         $this->MyAction = 'Notice';
         $level = $_SESSION ['Level'];
         if($level == 1){
-            
+            $noticemodel = new NoticeModule();
+            $where = 'where type = 0';
+            $count = $noticemodel->GetListsNum($where);
+            $num = $count['Num'];
+            $notice = $noticemodel->GetListsByWhere(array('id', 'title', 'updatetime', 'is_on'), $where . ' limit 0,8');
         }else{
             $result['err'] = 1001;
             $result['msg'] = '非法请求';
             echo jsonp($result);
             exit();
         }
+        $this->notice = $notice;
+        $this->nnum = $num;
     }
 
 }
