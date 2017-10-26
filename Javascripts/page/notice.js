@@ -1,6 +1,7 @@
 $(function() {
     /*获取公告*/
     $.get("Apps?module=Gbaopen&action=GetNotice",function(data){
+        var ue = UE.getEditor('editor');
         var data = data.msg;
         if(!data.err){
             $('.shbox input[name=id]').val(data.id);
