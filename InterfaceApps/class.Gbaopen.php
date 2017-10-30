@@ -3619,8 +3619,45 @@ class Gbaopen extends InterfaceVIEWS
         return $result;
     }
 
+    //删除公告
+    public function DelNotice(){
+        $result = array('err' => 0, 'data' => '', 'msg' => '');
+        $level = $_SESSION ['Level'];
+        if($level == 1){
+            $id = $this->_POST['id'];
+            if($id){
+                $where = 'where id='.$id;
+                $noticemodel = new NoticeModule();
+                $no = $noticemodel->GetOneByWhere(array('uid'),$where);
+                $uid = $no['uid'];
+                $res = $this->delGbpen($uid);
+                if($res[0]['err'] != 1000){
+                    $result['err'] = 1;
+                    $result['msg'] = '统一平台删除失败';
+                    return $result;
+                }
+                $notice = $noticemodel->DeleteInfoByKeyID($id);
+                if($notice){
+                    $result['err'] = 0;
+                    $result['msg'] = '删除成功';
+                }else{
+                    $result['err'] = 1;
+                    $result['msg'] = '删除失败';
+                }                
+            } else {
+                $result['err'] = 1001;
+                $result['msg'] = '参数缺失';
+            }            
+        } else {
+            $result['err'] = 1002;
+            $result['msg'] = '非法请求';
+        }
+
+        return $result;
+    }
+
     //公告信息同步到G宝盆
-    protected function toGbpen($data , $id){
+    protected function toGbpen($data){
         if(!$data){
             return 0;
         }
@@ -3655,4 +3692,38 @@ class Gbaopen extends InterfaceVIEWS
         $ReturnArray = json_decode($ReturnString, true);
         return $ReturnArray;
     }
+
+    //同步删除G宝盆信息
+    protected function delGbpen($uid){
+        if(!$uid){
+            return 0;
+        }
+
+        $TuUrl = GBAOPEN_DOMAIN . 'api/delnotice';
+        $str = 'uid=' . $uid;
+
+        //随机文件名开始生成
+        $randomLock = getstr();
+        $password = md5($randomLock);
+        $password = md5($password);
+
+        //生成握手密钥
+        $text = getstr();
+
+        //生成dll文件
+        $myfile = @fopen('./token/' . $password . '.dll', "w+");
+        if (!$myfile) {
+            return 0;
+        }
+        fwrite($myfile, $text);
+        fclose($myfile);
+
+        $str .= '&timemap=' . $randomLock;
+        $str .= '&taget=' . md5($text . $password);
+        $ReturnString = request_by_other($TuUrl, $str);
+        $ReturnArray = json_decode($ReturnString, true);
+        return $ReturnArray;
+
+    }
+
 }

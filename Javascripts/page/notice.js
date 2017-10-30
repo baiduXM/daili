@@ -88,4 +88,20 @@ $(function() {
         });
     });
 
+    /*点击删除*/
+    $('.delete').click(function(){
+        if(!confirm('确定删除?')){
+            return false;
+        }
+        var id = $(this).parent().parent().find('input:hidden').attr('value');
+        $.post("Apps?module=Gbaopen&action=DelNotice",{id:id},function(result){
+            if(result.err == 0){
+                alert('删除成功');
+                location.reload();
+            }else{
+                Msg(2, result.msg);
+            }
+        });
+    });
+
 });
