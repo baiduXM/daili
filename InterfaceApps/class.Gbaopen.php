@@ -2883,8 +2883,8 @@ class Gbaopen extends InterfaceVIEWS
             $info["G_Ftp_Mulu"] = "./www";
             $info["FTP"] = 2;
 
-            $m_url = str_replace('http://', '', $post['m_url']);
-            $m_url = str_replace(' ', '', $m_url);
+            $info['m_url'] = str_replace('http://', '', $post['m_url']);
+            $info['m_url'] = str_replace(' ', '', $info['m_url']);
         }
         $custpro = new CustProModule();
         $cuspro_old = $cuspro_info = $custpro->GetOneByWhere(array(), " where CustomersID=" . $CustmoersID);
@@ -2916,7 +2916,7 @@ class Gbaopen extends InterfaceVIEWS
             //$ToString .= '&ftp_url=' . ($info ['FuwuqiID'] > 0 ? preg_replace("/^http:\/\/c/", "http://" . $cuspro_info["G_name"], $info ['G_Ftp_FwAdress']) : $info ['G_Ftp_FwAdress']);
             $ToString .= '&ftp_url=' . ($info ['FuwuqiID'] > 0 ? "http://" . $info ['G_Ftp_Address'] . '/' . $cuspro_info["G_name"] : $info ['G_Ftp_FwAdress']);
             $ToString .= '&ftp_url_b=http://' . $info ['G_Ftp_Address_B'] . '/' . $cuspro_info["G_name"];
-            $ToString .= '&m_url=' . $m_url;
+            $ToString .= '&m_url=' . $info ['m_url'];
 
             //随机文件名开始生成
             $randomLock = getstr();
