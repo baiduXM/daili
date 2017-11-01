@@ -3540,7 +3540,7 @@ class Gbaopen extends InterfaceVIEWS
         @file_put_contents($root.'dl-log/'.date("Ym").'/35.log', '['.$username.']'.PHP_EOL.$data.PHP_EOL, FILE_APPEND);
     }
 
-    //公告获取
+    //公告/日志 获取
     public function GetNotice(){
         $level = $_SESSION ['Level'];
         $id = $this->_GET['id'];
@@ -3567,18 +3567,23 @@ class Gbaopen extends InterfaceVIEWS
         return $result;
     }
 
-    //发布公告
+    //发布/日志 公告
     public function ModifyNotice(){
         $result = array('err' => 0, 'data' => '', 'msg' => '');
         $post = $this->_POST['data'];
         $data['title'] = $post['title'];
-        $data['is_on'] = $post['is_on'];
         $data['content'] = $post['content'];
         $data['content'] = stripslashes($data['content']);
         $data['content'] = str_replace('&nbsp;', '', $data['content']);
+        $data['type'] = $post['type'];
+        if($data['type'] == 0){
+            $data['is_on'] = $post['is_on'];
+        } else {
+            $data['synopsis'] = $post['synopsis'];
+        }
 
         $data['updatetime'] = date('Y-m-d H:i:s' , time());
-        $data['type'] = 0;
+
 
         $level = $_SESSION ['Level'];
         if($level == 1){
@@ -3588,7 +3593,11 @@ class Gbaopen extends InterfaceVIEWS
             if($post['uid']){
                 $data['uid'] = $post['uid'];
             } else {
-                $data['uid'] = uniqid('nt',true);
+                if($data['type'] == 0){//日志和公告的uid用不同的前缀
+                    $data['uid'] = uniqid('nt',true);
+                }else{
+                    $data['uid'] = uniqid('tl',true);
+                }                
             }
 
             $res = $this->toGbpen($data);
@@ -3619,7 +3628,7 @@ class Gbaopen extends InterfaceVIEWS
         return $result;
     }
 
-    //删除公告
+    //删除公告/日志 
     public function DelNotice(){
         $result = array('err' => 0, 'data' => '', 'msg' => '');
         $level = $_SESSION ['Level'];
@@ -3656,7 +3665,7 @@ class Gbaopen extends InterfaceVIEWS
         return $result;
     }
 
-    //公告信息同步到G宝盆
+    //公告/日志 信息同步到G宝盆
     protected function toGbpen($data){
         if(!$data){
             return 0;
@@ -3667,6 +3676,7 @@ class Gbaopen extends InterfaceVIEWS
         $str .= '&title=' . $data['title'];
         $str .= '&content=' . $data['content'];
         $str .= '&is_on=' . $data['is_on'];
+        $str .= '&synopsis=' . $data['synopsis'];
         $str .= '&updatetime=' . $data['updatetime'];
         $str .= '&type=' . $data['type'];
 

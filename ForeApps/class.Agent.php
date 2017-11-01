@@ -204,7 +204,7 @@ class Agent extends ForeVIEWS {
         $this->Data = $user;
     }
 
-    //统一平台发布公告
+    //统一平台公告
     public function Notice() {
         $this->MyAction = 'Notice';
         $level = $_SESSION ['Level'];
@@ -213,7 +213,7 @@ class Agent extends ForeVIEWS {
             $where = 'where type = 0';
             $count = $noticemodel->GetListsNum($where);
             $num = $count['Num'];
-            $notice = $noticemodel->GetListsByWhere(array('id', 'title', 'updatetime', 'is_on'), $where . ' limit 0,8');
+            $notice = $noticemodel->GetListsByWhere(array('id', 'title', 'updatetime', 'is_on'), $where . ' order by id desc limit 0,8');
         }else{
             $result['err'] = 1001;
             $result['msg'] = '非法请求';
@@ -221,6 +221,26 @@ class Agent extends ForeVIEWS {
             exit();
         }
         $this->notice = $notice;
+        $this->nnum = $num;
+    }
+
+    //统一平台系统日志
+    public function TyLogs() {
+        $this->MyAction = 'TyLogs';
+        $level = $_SESSION ['Level'];
+        if($level == 1){
+            $noticemodel = new NoticeModule();
+            $where = 'where type = 1';
+            $count = $noticemodel->GetListsNum($where);
+            $num = $count['Num'];
+            $logs = $noticemodel->GetListsByWhere(array('id', 'title', 'updatetime', 'synopsis'), $where . ' order by id desc limit 0,8');
+        }else{
+            $result['err'] = 1001;
+            $result['msg'] = '非法请求';
+            echo jsonp($result);
+            exit();
+        }
+        $this->logs = $logs;
         $this->nnum = $num;
     }
 

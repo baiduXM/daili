@@ -38,6 +38,12 @@
                     <span>代理商管理</span>
                 </a>
             </li>
+            <li <?PHP if ($MyModule == 'Agent' && $MyAction == 'TyLogs') { ?>class="on"<?php } ?>>
+                <a href="<?php echo UrlRewriteSimple('Agent', 'TyLogs', true); ?>">
+                    <i class="fa fa-electronics"></i>
+                    <span>统一日志</span>
+                </a>
+            </li>
             <li <?PHP if ($MyModule == 'Agent' && $MyAction == 'Notice') { ?>class="on"<?php } ?>>
                 <a href="<?php echo UrlRewriteSimple('Agent', 'Notice', true); ?>">
                     <i class="fa fa-calendar"></i>

@@ -7,8 +7,7 @@ $(function() {
         $("input[name=id]").val('');
         $("input[name=uid]").val('');
         $("input[name=title]").val('');
-        $("input[name=is_on]:eq(0)").prop('checked',false);
-        $("input[name=is_on]:eq(1)").prop('checked','checked');
+        $("#synopsis").val('');
         UE.getEditor('editor').setContent('');
     });
 
@@ -34,12 +33,12 @@ $(function() {
     $(".pagebox a.num").click(function() {
         var _this = $(this);
         if (!_this.hasClass("pon")) {
-            $.get("Apps?module=Agent&action=noticeList&type=0&page=" + _this.text(), function(result) {
+            $.get("Apps?module=Agent&action=noticeList&type=1&page=" + _this.text(), function(result) {
                 if(result.err == 1000){
                     var html;
                     $.each(result.msg, function(i,v){
                         html += '<tr><td class="text-left">' + v.title + '</td>\
-                                    <td class="enfont">' + (v.is_on == 1 ? '是' : '否') + '</td>\
+                                    <td class="enfont">' + v.synopsis + '</td>\
                                     <td class="enfont">' + v.updatetime + '</td>\
                                     <td class="text-right pop">\
                                         <a href="javascript:;" class="modify">修改</a>\n\
@@ -58,26 +57,7 @@ $(function() {
         }
     });
 
-    /*获取公告*/
-    // $.get("Apps?module=Gbaopen&action=GetNotice",function(data){
-    //     var ue = UE.getEditor('editor');
-    //     var data = data.msg;
-    //     if(!data.err){
-    //         $('.shbox input[name=id]').val(data.id);
-    //         $('.shbox input[name=uid]').val(data.uid);
-    //         $('.shbox input[name=title]').val(data.title);
-    //         if(data.is_on == 1){
-    //             $('.shbox input[name=is_on]:eq(0)').attr('checked',true);
-    //         } else {
-    //             $('.shbox input[name=is_on]:eq(1)').attr('checked',true);
-    //         }
-    //         ue.addListener("ready", function () {
-    //             UE.getEditor('editor').setContent(data.content);
-    //         });
-    //     }        
-    // });
-
-    /*发布公告*/
+    /*发布日志*/
     $('.Btn1').click(function(){
         var editor = UE.getEditor('editor');
         var data = {};
@@ -86,13 +66,11 @@ $(function() {
         data['uid'] = $("input[name=uid]").val();
         data['content'] = editor.getContent();
         data['title'] = $("input[name=title]").val();
-        data['is_on'] = $("input[name=is_on]:checked").val();
-        data['type'] = 0;
-        // console.log(data);
+        data['synopsis'] = $("#synopsis").val();
+        data['type'] = 1;
         if(data){
             $.post("Apps?module=Gbaopen&action=ModifyNotice",{data:data},function(result){
                 if(result.err == 0){
-                    // Msg(3, result.msg);
                     alert('发布成功');
                     location.reload();
                 }else{
@@ -105,7 +83,7 @@ $(function() {
     });
 
     /*点击修改*/
-    $('#listtbody').on('click','.modify',function(){
+     $('#listtbody').on('click','.modify',function(){
         $('#edit').addClass("cur");
         $('#edit').siblings().removeClass("cur");
         $('#notice-edit').addClass("cur");
@@ -120,16 +98,7 @@ $(function() {
                 $('.shbox input[name=id]').val(data.id);
                 $('.shbox input[name=uid]').val(data.uid);
                 $('.shbox input[name=title]').val(data.title);
-                if(data.is_on == 1){
-                    $('.shbox input[name=is_on]:eq(0)').attr('checked',true);
-                    $('.shbox input[name=is_on]:eq(1)').attr('checked',false);
-                } else {
-                    $('.shbox input[name=is_on]:eq(0)').attr('checked',false);
-                    $('.shbox input[name=is_on]:eq(1)').attr('checked',true);
-                }
-                // ue.addListener("ready", function () {
-                //     UE.getEditor('editor').setContent(data.content);
-                // });
+                $('#synopsis').val(data.synopsis);
                 UE.getEditor('editor').setContent(data.content);
             }        
         });
@@ -150,5 +119,6 @@ $(function() {
             }
         });
     });
+    
 
 });
