@@ -2849,6 +2849,11 @@ class Gbaopen extends InterfaceVIEWS
             $info["G_Ftp_Duankou"] = $post["port"];
             $info["G_Ftp_Mulu"] = $post["dir"];
             $info["FTP"] = 0;
+
+            //备用ftp
+            $info["G_Ftp_Address_B"] = "";
+            $info["G_Ftp_User_B"] = "";
+            $info["G_Ftp_Pwd_B"] = "";
         } elseif($post["FTP"] == 1) {
             $info["FuwuqiID"] = $post["FuwuqiID"];
             $fuwuqi = new FuwuqiModule();
@@ -2886,15 +2891,20 @@ class Gbaopen extends InterfaceVIEWS
             $info["G_Ftp_Mulu"] = "./www";
             $info["FTP"] = 2;
 
+            //备用ftp
+            $info["G_Ftp_Address_B"] = "";
+            $info["G_Ftp_User_B"] = "";
+            $info["G_Ftp_Pwd_B"] = "";
+
             $m_url = str_replace('http://', '', $post['m_url']);
             $m_url = str_replace(' ', '', $m_url);
         }
         $custpro = new CustProModule();
         $cuspro_old = $cuspro_info = $custpro->GetOneByWhere(array(), " where CustomersID=" . $CustmoersID);
-        if (strpos($cuspro_old["Mobile_domain"], '.5067.org') !== false) {
+        if (strpos($cuspro_old["Mobile_domain"], '.5067.org') !== false && $info["FTP"] != 2) {
             $info["Mobile_domain"] = preg_replace("/^http:\/\/c/", 'http://m.' . $cuspro_info["G_name"], $info ['G_Ftp_FwAdress']);
         }
-        if (strpos($cuspro_old["PC_domain"], '.5067.org') !== false) {
+        if (strpos($cuspro_old["PC_domain"], '.5067.org') !== false && $info["FTP"] != 2) {
             $info["PC_domain"] = preg_replace("/^http:\/\/c/", 'http://' . $cuspro_info["G_name"], $info ['G_Ftp_FwAdress']);
         }
         if ($custpro->UpdateArray($info, $CustmoersID)) {
