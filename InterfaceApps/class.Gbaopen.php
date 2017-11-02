@@ -3574,7 +3574,7 @@ class Gbaopen extends InterfaceVIEWS
         $data['title'] = $post['title'];
         $data['content'] = $post['content'];
         $data['content'] = stripslashes($data['content']);
-        $data['content'] = str_replace('&nbsp;', '', $data['content']);
+        // $data['content'] = str_replace('&nbsp;', '', $data['content']);
         $data['type'] = $post['type'];
         if($data['type'] == 0){
             $data['is_on'] = $post['is_on'];
@@ -3672,13 +3672,13 @@ class Gbaopen extends InterfaceVIEWS
         }
 
         $TuUrl = GBAOPEN_DOMAIN . 'api/modifynotice';
-        $str = 'uid=' . $data['uid'];
-        $str .= '&title=' . $data['title'];
-        $str .= '&content=' . $data['content'];
-        $str .= '&is_on=' . $data['is_on'];
-        $str .= '&synopsis=' . $data['synopsis'];
-        $str .= '&updatetime=' . $data['updatetime'];
-        $str .= '&type=' . $data['type'];
+        // $str = 'uid=' . $data['uid'];
+        // $str .= '&title=' . $data['title'];
+        // $str .= '&content=' . $data['content'];
+        // $str .= '&is_on=' . $data['is_on'];
+        // $str .= '&synopsis=' . $data['synopsis'];
+        // $str .= '&updatetime=' . $data['updatetime'];
+        // $str .= '&type=' . $data['type'];
 
         //随机文件名开始生成
         $randomLock = getstr();
@@ -3696,9 +3696,30 @@ class Gbaopen extends InterfaceVIEWS
         fwrite($myfile, $text);
         fclose($myfile);
 
-        $str .= '&timemap=' . $randomLock;
-        $str .= '&taget=' . md5($text . $password);
-        $ReturnString = request_by_other($TuUrl, $str);
+        // $str .= '&timemap=' . $randomLock;
+        // $str .= '&taget=' . md5($text . $password);
+        // $ReturnString = request_by_other($TuUrl, $str);
+
+        $post_data = array (
+            "uid" => $data['uid'],
+            "title" => $data['title'],
+            "content" => $data['content'],
+            "is_on" => $data['is_on'],
+            "synopsis" => $data['synopsis'],
+            "updatetime" => $data['updatetime'],
+            "type" => $data['type'],
+            "timemap" => $randomLock,
+            "taget" => md5($text . $password)
+        );
+
+        $curl = curl_init();    
+        curl_setopt($curl, CURLOPT_URL, $TuUrl);                       
+        curl_setopt($curl, CURLOPT_POST, 1);     
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $post_data);         
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);      
+        $ReturnString = curl_exec($curl);         
+        curl_close($curl); 
+
         $ReturnArray = json_decode($ReturnString, true);
         return $ReturnArray;
     }
