@@ -2843,10 +2843,13 @@ class Gbaopen extends InterfaceVIEWS
             $info["G_Ftp_User"] = $post["user"];
             $info["G_Ftp_Pwd"] = $post["pwd"];
             $info["G_Ftp_FwAdress"] = $post["ftp_url"];
+            $info["G_Ftp_FwAdress"] = str_replace('http://', '', $info["G_Ftp_FwAdress"]);
+            $info["G_Ftp_FwAdress"] = 'http://' . $info["G_Ftp_FwAdress"];
+
             $info["G_Ftp_Duankou"] = $post["port"];
             $info["G_Ftp_Mulu"] = $post["dir"];
-            $info["FTP"] = 2;
-        } else {
+            $info["FTP"] = 0;
+        } elseif($post["FTP"] == 1) {
             $info["FuwuqiID"] = $post["FuwuqiID"];
             $fuwuqi = new FuwuqiModule();
             $fuwuqi_info = $fuwuqi->GetOneInfoByKeyID($info["FuwuqiID"]);
@@ -2873,6 +2876,18 @@ class Gbaopen extends InterfaceVIEWS
                 $this->LogsFunction->LogsCusRecord(121, 3, $CustmoersID, $result['msg']);
                 return $result;
             }
+        } elseif($post["FTP"] == 2) {
+            $info["FuwuqiID"] = "";
+            $info["G_Ftp_Address"] = "103.236.254.134";
+            $info["G_Ftp_User"] = $post["35user"];
+            $info["G_Ftp_Pwd"] = $post["35pwd"];
+            $info["G_Ftp_FwAdress"] = 'http://' . $post["35user"] . ".sy01.host.35.com";
+            $info["G_Ftp_Duankou"] = 21;
+            $info["G_Ftp_Mulu"] = "./www";
+            $info["FTP"] = 2;
+
+            $m_url = str_replace('http://', '', $post['m_url']);
+            $m_url = str_replace(' ', '', $m_url);
         }
         $custpro = new CustProModule();
         $cuspro_old = $cuspro_info = $custpro->GetOneByWhere(array(), " where CustomersID=" . $CustmoersID);
@@ -2898,11 +2913,13 @@ class Gbaopen extends InterfaceVIEWS
             $ToString .= '&ftp_user_b=' . $info ['G_Ftp_User_B'];
             $ToString .= '&ftp_pwd_b=' . $info ['G_Ftp_Pwd_B'];
 
-            $ToString .= '&ftp_flag=' . ($info ['FuwuqiID'] > 0 ? "1" : "0");
+            // $ToString .= '&ftp_flag=' . ($info ['FuwuqiID'] > 0 ? "1" : "0");
+            $ToString .= '&ftp_flag=' . $info["FTP"];
 
             //$ToString .= '&ftp_url=' . ($info ['FuwuqiID'] > 0 ? preg_replace("/^http:\/\/c/", "http://" . $cuspro_info["G_name"], $info ['G_Ftp_FwAdress']) : $info ['G_Ftp_FwAdress']);
-            $ToString .= '&ftp_url=' . ($info ['FuwuqiID'] > 0 ? "http://" . $info ['G_Ftp_Address'] . '/' . $cuspro_info["G_name"] : $info ['G_Ftp_FwAdress'] . '/' . $cuspro_info["G_name"]);
+            $ToString .= '&ftp_url=' . ($info ['FuwuqiID'] > 0 ? "http://" . $info ['G_Ftp_Address'] . '/' . $cuspro_info["G_name"] : $info ['G_Ftp_FwAdress']);
             $ToString .= '&ftp_url_b=http://' . $info ['G_Ftp_Address_B'] . '/' . $cuspro_info["G_name"];
+            $ToString .= '&m_url=' . $m_url;
 
             //随机文件名开始生成
             $randomLock = getstr();
