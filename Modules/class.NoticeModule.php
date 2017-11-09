@@ -61,4 +61,25 @@ class NoticeModule
         }
         return $DB->GetOne('select ' . $select . ' from ' . $this->TableName . ' ' . $where);
     }
+
+    public function GetListsByWhere($lists = array(), $where = '')
+    {
+        $DB = new DB ();
+        if (is_array($lists)) {
+            if (count($lists))
+                $select = implode(',', $lists);
+            else
+                $select = '*';
+        } else {
+            $where = $lists;
+            $select = '*';
+        }
+        return $DB->Select('select ' . $select . ' from ' . $this->TableName . ' ' . $where);
+    }
+
+    public function GetListsNum($MysqlWhere = '')
+    {
+        $DB = new DB ();
+        return $DB->GetOne('select count(' . $this->KeyID . ') as Num from ' . $this->TableName . ' ' . $MysqlWhere);
+    }
 }

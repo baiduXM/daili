@@ -2843,10 +2843,18 @@ class Gbaopen extends InterfaceVIEWS
             $info["G_Ftp_User"] = $post["user"];
             $info["G_Ftp_Pwd"] = $post["pwd"];
             $info["G_Ftp_FwAdress"] = $post["ftp_url"];
+            $info["G_Ftp_FwAdress"] = str_replace('http://', '', $info["G_Ftp_FwAdress"]);
+            $info["G_Ftp_FwAdress"] = 'http://' . $info["G_Ftp_FwAdress"];
+
             $info["G_Ftp_Duankou"] = $post["port"];
             $info["G_Ftp_Mulu"] = $post["dir"];
-            $info["FTP"] = 2;
-        } else {
+            $info["FTP"] = 0;
+
+            //备用ftp
+            $info["G_Ftp_Address_B"] = "";
+            $info["G_Ftp_User_B"] = "";
+            $info["G_Ftp_Pwd_B"] = "";
+        } elseif($post["FTP"] == 1) {
             $info["FuwuqiID"] = $post["FuwuqiID"];
             $fuwuqi = new FuwuqiModule();
             $fuwuqi_info = $fuwuqi->GetOneInfoByKeyID($info["FuwuqiID"]);
@@ -2873,13 +2881,30 @@ class Gbaopen extends InterfaceVIEWS
                 $this->LogsFunction->LogsCusRecord(121, 3, $CustmoersID, $result['msg']);
                 return $result;
             }
+        } elseif($post["FTP"] == 2) {
+            $info["FuwuqiID"] = "";
+            $info["G_Ftp_Address"] = "103.236.254.134";
+            $info["G_Ftp_User"] = $post["35user"];
+            $info["G_Ftp_Pwd"] = $post["35pwd"];
+            $info["G_Ftp_FwAdress"] = 'http://' . $post["35user"] . ".sy01.host.35.com";
+            $info["G_Ftp_Duankou"] = 21;
+            $info["G_Ftp_Mulu"] = "./www";
+            $info["FTP"] = 2;
+
+            //备用ftp
+            $info["G_Ftp_Address_B"] = "";
+            $info["G_Ftp_User_B"] = "";
+            $info["G_Ftp_Pwd_B"] = "";
+
+            $m_url = str_replace('http://', '', $post['m_url']);
+            $m_url = str_replace(' ', '', $m_url);
         }
         $custpro = new CustProModule();
         $cuspro_old = $cuspro_info = $custpro->GetOneByWhere(array(), " where CustomersID=" . $CustmoersID);
-        if (strpos($cuspro_old["Mobile_domain"], '.5067.org') !== false) {
+        if (strpos($cuspro_old["Mobile_domain"], '.5067.org') !== false && $info["FTP"] != 2) {
             $info["Mobile_domain"] = preg_replace("/^http:\/\/c/", 'http://m.' . $cuspro_info["G_name"], $info ['G_Ftp_FwAdress']);
         }
-        if (strpos($cuspro_old["PC_domain"], '.5067.org') !== false) {
+        if (strpos($cuspro_old["PC_domain"], '.5067.org') !== false && $info["FTP"] != 2) {
             $info["PC_domain"] = preg_replace("/^http:\/\/c/", 'http://' . $cuspro_info["G_name"], $info ['G_Ftp_FwAdress']);
         }
         if ($custpro->UpdateArray($info, $CustmoersID)) {
@@ -2898,11 +2923,13 @@ class Gbaopen extends InterfaceVIEWS
             $ToString .= '&ftp_user_b=' . $info ['G_Ftp_User_B'];
             $ToString .= '&ftp_pwd_b=' . $info ['G_Ftp_Pwd_B'];
 
-            $ToString .= '&ftp_flag=' . ($info ['FuwuqiID'] > 0 ? "1" : "0");
+            // $ToString .= '&ftp_flag=' . ($info ['FuwuqiID'] > 0 ? "1" : "0");
+            $ToString .= '&ftp_flag=' . $info["FTP"];
 
             //$ToString .= '&ftp_url=' . ($info ['FuwuqiID'] > 0 ? preg_replace("/^http:\/\/c/", "http://" . $cuspro_info["G_name"], $info ['G_Ftp_FwAdress']) : $info ['G_Ftp_FwAdress']);
-            $ToString .= '&ftp_url=' . ($info ['FuwuqiID'] > 0 ? "http://" . $info ['G_Ftp_Address'] . '/' . $cuspro_info["G_name"] : $info ['G_Ftp_FwAdress'] . '/' . $cuspro_info["G_name"]);
+            $ToString .= '&ftp_url=' . ($info ['FuwuqiID'] > 0 ? "http://" . $info ['G_Ftp_Address'] . '/' . $cuspro_info["G_name"] : $info ['G_Ftp_FwAdress']);
             $ToString .= '&ftp_url_b=http://' . $info ['G_Ftp_Address_B'] . '/' . $cuspro_info["G_name"];
+            $ToString .= '&m_url=' . $m_url;
 
             //随机文件名开始生成
             $randomLock = getstr();
@@ -3540,13 +3567,19 @@ class Gbaopen extends InterfaceVIEWS
         @file_put_contents($root.'dl-log/'.date("Ym").'/35.log', '['.$username.']'.PHP_EOL.$data.PHP_EOL, FILE_APPEND);
     }
 
-    //公告获取
+    //公告/日志 获取
     public function GetNotice(){
         $level = $_SESSION ['Level'];
-        // $id = $this->_POST['id'] ? $this->_POST['id'] : 1;
+        $id = $this->_GET['id'];
+        if(!$id){
+            $result['err'] = 1001;
+            $result['msg'] = '参数缺失';
+            return $result;
+        }
         if($level == 1){
             $noticemodel = new NoticeModule();
-            $notice = $noticemodel->GetOneByWhere();
+            // $notice = $noticemodel->GetOneByWhere();
+            $notice = $noticemodel->GetOneInfoByKeyID($id);
             if($notice){
                 $result['err'] = 0;
                 $result['msg'] = $notice;
@@ -3561,18 +3594,23 @@ class Gbaopen extends InterfaceVIEWS
         return $result;
     }
 
-    //发布公告
+    //发布/日志 公告
     public function ModifyNotice(){
         $result = array('err' => 0, 'data' => '', 'msg' => '');
         $post = $this->_POST['data'];
         $data['title'] = $post['title'];
-        $data['is_on'] = $post['is_on'];
         $data['content'] = $post['content'];
         $data['content'] = stripslashes($data['content']);
-        $data['content'] = str_replace('&nbsp;', '', $data['content']);
+        // $data['content'] = str_replace('&nbsp;', '', $data['content']);
+        $data['type'] = $post['type'];
+        if($data['type'] == 0){
+            $data['is_on'] = $post['is_on'];
+        } else {
+            $data['synopsis'] = $post['synopsis'];
+        }
 
         $data['updatetime'] = date('Y-m-d H:i:s' , time());
-        $data['type'] = 0;
+
 
         $level = $_SESSION ['Level'];
         if($level == 1){
@@ -3582,7 +3620,11 @@ class Gbaopen extends InterfaceVIEWS
             if($post['uid']){
                 $data['uid'] = $post['uid'];
             } else {
-                $data['uid'] = uniqid('nt',true);
+                if($data['type'] == 0){//日志和公告的uid用不同的前缀
+                    $data['uid'] = uniqid('nt',true);
+                }else{
+                    $data['uid'] = uniqid('tl',true);
+                }                
             }
 
             $res = $this->toGbpen($data);
@@ -3613,19 +3655,110 @@ class Gbaopen extends InterfaceVIEWS
         return $result;
     }
 
-    //公告信息同步到G宝盆
-    protected function toGbpen($data , $id){
+    //删除公告/日志 
+    public function DelNotice(){
+        $result = array('err' => 0, 'data' => '', 'msg' => '');
+        $level = $_SESSION ['Level'];
+        if($level == 1){
+            $id = $this->_POST['id'];
+            if($id){
+                $where = 'where id='.$id;
+                $noticemodel = new NoticeModule();
+                $no = $noticemodel->GetOneByWhere(array('uid'),$where);
+                $uid = $no['uid'];
+                $res = $this->delGbpen($uid);
+                if($res[0]['err'] != 1000){
+                    $result['err'] = 1;
+                    $result['msg'] = '统一平台删除失败';
+                    return $result;
+                }
+                $notice = $noticemodel->DeleteInfoByKeyID($id);
+                if($notice){
+                    $result['err'] = 0;
+                    $result['msg'] = '删除成功';
+                }else{
+                    $result['err'] = 1;
+                    $result['msg'] = '删除失败';
+                }                
+            } else {
+                $result['err'] = 1001;
+                $result['msg'] = '参数缺失';
+            }            
+        } else {
+            $result['err'] = 1002;
+            $result['msg'] = '非法请求';
+        }
+
+        return $result;
+    }
+
+    //公告/日志 信息同步到G宝盆
+    protected function toGbpen($data){
         if(!$data){
             return 0;
         }
 
         $TuUrl = GBAOPEN_DOMAIN . 'api/modifynotice';
-        $str = 'uid=' . $data['uid'];
-        $str .= '&title=' . $data['title'];
-        $str .= '&content=' . $data['content'];
-        $str .= '&is_on=' . $data['is_on'];
-        $str .= '&updatetime=' . $data['updatetime'];
-        $str .= '&type=' . $data['type'];
+        // $str = 'uid=' . $data['uid'];
+        // $str .= '&title=' . $data['title'];
+        // $str .= '&content=' . $data['content'];
+        // $str .= '&is_on=' . $data['is_on'];
+        // $str .= '&synopsis=' . $data['synopsis'];
+        // $str .= '&updatetime=' . $data['updatetime'];
+        // $str .= '&type=' . $data['type'];
+
+        //随机文件名开始生成
+        $randomLock = getstr();
+        $password = md5($randomLock);
+        $password = md5($password);
+
+        //生成握手密钥
+        $text = getstr();
+
+        //生成dll文件
+        $myfile = @fopen('./token/' . $password . '.dll', "w+");
+        if (!$myfile) {
+            return 0;
+        }
+        fwrite($myfile, $text);
+        fclose($myfile);
+
+        // $str .= '&timemap=' . $randomLock;
+        // $str .= '&taget=' . md5($text . $password);
+        // $ReturnString = request_by_other($TuUrl, $str);
+
+        $post_data = array (
+            "uid" => $data['uid'],
+            "title" => $data['title'],
+            "content" => $data['content'],
+            "is_on" => $data['is_on'],
+            "synopsis" => $data['synopsis'],
+            "updatetime" => $data['updatetime'],
+            "type" => $data['type'],
+            "timemap" => $randomLock,
+            "taget" => md5($text . $password)
+        );
+
+        $curl = curl_init();    
+        curl_setopt($curl, CURLOPT_URL, $TuUrl);                       
+        curl_setopt($curl, CURLOPT_POST, 1);     
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $post_data);         
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);      
+        $ReturnString = curl_exec($curl);         
+        curl_close($curl); 
+
+        $ReturnArray = json_decode($ReturnString, true);
+        return $ReturnArray;
+    }
+
+    //同步删除G宝盆信息
+    protected function delGbpen($uid){
+        if(!$uid){
+            return 0;
+        }
+
+        $TuUrl = GBAOPEN_DOMAIN . 'api/delnotice';
+        $str = 'uid=' . $uid;
 
         //随机文件名开始生成
         $randomLock = getstr();
@@ -3648,5 +3781,7 @@ class Gbaopen extends InterfaceVIEWS
         $ReturnString = request_by_other($TuUrl, $str);
         $ReturnArray = json_decode($ReturnString, true);
         return $ReturnArray;
+
     }
+
 }

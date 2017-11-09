@@ -607,4 +607,35 @@ class Agent extends InterfaceVIEWS
         return json_encode($balance);
     }
 
+    //点击页码的公告/日志 列表
+    public function noticeList() {
+        $this->MyAction = 'Notice';
+        $level = $_SESSION ['Level'];
+        $page = (int)$this->_GET['page'];
+        $type = (int)$this->_GET['type'];//类型 0为公告 1为统一日志
+        $start = ($page - 1) * 8;
+        if($level == 1){
+            $noticemodel = new NoticeModule();
+
+            if($type == 0){
+                $where = 'where type = 0';
+                $count = $noticemodel->GetListsNum($where);
+                $num = $count['Num'];
+                $notice = $noticemodel->GetListsByWhere(array('id', 'title', 'updatetime', 'is_on'), $where . ' order by id desc limit ' . $start . ',8');
+            } else {
+                $where = 'where type = 1';
+                $count = $noticemodel->GetListsNum($where);
+                $num = $count['Num'];
+                $notice = $noticemodel->GetListsByWhere(array('id', 'title', 'updatetime', 'synopsis'), $where . ' order by id desc limit ' . $start . ',8');
+            }
+            
+            $result['err'] = 1000;
+            $result['msg'] = $notice;
+        }else{
+            $result['err'] = 1001;
+            $result['msg'] = '获取失败';
+        }
+        return $result;
+    }
+
 }

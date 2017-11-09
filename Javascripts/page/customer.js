@@ -1026,8 +1026,9 @@ jQuery(document).ready(function () {
                                 <input type="hidden" class="Input" value="' + cus + '">\
                                 <span class="content-l">FTP:</span>\n\
                                 <span class="Input">\n\
-                                    <input type="radio" name="FTP" value="1" onchange="if($(\'input[name=FTP]:checked\').val()==1){$(\'.FTP_1\').show();$(\'.FTP_0\').hide();}else{$(\'.FTP_0\').show();$(\'.FTP_1\').hide();}"/>公司FTP\n\
-                                    <input type="radio" onchange="if($(\'input[name=FTP]:checked\').val()==1){$(\'.FTP_1\').show();$(\'.FTP_0\').hide();}else{$(\'.FTP_0\').show();$(\'.FTP_1\').hide();}" name="FTP" value="0" checked/>客户FTP\n\
+                                    <input type="radio" name="FTP" value="1" onchange="if($(\'input[name=FTP]:checked\').val()==1){$(\'.FTP_1\').show();$(\'.FTP_0\').hide();$(\'.FTP_2\').hide();}"/>公司FTP\n\
+                                    <input type="radio" onchange="if($(\'input[name=FTP]:checked\').val()==0){$(\'.FTP_0\').show();$(\'.FTP_1\').hide();$(\'.FTP_2\').hide();}" name="FTP" value="0" checked/>客户FTP\n\
+                                    <input type="radio" onchange="if($(\'input[name=FTP]:checked\').val()==2){$(\'.FTP_2\').show();$(\'.FTP_1\').hide();$(\'.FTP_0\').hide();}" name="FTP" value="2" />35FTP\n\
                                 </span>\n\
                             </p>\
                             <div class="FTP_0" style="padding-top: 25px;">\n\
@@ -1071,6 +1072,26 @@ jQuery(document).ready(function () {
                             <div class="FTP_1" style="display:none;padding-top: 25px;">\n\
                                 <span class="content-l">服务器选择:</span>\n\
                                 <select class="Input" id="FuwuqiID">' + option_html + '</select>\n\
+                            </div>\n\
+                            <div class="FTP_2" style="display:none;padding-top: 25px;">\n\
+                                <p>\n\
+                                    <span class="content-l">FTP用户名:</span>\n\
+                                    <span>\n\
+                                        <input type="text" id="35user" name="35user" class="Input"/>\n\
+                                    </span>\n\
+                                </p>\n\
+                                <p>\n\
+                                    <span class="content-l">FTP密码:</span>\n\
+                                    <span>\n\
+                                        <input type="text" id="35pwd" name="35pwd" class="Input"/>\n\
+                                    </span>\n\
+                                </p>\n\
+                                <p>\n\
+                                    <span class="content-l">手机域名:</span>\n\
+                                    <span>\n\
+                                        <textarea id="m_url" name="m_url" class="Input" style="height:50px;"/></textarea>\n\
+                                    </span>\n\
+                                </p>\n\
                             </div>\n\
                             <span style="color:red;">注:迁移成功之后,请重新解析域名</span>\
                         </div>';
@@ -1468,13 +1489,17 @@ jQuery(document).ready(function () {
             data["num"] = number;
             if (data["FTP"] == 1) {
                 data["FuwuqiID"] = $('.userdata-content #FuwuqiID').val();
-            } else {
+            } else if(data["FTP"] == 0) {
                 data["address"] = $('.userdata-content #address').val();
                 data["user"]    = $('.userdata-content #user').val();
                 data["pwd"]     = $('.userdata-content #pwd').val();
                 data["ftp_url"] = $('.userdata-content #ftp_url').val();
                 data["port"]    = $('.userdata-content #port').val();
                 data["dir"]     = $('.userdata-content #dir').val();
+            } else if(data["FTP"] == 2){
+                data["35user"]    = $('.userdata-content #35user').val();
+                data["35pwd"]     = $('.userdata-content #35pwd').val();
+                data["m_url"]     = $('.userdata-content #m_url').val();
             }
             Msg(1, '<span>正在处理，请稍等...</span><span class="flower-loader" style="opacity: 1;"></span>');
             $.post("Apps?module=Gbaopen&action=SiteMove", data, function (result) {
