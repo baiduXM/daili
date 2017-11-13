@@ -62,6 +62,10 @@
                                                 <td class="text-right pop">
                                                     <!--                                                    <a href="javascript:;" class="recharge">充值</a>
                                                                                                         <font class="line">|</font>-->
+                                                    <?php if ($_SESSION["Level"] == 2 || $_SESSION["Level"] == 1) { ?>
+                                                        <a href="<?php echo 'Apps?module=Agent&action=getPwd&id=' . $val['AgentID']; ?>" >下载修改</a>
+                                                        <a href="javascript:;" class="batchpwd">重置客户密码</a>
+                                                    <?php } ?>
                                                     <a href="javascript:;" class="modify">密码修改</a>
                                                     <?php if ($_SESSION["Level"] == 1) { ?>
                                                         <a href="javascript:;" class="recharge">充值</a>

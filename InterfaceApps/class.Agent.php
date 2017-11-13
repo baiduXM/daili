@@ -40,7 +40,7 @@ class Agent extends InterfaceVIEWS
         if ($level == 1) {
             $DB = new DB;
             $usermodel = new AccountModule;
-            $start = ($page - 1) * $num;
+            $start = ($page - 1) * 8;
             $where = 'where Level = 2';
             $agentmsg = $usermodel->GetListsByWhere(array('AgentID', 'UserName', 'ContactName', 'ContactTel', 'ContactEmail'), $where . ' limit ' . $start . ',8');
             $num = $DB->Select('select a.BossAgentID,b.AgentID,count(b.AgentID) Num from tb_account a inner join tb_customers_project b on a.AgentID = b.AgentID group by b.AgentID');
@@ -636,6 +636,155 @@ class Agent extends InterfaceVIEWS
             $result['msg'] = '获取失败';
         }
         return $result;
+    }
+
+    //批量修改同一客服下客户的密码
+    public function BatchPwd(){
+        set_time_limit(300);
+        $agent_id = (int) $_SESSION ['AgentID'];
+        $level = $_SESSION ['Level'];
+        $id = $this->_POST['id'];
+        //根据账号等级获取用户
+        if($level == 2) {//只获取客服
+            $CustProModule = new CustProModule ();
+            //该客服下的所有的用户名
+            $gname = $CustProModule->GetListsByWhere(array('G_name') , ' where AgentID = ' . $id);            
+        } elseif($level == 1) {//获取代理商和客服
+            $AccountModule = new AccountModule ();
+            $CustProModule = new CustProModule ();
+            //该代理商下的所有客服
+            $agent = $AccountModule->GetListByBossAgentID($id , 'AgentID');
+            //代理及其所有客服的id
+            $ids[] = $id;
+            foreach ($agent as $k => $v) {
+                $ids[] = $v['AgentID'];
+            }
+            $ids_str = implode(',', $ids);                       
+            $gname = $CustProModule->GetListsByWhere(array('G_name') , ' where AgentID in(' . $ids_str . ')');             
+        } else {
+            $result['err'] = 1002;
+            $result['msg'] = '非法请求';
+            return $result;
+        }
+        //进行批量修改
+        if($gname) {
+            foreach ($gname as $k => $v) {
+                $gname[$k]['pwd'] = getstr();
+            }
+            //随机文件名开始生成
+            $randomLock = getstr();
+            $password = md5($randomLock);
+            $password = md5($password);
+
+            //生成握手密钥
+            $text = getstr();
+
+            //生成dll文件
+            $myfile = @fopen('./token/' . $password . '.dll', "w+");
+            if (!$myfile) {
+                return 0;
+            }
+            fwrite($myfile, $text);
+            fclose($myfile);
+
+            file_put_contents('filename.txt', json_encode($gname));
+            $data = array(
+                'name' => json_encode($gname),
+                'timemap' => $randomLock,
+                'taget' => md5($text . $password)
+            );
+            $url = GBAOPEN_DOMAIN . 'api/batchpwd';
+            $ReturnString = curl_post($url , $data);
+            $ReturnArray = json_decode($ReturnString, true);
+            //excel导出
+            if($ReturnArray[0]['err'] == 0){
+                $this->export($gname, $agent_id, $id);
+            }
+            $result['err'] = $ReturnArray[0]['err'];
+            $result['msg'] = $ReturnArray[0]['msg'];
+        } else {
+            $result['err'] = 1001;
+            $result['msg'] = '无相关信息';
+        }
+        return $result;
+    }
+
+    //导出Excel
+    public function export($datas, $agent_id, $id) {
+        set_time_limit(300);
+        include 'PHPExcel/PHPExcel.php';
+        include 'PHPExcel/PHPExcel/Writer/Excel2007.php';
+        $objPHPExcel = new PHPExcel();
+        //设置文档基本属性
+        $objPHPExcel->getProperties()->setCreator("agent-" . $agent_id)->setLastModifiedBy("agent-" . $agent_id)->setTitle("chpwd")->setSubject("chpwd")->setDescription("修改客服" . $id . "的客户密码")->setKeywords("客服" . $id)->setCategory("chpwd");
+        //设置单元格内容
+        $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A1', '用户名')->setCellValue('B1', '新密码');
+        //设置标题
+        $objPHPExcel->getActiveSheet()->setTitle($agent_id . '-' . $id . '-' . date('Y-m-d'));
+        //默认打开首张sheet
+        $objPHPExcel->setActiveSheetIndex(0);
+        //设置单元格默认高度
+        $objPHPExcel->getActiveSheet()->getDefaultRowDimension()->setRowHeight(15);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setAutoSize(true);
+        //设置单元格底色
+        $objPHPExcel->getActiveSheet()->getStyle('A1')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+        $objPHPExcel->getActiveSheet()->getStyle('A1')->getFill()->getStartColor()->setARGB('#FFFF66');
+        $objPHPExcel->getActiveSheet()->getStyle('B1')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+        $objPHPExcel->getActiveSheet()->getStyle('B1')->getFill()->getStartColor()->setARGB('#FFFF66');
+        $i = 2;
+        //遍历数据
+        foreach($datas as $data){
+            //设置单元格内容
+            $objPHPExcel->getActiveSheet()->setCellValue('A' . $i, $data['G_name']);
+            $objPHPExcel->getActiveSheet()->setCellValue('B' . $i, $data['pwd']);
+            $i++ ;
+        }
+
+        $filename = $agent_id . '-' . $id . '-' . date('YmdHis') . '-'. rand(10,99);//文件名:代理商-客服-日期-随机数
+        
+        header('pragma:public');
+        header('Content-type:application/vnd.ms-excel;charset=utf-8;name="'.$filename.'.xls"');
+        header("Content-Disposition:attachment;filename=".$filename. ".xls");        
+        //服务器上的保存路径
+        $root = DocumentRoot . '/../';
+        if (!is_dir($root . 'dl-chpwd'))
+            mkdir($root . 'dl-chpwd/');
+        $save = $root . 'dl-chpwd/' . $filename . '.xls';
+        //输出
+        $objWriter = new PHPExcel_Writer_Excel5($objPHPExcel);
+        $res = $objWriter->save($save);
+        // $objWriter->save('php://output');
+        ob_end_clean();//清除缓冲区,避免乱码
+
+        //存入数据库
+        $line['agent_id'] = $id; 
+        $line['excel'] = $filename; 
+        $line['type'] = 'pwd';
+        $DB = new DB ();
+        $DB ->insertArray('tb_agentFile', $line); 
+    }
+
+    //下载修改后的excel密码文件
+    public function getPwd() {
+        $id = $this->_GET['id'];
+        $DB = new DB ();
+        $file = $DB ->GetOne('select excel from tb_agentFile where type="pwd" and agent_id=' . $id . ' order by id desc');
+        $filename = $file['excel'];
+        if($filename) {
+            $path = DocumentRoot . '/../dl-chpwd/' . $filename . '.xls';
+            if(file_exists($path)) {
+                header('Content-type: application/octet-stream');
+                header('Content-Disposition: attachment; filename="' . $filename . '.xls"');
+                readfile($path);
+            } else {
+                echo '<meta charset="UTF-8"><script language="javascript">alert("文件不存在");window.history.back(-1);</script>';
+                exit();
+            }            
+        } else {
+            echo '<meta charset="UTF-8"><script language="javascript">alert("还未批量修改过");window.history.back(-1);</script>';
+            exit();
+        }
     }
 
 }
