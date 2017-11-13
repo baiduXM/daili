@@ -761,3 +761,17 @@ function jsonp($data, $type = '') {
 function GetOrderNO() {
     return date("YmdHis") . rand(100000, 999999);
 }
+
+//curl提交数据
+function curl_post($TuUrl , $post_data) {
+    $curl = curl_init();    
+    curl_setopt($curl, CURLOPT_URL, $TuUrl);                       
+    curl_setopt($curl, CURLOPT_POST, 1);     
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $post_data);         
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl, CURLOPT_TIMEOUT,300);      
+    $ReturnString = curl_exec($curl);         
+    curl_close($curl); 
+
+    return $ReturnString;
+}

@@ -100,6 +100,8 @@ $(function() {
                                     <td class="enfont">' + (v.email ? v.email : '--') + '</td>\
                                     <td><font style="color:#090">' + (v.num ? v.num : 0) + '</font></td>\
                                     <td class="text-right">\
+                                        <a href="Apps?module=Agent&action=getPwd&id=' + v.id + '" >下载修改</a>\n\
+                                        <a href="javascript:;" class="batchpwd">重置客户密码</a>\n\
                                         <a href="javascript:;" class="modify">密码修改</a>\n\
                                         ' + (result.data.del ? '<a href="javascript:;" class="delete">删除</a>' : '') + '\
                                     </td>\
@@ -263,4 +265,20 @@ $(function() {
 //        var yy = e.originalEvent.y || e.originalEvent.layerY || 0; 
 //        $(this).text(xx + '---' + yy); 
 //    }); 
+
+    //批量修改客户密码
+    $("#listtbody").on('click','.batchpwd',function(){
+        if(!confirm('确认重置')) {
+            return false;
+        }
+        var cus = $(this).parent().parent().find('input:hidden').attr('value');
+        Msg(1, '<span>正在处理，请稍等...</span><span class="flower-loader" style="opacity: 1;"></span>');
+        $.post('Apps?module=Agent&action=BatchPwd',{id : cus}, function(result){
+            if(result.err == 0) {
+                Msg(3, result.msg);
+            } else {
+                Msg(2, result.msg);
+            }
+        });
+    });
 });
