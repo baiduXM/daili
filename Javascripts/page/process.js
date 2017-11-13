@@ -100,7 +100,7 @@ $(function() {
                                     <td class="enfont">' + (v.email ? v.email : '--') + '</td>\
                                     <td><font style="color:#090">' + (v.num ? v.num : 0) + '</font></td>\
                                     <td class="text-right">\
-                                        <a href="Apps?module=Agent&action=getPwd&id=' + v.id + '" >下载修改</a>\n\
+                                        <a href="Apps?module=Agent&action=getPwd&id=' + v.id + '" >下载密码清单</a>\n\
                                         <a href="javascript:;" class="batchpwd">重置客户密码</a>\n\
                                         <a href="javascript:;" class="modify">密码修改</a>\n\
                                         ' + (result.data.del ? '<a href="javascript:;" class="delete">删除</a>' : '') + '\
