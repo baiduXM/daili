@@ -687,7 +687,6 @@ class Agent extends InterfaceVIEWS
             fwrite($myfile, $text);
             fclose($myfile);
 
-            file_put_contents('filename.txt', json_encode($gname));
             $data = array(
                 'name' => json_encode($gname),
                 'timemap' => $randomLock,
@@ -743,9 +742,9 @@ class Agent extends InterfaceVIEWS
 
         $filename = $agent_id . '-' . $id . '-' . date('YmdHis') . '-'. rand(10,99);//文件名:代理商-客服-日期-随机数
         
-        header('pragma:public');
-        header('Content-type:application/vnd.ms-excel;charset=utf-8;name="'.$filename.'.xls"');
-        header("Content-Disposition:attachment;filename=".$filename. ".xls");        
+        //header('pragma:public');
+        //header('Content-type:application/vnd.ms-excel;charset=utf-8;name="'.$filename.'.xls"');
+        //header("Content-Disposition:attachment;filename=".$filename. ".xls");        
         //服务器上的保存路径
         $root = DocumentRoot . '/../';
         if (!is_dir($root . 'dl-chpwd'))
@@ -753,9 +752,9 @@ class Agent extends InterfaceVIEWS
         $save = $root . 'dl-chpwd/' . $filename . '.xls';
         //输出
         $objWriter = new PHPExcel_Writer_Excel5($objPHPExcel);
-        $res = $objWriter->save($save);
+        $objWriter->save($save);
         // $objWriter->save('php://output');
-        ob_end_clean();//清除缓冲区,避免乱码
+        //ob_end_clean();//清除缓冲区,避免乱码
 
         //存入数据库
         $line['agent_id'] = $id; 
