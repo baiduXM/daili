@@ -18,6 +18,12 @@
                 <span>客户管理</span>
             </a>
         </li>
+        <li <?PHP if ($MyModule == 'Gcard' && $MyAction == 'Glist') { ?>class="on"<?php } ?>>
+            <a href="<?php echo UrlRewriteSimple('Gcard', 'Customer', true); ?>">
+                <i class="fa fa-bags"></i>
+                <span>G名片管理</span>
+            </a>
+        </li>
 
         <li <?PHP if ($MyModule == 'Agent' && $MyAction == 'UserInfo') { ?>class="on"<?php } ?>>
             <a href="<?php echo UrlRewriteSimple('Agent', 'UserInfo', true); ?>">
@@ -63,11 +69,23 @@
                     <span>创建G宝盆客户</span>
                 </a>
             </li>
+            <li <?PHP if ($MyModule == 'Gcard' && $MyAction == 'Build') { ?>class="on"<?php } ?>>
+                <a href="<?php echo UrlRewriteSimple('Gcard', 'Create', true); ?>">
+                    <i class="fa fa-clock"></i>
+                    <span>创建G名片客户</span>
+                </a>
+            </li>
         <?PHP } elseif ($_SESSION['Level'] == 3) { ?>
             <li <?PHP if ($MyModule == 'Gbaopen' && $MyAction == 'Create') { ?>class="on"<?php } ?>>
                 <a href="<?php echo UrlRewriteSimple('Gbaopen', 'Create', true); ?>">
                     <i class="fa fa-atm"></i>
                     <span>创建G宝盆客户</span>
+                </a>
+            </li>
+            <li <?PHP if ($MyModule == 'Gcard' && $MyAction == 'Build') { ?>class="on"<?php } ?>>
+                <a href="<?php echo UrlRewriteSimple('Gcard', 'Create', true); ?>">
+                    <i class="fa fa-clock"></i>
+                    <span>创建G名片客户</span>
                 </a>
             </li>
         <?PHP } ?>
