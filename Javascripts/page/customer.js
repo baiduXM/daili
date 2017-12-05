@@ -802,6 +802,11 @@ jQuery(document).ready(function () {
                             } else if(time_type == 1) {\n\
                                 this.pcDate = theTime;\n\
                                 this.mobileDate = theTime;\n\
+                                if(pm_type == 1) {\n\
+                                    this.mobileDate = "'+data.mobile.time+'";\n\
+                                } else if(pm_type == 2) {\n\
+                                    this.pcDate = "'+data.pc.time+'";\n\
+                                }\n\
                             }\n\
                             if( pm_type == 1) {\n\
                                 var pc_add_year = _this.year;\n\
