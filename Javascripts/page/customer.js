@@ -715,7 +715,22 @@ jQuery(document).ready(function () {
                                 <option value="10">10 - 年</option>\
                             </select>\
                         </span>\
-                    </p>' + (data.pc.exist ? '<p>\
+                    </p>\
+                    <p>\
+                        <span class="content-l">续费起始时间</span>\
+                        <span class="Input">\
+                            <input type="radio" name="time_type" value="0" checked>过期时间\
+                            <input type="radio" name="time_type" value="1">当前时间\
+                        </span>\
+                    </p>\
+                    \n\
+                    ' + (data.pc.exist && data.mobile.exist ? '<p><span class="content-l">续费类型</span>\
+                        <span class="Input">\
+                            <input type="radio" name="pm_type" value="3" checked>双站续费\
+                            <input type="radio" name="pm_type" value="1">单PC续费\
+                            <input type="radio" name="pm_type" value="2">单手机续费\
+                        </span>\
+                    </p>' : '') + (data.pc.exist ? '<p>\
                         <span class="content-l">PC续费到</span>\
                         <span><input type="text" name="pc_time" class="Input" disabled="true"></span>\
                         <span class="as"></span>\
@@ -745,15 +760,27 @@ jQuery(document).ready(function () {
                         theTime=(new Date()).Format("yyyy-MM-dd hh:mm:ss");\n\
                         this.radioCho;\n\
                         this.year\n\
-                        ;this.pcDate = "' + data.pc.time + '">theTime?"' + data.pc.time + '":theTime;\n\
-                        ;this.mobileDate = "' + data.mobile.time + '">theTime?"' + data.mobile.time + '":theTime;\n\
+                        ;this.pcDate = "' + data.pc.time + '";\n\
+                        ;this.mobileDate = "' + data.mobile.time + '";\n\
+                        if(this.pcDate == "null" || this.pcDate == "") {\n\
+                            this.pcDate = theTime;\n\
+                        }\n\
+                        if(this.mobileDate == "null" || this.mobileDate == "") {\n\
+                            this.mobileDate = theTime;\n\
+                        }\n\
                         ;this.change = function(){\n\
                             var _this = this;\n\
                             $(".userdata-content select").change(function(){\n\
                                 _this.year = $(this).children("option:selected").val();\n\
                                 _this.reset();\n\
                             });\n\
+                            $(".userdata-content input:radio[name=\'time_type\']").change(function(){\n\
+                                _this.reset();\n\
+                            });\n\
                             $(".userdata-content input:radio[name=\'capacity\']").change(function(){\n\
+                                _this.reset();\n\
+                            });\n\
+                            $(".userdata-content input:radio[name=\'pm_type\']").change(function(){\n\
                                 _this.reset();\n\
                             });\n\
                         };\n\
@@ -761,12 +788,37 @@ jQuery(document).ready(function () {
                             var _this = this;\n\
                             var newprice,newyear;\n\
                             var single_money=$("input:radio[name=\'capacity\']:checked").data("money");\n\
+                            var pm_type = $("input:radio[name=\'pm_type\']:checked").val();\n\
+                            var time_type = $("input:radio[name=\'time_type\']:checked").val();\n\
+                            if(time_type == 0) {\n\
+                                this.pcDate = "'+data.pc.time+'";\n\
+                                this.mobileDate = "'+data.mobile.time+'";\n\
+                                if(this.pcDate == "null" || this.pcDate == "" || this.pcDate == "0000-00-00 00:00:00") {\n\
+                                    this.pcDate = theTime;\n\
+                                }\n\
+                                if(this.mobileDate == "null" || this.mobileDate == "" || this.mobileDate == "0000-00-00 00:00:00") {\n\
+                                    this.mobileDate = theTime;\n\
+                                }\n\
+                            } else if(time_type == 1) {\n\
+                                this.pcDate = theTime;\n\
+                                this.mobileDate = theTime;\n\
+                            }\n\
+                            if( pm_type == 1) {\n\
+                                var pc_add_year = _this.year;\n\
+                                var mobile_add_year = 0;\n\
+                            } else if( pm_type == 2) {\n\
+                                var pc_add_year = 0;\n\
+                                var mobile_add_year = _this.year;\n\
+                            } else {\n\
+                                var pc_add_year = _this.year;\n\
+                                var mobile_add_year = _this.year;\n\
+                            }\n\
                             newyear = new Date(_this.pcDate);\n\
-                            newyear.setFullYear(parseInt(newyear.getFullYear())+parseInt(_this.year));\n\
+                            newyear.setFullYear(parseInt(newyear.getFullYear())+parseInt(pc_add_year));\n\
                             newyear = newyear.Format("yyyy-MM-dd hh:mm:ss");\n\
                             $(".userdata-content input[name=\'pc_time\']").val(newyear);\n\
                             newyear = new Date(_this.mobileDate);\n\
-                            newyear.setFullYear(parseInt(newyear.getFullYear())+parseInt(_this.year));\n\
+                            newyear.setFullYear(parseInt(newyear.getFullYear())+parseInt(mobile_add_year));\n\
                             newyear = newyear.Format("yyyy-MM-dd hh:mm:ss");\n\
                             $(".userdata-content input[name=\'mobile_time\']").val(newyear);\n\
                             newprice = single_money * _this.year;\n\
@@ -930,7 +982,7 @@ jQuery(document).ready(function () {
                     <p class="modelchoose" id="domain_outpc">\
                        <input name="outpc_add" type="checkbox"' + (data.pcdomain != 'http://' ? ' checked' : '') + '>\
                        <span class="content-l">外域PC域名</span>\
-                       <span><input type="text" name="outpcdomain" class="Input" value="' + (data.pcdomain ? data.pcdomain : 'http://') + '"></span>\
+                       <span><input type="text" name="outpcdomain" class="Input" value="' + (data.pc_out_domain ? data.pc_out_domain : data.pcdomain ?  data.pcdomain : 'http://') + '"></span>\
                         <textarea readonly="readonly" class="info" style="display:none;"></textarea>\
                         <textarea readonly="readonly" class="infoblnd" style="display:none;"><script type="text/javascript">var system ={win : false,mac : false,xll : false,ipad:false};var p = navigator.platform;system.win = p.indexOf("Win") == 0;system.mac = p.indexOf("Mac") == 0;system.x11 = (p == "X11") || (p.indexOf("Linux") == 0);system.ipad = (navigator.userAgent.match(/iPad/i) != null)?true:false;if(system.win||system.mac||system.xll||system.ipad){}else{top.location.href="$$";}<\/script></textarea>\
                         <span class="as"></span>\
@@ -938,7 +990,7 @@ jQuery(document).ready(function () {
                     <p class="modelchoose" id="domain_outmobile">\
                        <input name="outmobile_add" type="checkbox"' + (data.mobiledomain != 'http://' ? ' checked' : '') + '>\
                        <span class="content-l">外域手机域名</span>\
-                       <span><input type="text" name="outmobiledomain" class="Input" value="' + (data.mobiledomain ? data.mobiledomain : 'http://') + '"></span>\
+                       <span><input type="text" name="outmobiledomain" class="Input" value="' + (data.mobile_out_domain ? data.mobile_out_domain : data.mobiledomain ? data.mobiledomain : 'http://') + '"></span>\
                        <textarea readonly="readonly" class="info" style="display:none;"></textarea>\
                        <textarea readonly="readonly" class="infoblnd" style="display:none;"><script type="text/javascript"> var system ={ win : false, mac : false, xll : false };  var p = navigator.platform; system.win = p.indexOf("Win") == 0; system.mac = p.indexOf("Mac") == 0; system.x11 = (p == "X11") || (p.indexOf("Linux") == 0); if(system.win||system.mac||system.xll){      top.location.href="$$"; }else{ } <\/script></textarea>\
                        <span class="as">\
@@ -1400,10 +1452,14 @@ jQuery(document).ready(function () {
         if ($(this).hasClass("gorenew")) {
             var year     = $(".userdata-content select").children("option:selected").val(),
                 capacity = $(".userdata-content input[name='capacity']:checked").val(),
+                pm_type = $(".userdata-content input[name='pm_type']:checked").val(),
+                time_type = $(".userdata-content input[name='time_type']:checked").val(),
                 money    = $(".userdata-content input[name='money']").val();
             $.post("Apps?module=Gbaopen&action=Renew", {
                 num: number,
                 capacity: capacity,
+                pm_type: pm_type,
+                time_type: time_type,
                 price: money,
                 yearnum: year
             }, function (result) {
