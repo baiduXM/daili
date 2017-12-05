@@ -368,9 +368,18 @@ class Gbaopen extends InterfaceVIEWS
                             $data['type'] = $cuspro['CPhone'];
                             $data['name'] = $cus['CompanyName'];
                             $data['capacity'] = (int)$cuspro['Capacity'];
+                            //模板价格
+                            $pc_price = $model->GetOneByWhere(array('Price', 'Youhui'), 'where NO=\'' . $cuspro['PC_model'] . '\'');
+                            if(!$pc_price) {
+                                $pc_price = $model->GetOneByWhere(array('Price', 'Youhui'), 'where NO_bak=\'' . $cuspro['PC_model'] . '\'');
+                            }
+                            $mobile_price = $model->GetOneByWhere(array('Price', 'Youhui'), 'where NO=\'' . $cuspro['Mobile_model'] . '\'');
+                            if(!$mobile_price) {
+                                $mobile_price = $model->GetOneByWhere(array('Price', 'Youhui'), 'where NO_bak=\'' . $cuspro['Mobile_model'] . '\'');
+                            }
                             switch ($cuspro['CPhone']) {
                                 case 4:
-                                    $pc_price = $mobile_price = array();
+                                    // $pc_price = $mobile_price = array();
                                     $price = $package->GetOneByWhere(array('Price', 'Youhui', 'PCNum', 'PhoneNum'), 'where PackagesNum=\'' . $cuspro['PK_model'] . '\'');
                                     if ($price) {
                                         $data['state'] = 1;
@@ -380,8 +389,7 @@ class Gbaopen extends InterfaceVIEWS
                                     } else {
                                         $exist = false;
                                     }
-                                    $pc_price = $model->GetOneByWhere(array('Price', 'Youhui'), 'where NO=\'' . $cuspro['PC_model'] . '\'');
-                                    $mobile_price = $model->GetOneByWhere(array('Price', 'Youhui'), 'where NO=\'' . $cuspro['Mobile_model'] . '\'');
+                                    
                                     $data['package'] = array('exist' => $exist, 'name' => $cuspro['PK_model'], 'pc' => $price['PCNum'], 'mobile' => $price['PhoneNum'], 'price' => $price['Price'], 'youhui' => $price['Youhui']);
                                     $exist = $pc_price ? true : false;
                                     $data['pc'] = array('exist' => $exist, 'name' => $cuspro['PC_model'], 'price' => $pc_price['Price'], 'youhui' => $pc_price['Youhui'], 'time' => $cuspro['PC_EndTime']);
@@ -389,8 +397,7 @@ class Gbaopen extends InterfaceVIEWS
                                     $data['mobile'] = array('exist' => $exist, 'name' => $cuspro['Mobile_model'], 'price' => $mobile_price['Price'], 'youhui' => $mobile_price['Youhui'], 'time' => $cuspro['Mobile_EndTime']);
                                     break;
                                 case 3:
-                                    $pc_price = $model->GetOneByWhere(array('Price', 'Youhui'), 'where NO=\'' . $cuspro['PC_model'] . '\'');
-                                    $mobile_price = $model->GetOneByWhere(array('Price', 'Youhui'), 'where NO=\'' . $cuspro['Mobile_model'] . '\'');
+                                    
                                     $exist = $pc_price ? true : false;
                                     $data['pc'] = array('exist' => $exist, 'name' => $cuspro['PC_model'], 'price' => $pc_price['Price'], 'youhui' => $pc_price['Youhui'], 'time' => $cuspro['PC_EndTime']);
                                     $exist = $mobile_price ? true : false;
@@ -398,14 +405,14 @@ class Gbaopen extends InterfaceVIEWS
                                     $data['package'] = array('exist' => false);
                                     break;
                                 case 2:
-                                    $mobile_price = $model->GetOneByWhere(array('Price', 'Youhui'), 'where NO=\'' . $cuspro['Mobile_model'] . '\'');
+                                    
                                     $data['pc'] = array('exist' => false);
                                     $exist = $mobile_price ? true : false;
                                     $data['mobile'] = array('exist' => $exist, 'name' => $cuspro['Mobile_model'], 'price' => $mobile_price['Price'], 'youhui' => $mobile_price['Youhui'], 'time' => $cuspro['Mobile_EndTime']);
                                     $data['package'] = array('exist' => false);
                                     break;
                                 case 1:
-                                    $pc_price = $model->GetOneByWhere(array('Price', 'Youhui'), 'where NO=\'' . $cuspro['PC_model'] . '\'');
+                                    
                                     $exist = $pc_price ? true : false;
                                     $data['pc'] = array('exist' => $exist, 'name' => $cuspro['PC_model'], 'price' => $pc_price['Price'], 'youhui' => $pc_price['Youhui'], 'time' => $cuspro['PC_EndTime']);
                                     $data['mobile'] = array('exist' => false);
@@ -488,7 +495,7 @@ class Gbaopen extends InterfaceVIEWS
                     if ($this->Assess($power, $this->process)) {
                         $cuspromodel = new CustProModule;
                         $fuwuqi = new FuwuqiModule();
-                        $lists = array('G_name', 'CPhone', 'PK_model', 'PC_model', 'Mobile_model', 'Link_Cus', 'PC_AddTime', 'Mobile_AddTime', 'PC_StartTime', 'Mobile_StartTime', 'PC_domain', 'Mobile_domain', 'Customization', 'FuwuqiID' , 'column_on');
+                        $lists = array('G_name', 'CPhone', 'PK_model', 'PC_model', 'Mobile_model', 'Link_Cus', 'PC_AddTime', 'Mobile_AddTime', 'PC_StartTime', 'Mobile_StartTime', 'PC_domain', 'Mobile_domain', 'Customization', 'FuwuqiID' , 'column_on' , 'pc_out_domain' , 'mobile_out_domain' );
                         $cuspro = $cuspromodel->GetOneByWhere($lists, 'where CustomersID=' . $cus_id);
                         if ($cuspro) {
                             if ($cuspro['FuwuqiID']) {
@@ -529,6 +536,8 @@ class Gbaopen extends InterfaceVIEWS
                                           'mobiledomain'     => $cuspro['Mobile_domain'] ? $cuspro['Mobile_domain'] : '',
                                           'senior'           => $cuspro['Customization'],
                                           'column_on'        => $cuspro['column_on'],
+                                          'pc_out_domain'    => $cuspro['pc_out_domain'],
+                                          'mobile_out_domain' => $cuspro['mobile_out_domain'],
                                           'othercus'         => $cuspro['Link_Cus']);
                             $result['data'] = $data;
                         } else {
@@ -564,6 +573,8 @@ class Gbaopen extends InterfaceVIEWS
         $cus_id = (int)$this->_POST['num'];
         $addyear = intval($this->_POST['yearnum']);
         $capacity = intval($this->_POST['capacity']);
+        $pm_type = $this->_POST['pm_type'] ? intval($this->_POST['pm_type']) : 3;//续费类型，1-单PC，2单手机；没有默认为3
+        $time_type = intval($this->_POST['time_type']);//续费起始时间，0-过期时间，1-当前时间
         if ($cus_id && $this->Assess($power, $this->renew) && $addyear > 0) {
             $agent = new AccountModule;
             $cusmodel = new CustomersModule;
@@ -747,16 +758,36 @@ class Gbaopen extends InterfaceVIEWS
                 }
                 //PC续费处理
                 $cuspro_time = array('UpdateTime' => date('Y-m-d H:i:s', time()));
-                if ($type == 1 or $type == 3 or $type == 4) {
-                    $nowyear = (strtotime($cuspro['PC_EndTime']) > time()) ? strtotime($cuspro['PC_EndTime']) : time();
+                if (($type == 1 or $type == 3 or $type == 4) && ($pm_type == 1 or $pm_type == 3)) {
+                    // $nowyear = (strtotime($cuspro['PC_EndTime']) > time()) ? strtotime($cuspro['PC_EndTime']) : time();
 //                    $newyear = (date('Y', $nowyear) + $addyear) . '-' . date('m-d H:i:s', $nowyear);
+                    if($time_type == 0) {//从过期时间开始续费
+                        //没有PC过期时间从当前时间开始
+                        if(!$cuspro['PC_EndTime'] or $cuspro['PC_EndTime'] != '0000-00-00 00:00:00') {
+                            $nowyear = strtotime($cuspro['PC_EndTime']);
+                        } else {
+                            $nowyear = time();
+                        }
+                    } elseif ($time_type == 1) {//从当前时间开始
+                        $nowyear = time();
+                    }
                     $newyear = date('Y-m-d H:i:s', strtotime('+' . $addyear . ' year', $nowyear));
 
                     $cuspro_time['PC_EndTime'] = $newyear;
                 }
-                if ($type == 2 or $type == 3 or $type == 4) {
-                    $nowyear = (strtotime($cuspro['Mobile_EndTime']) > time()) ? strtotime($cuspro['Mobile_EndTime']) : time();
+                if (($type == 2 or $type == 3 or $type == 4) && ($pm_type == 2 or $pm_type == 3)) {
+                    // $nowyear = (strtotime($cuspro['Mobile_EndTime']) > time()) ? strtotime($cuspro['Mobile_EndTime']) : time();
 //                    $newyear = (date('Y', $nowyear) + $addyear) . '-' . date('m-d H:i:s', $nowyear);
+                    if($time_type == 0) {//从过期时间开始续费
+                        //没有手机过期时间从当前时间开始
+                        if(!$cuspro['Mobile_EndTime'] or $cuspro['Mobile_EndTime'] != '0000-00-00 00:00:00') {
+                            $nowyear = strtotime($cuspro['Mobile_EndTime']);
+                        } else {
+                            $nowyear = time();
+                        }
+                    } elseif ($time_type == 1) {//从当前时间开始续费
+                        $nowyear = time();
+                    }
                     $newyear = date('Y-m-d H:i:s', strtotime('+' . $addyear . ' year', $nowyear));
                     $cuspro_time['Mobile_EndTime'] = $newyear;
                 }
@@ -1082,8 +1113,12 @@ class Gbaopen extends InterfaceVIEWS
                         return $result;
                     }
                     $Data['Mobile_model'] = 0;
-                    $Data['Mobile_domain'] = $post['outmobile_add'] ? 'http://' . str_replace('http://', '', $post['outmobiledomain']) : '';
-                    $Data['Mobile_domain'] = $Data['Mobile_domain'] ? str_replace(' ', '', $Data['Mobile_domain']) : '';
+                    //PC站域名处理
+                    $Data['Mobile_domain'] = '';//手机站域名置空
+                    $Data['pc_out_domain'] = '';//PC站外域名置空
+                    //手机外域名
+                    $Data['mobile_out_domain'] = $post['outmobile_add'] ? 'http://' . str_replace('http://', '', $post['outmobiledomain']) : '';
+                    $Data['mobile_out_domain'] = $Data['mobile_out_domain'] ? str_replace(' ', '', $Data['mobile_out_domain']) : '';
                 } else {
                     $result['err'] = 1002;
                     $result['msg'] = '当前PC模板不存在';
@@ -1100,8 +1135,12 @@ class Gbaopen extends InterfaceVIEWS
                 $Data['Mobile_model'] = $post['mobilemodel'];
                 if ($this->GetModleIDByName($Data['Mobile_model']) > 0) {
                     $Data['PC_model'] = 0;
-                    $Data['PC_domain'] = $post['outpc_add'] ? 'http://' . str_replace('http://', '', $post['outpcdomain']) : '';
-                    $Data['PC_domain'] = str_replace(' ', '', $Data['PC_domain']);
+                    //手机站域名处理
+                    $Data['PC_domain'] = '';//PC站域名置空
+                    $Data['mobile_out_domain'] = '';//手机站外域名置空
+                    //PC外域名
+                    $Data['pc_out_domain'] = $post['outpc_add'] ? 'http://' . str_replace('http://', '', $post['outpcdomain']) : '';
+                    $Data['pc_out_domain'] = str_replace(' ', '', $Data['pc_out_domain']);
                     if ($post['mobiledomain']) {
                         $Data['Mobile_domain'] = 'http://' . str_replace('http://', '', $post['mobiledomain']);
                         $Data['Mobile_domain'] = str_replace(' ', '', $Data['Mobile_domain']);
@@ -1147,6 +1186,9 @@ class Gbaopen extends InterfaceVIEWS
                     $result['msg'] = '当前手机模板不存在';
                     return $result;
                 }
+                //双站外域名
+                $Data['pc_out_domain'] = '';
+                $Data['mobile_out_domain'] = '';
             } else {
                 $Data['CPhone'] = 4;
                 $Data['PK_model'] = $post['pkmodel'];
@@ -1188,6 +1230,9 @@ class Gbaopen extends InterfaceVIEWS
                     $result['msg'] = '当前套餐模板不存在';
                     return $result;
                 }
+                //套餐站外域名
+                $Data['pc_out_domain'] = '';
+                $Data['mobile_out_domain'] = '';
             }
 //            $ordermodule = new OrderModule();
 //            $order_data = $ordermodule->GetOneInfoByKeyID($cuspro["OrderID"]);
@@ -1467,7 +1512,7 @@ class Gbaopen extends InterfaceVIEWS
                                 }else{
                                     $Data['PC_domain'] = 'http://' . $pc_domain;
                                 }
-                                $this->mobile_domain = '';
+                                $this->mobile_domain = '';//35多个域名字符串
                             }
                             
                         } else {
@@ -1476,9 +1521,13 @@ class Gbaopen extends InterfaceVIEWS
                             return $result;
                         }
                         $Data['Mobile_model'] = 0;
+                        //PC站域名处理
+                        $Data['Mobile_domain'] = '';//手机站域名置空
+                        $Data['pc_out_domain'] = '';//PC站外域名置空
                         if ($post['outmobile_add']) {
-                            $Data['Mobile_domain'] = 'http://' . str_replace('http://', '', $post['outmobiledomain']);
-                            $Data['Mobile_domain'] = str_replace(' ', '', $Data['Mobile_domain']);
+                            //手机站外域名
+                            $Data['mobile_out_domain'] = 'http://' . str_replace('http://', '', $post['outmobiledomain']);
+                            $Data['mobile_out_domain'] = str_replace(' ', '', $Data['mobile_out_domain']);
                         }
                     } else {
                         $result['err'] = 1002;
@@ -1498,9 +1547,13 @@ class Gbaopen extends InterfaceVIEWS
                     $modelMsg = $this->GetModleIDByName($Data['Mobile_model']);
                     if (is_array($modelMsg)) {
                         $Data['PC_model'] = 0;
+                        //手机站域名处理
+                        $Data['PC_domain'] = '';//PC站域名置空
+                        $Data['mobile_out_domain'] = '';//手机站外域名置空
                         if ($post['outpc_add']) {
-                            $Data['PC_domain'] = 'http://' . str_replace('http://', '', $post['outpcdomain']);
-                            $Data['PC_domain'] = str_replace(' ', '', $Data['PC_domain']);
+                            //PC站外域名
+                            $Data['pc_out_domain'] = 'http://' . str_replace('http://', '', $post['outpcdomain']);
+                            $Data['pc_out_domain'] = str_replace(' ', '', $Data['pc_out_domain']);
                         }
                         if ($post['mobiledomain']) {
                             if($post['ftp_c'] != 2){
@@ -1587,6 +1640,10 @@ class Gbaopen extends InterfaceVIEWS
                     }
                     //pc+手机 总价格
                     $price += $modelMsg['Youhui'];
+
+                    //双站外域名置空
+                    $Data['pc_out_domain'] ='';
+                    $Data['mobile_out_domain'] ='';
                 } else {
                     $Data['CPhone'] = 4;
                     $Data['PK_model'] = $post['pkmodel'];
@@ -1648,7 +1705,12 @@ class Gbaopen extends InterfaceVIEWS
                     }
                     //模板价格
                     $price = $modelMsg['Youhui'];
+
+                    //套餐站外域名置空
+                    $Data['pc_out_domain'] ='';
+                    $Data['mobile_out_domain'] ='';
                 }
+                // $Data['mobile_other'] = $this->mobile_domain;
                 //FTP处理
                 if ($post['ftp_c'] == 1) {
                     $FuwiqiModule = new FuwuqiModule ();
@@ -2059,6 +2121,8 @@ class Gbaopen extends InterfaceVIEWS
         $ToString .= '&switch_cus_name=' . $CustProInfo ['Link_Cus'];
         $ToString .= '&status=' . $CustProInfo ['status'];
         $ToString .= '&column_on=' . $CustProInfo ['column_on'];
+        $ToString .= '&pc_out_domain=' . $CustProInfo ['pc_out_domain'];//手机站PC外域名
+        $ToString .= '&mobile_out_domain=' . $CustProInfo ['mobile_out_domain'];//PC站手机外域名
         $ToString .= '&mobile_other=' . $this->mobile_domain;
         if (isset($_POST["password"]) && !empty($_POST["password"])) {
             $ToString .= '&password=' . $_POST["password"];
