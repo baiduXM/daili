@@ -763,10 +763,10 @@ class Gbaopen extends InterfaceVIEWS
 //                    $newyear = (date('Y', $nowyear) + $addyear) . '-' . date('m-d H:i:s', $nowyear);
                     if($time_type == 0) {//从过期时间开始续费
                         //没有PC过期时间从当前时间开始
-                        if(!$cuspro['PC_EndTime'] or $cuspro['PC_EndTime'] != '0000-00-00 00:00:00') {
-                            $nowyear = strtotime($cuspro['PC_EndTime']);
-                        } else {
+                        if(!$cuspro['PC_EndTime'] or $cuspro['PC_EndTime'] == '0000-00-00 00:00:00') {
                             $nowyear = time();
+                        } else {
+                            $nowyear = strtotime($cuspro['PC_EndTime']);                            
                         }
                     } elseif ($time_type == 1) {//从当前时间开始
                         $nowyear = time();
@@ -780,10 +780,10 @@ class Gbaopen extends InterfaceVIEWS
 //                    $newyear = (date('Y', $nowyear) + $addyear) . '-' . date('m-d H:i:s', $nowyear);
                     if($time_type == 0) {//从过期时间开始续费
                         //没有手机过期时间从当前时间开始
-                        if(!$cuspro['Mobile_EndTime'] or $cuspro['Mobile_EndTime'] != '0000-00-00 00:00:00') {
-                            $nowyear = strtotime($cuspro['Mobile_EndTime']);
-                        } else {
+                        if(!$cuspro['Mobile_EndTime'] or $cuspro['Mobile_EndTime'] == '0000-00-00 00:00:00') {
                             $nowyear = time();
+                        } else {
+                            $nowyear = strtotime($cuspro['Mobile_EndTime']);                            
                         }
                     } elseif ($time_type == 1) {//从当前时间开始续费
                         $nowyear = time();
