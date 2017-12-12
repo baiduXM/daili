@@ -119,6 +119,8 @@ jQuery(document).ready(function() {
                         v.price = v.price ? v.price : 0;
                         modelList += '<tr><!--<td><input type="checkbox" name="ID"></td>-->\
                                 <td class="text-left"><a href="javascript:;" class="dName modify">' + v.name + '</a></td>\
+                                <td>' + v.name_bak + '</td>\
+                                <td>' + v.cusNum + '</td>\
                                 <td class="poptip"><font class="orange"><a href="' + v.url[0] + '" target="_blank">' + v.url[0] + '</a></font>' + (v.url[1] ? '<div class="popfrm"><b class="phpicn">◆</b><p>' + v.url[1] + '</p></div>' : '') + '</td>\
                                 <td class="poptip">' + v.youhui + '<div class="popfrm"><b class="phpicn">◆</b><p class="strickout">' + v.price + '</p></div></td>'
                                 +(_this.listID!=3?('<td class="devname">' + v.devname + '</td>'):'')+

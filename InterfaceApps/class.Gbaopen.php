@@ -1093,6 +1093,33 @@ class Gbaopen extends InterfaceVIEWS
             //模板号域名处理
             $Model = new ModelModule();
             $Data['CPhone'] = $post['pc_mobile'];
+            //更改套餐时的时间处理
+            if($cuspro['CPhone'] != $Data['CPhone']) {//套餐发生是否更改
+                //PC添加时间为空，则设置为当前时间
+                if(!$cuspro['PC_AddTime'] or $cuspro['PC_AddTime'] == '0000-00-00 00:00:00') {
+                    $Data['PC_AddTime'] = date('Y-m-d H:i:s' , time());
+                }
+                //PC开始时间为空，则设置为当前时间
+                if(!$cuspro['PC_StartTime'] or $cuspro['PC_StartTime'] == '0000-00-00 00:00:00') {
+                    $Data['PC_StartTime'] = date('Y-m-d H:i:s' , time());
+                }
+                //PC过期时间为空，则设置为一年后过期
+                if(!$cuspro['PC_EndTime'] or $cuspro['PC_EndTime'] == '0000-00-00 00:00:00') {
+                    $Data['PC_EndTime'] = date('Y-m-d H:i:s' , strtotime('+1 year'));
+                }
+                //手机添加时间为空，则设置为当前时间
+                if(!$cuspro['Mobile_AddTime'] or $cuspro['Mobile_AddTime'] == '0000-00-00 00:00:00') {
+                    $Data['Mobile_AddTime'] = date('Y-m-d H:i:s' , time());
+                }
+                //手机开始时间为空，则设置为当前时间
+                if(!$cuspro['Mobile_StartTime'] or $cuspro['Mobile_StartTime'] == '0000-00-00 00:00:00') {
+                    $Data['Mobile_StartTime'] = date('Y-m-d H:i:s' , time());
+                }                
+                //手机过期时间为空，则设置为一年后过期
+                if(!$cuspro['Mobile_EndTime'] or $cuspro['Mobile_EndTime'] == '0000-00-00 00:00:00') {
+                    $Data['Mobile_EndTime'] = date('Y-m-d H:i:s' , strtotime('+1 year'));
+                }
+            }
             $Data['Customization'] = $post['senior'];
             if ($Data['CPhone'] == 1) {
                 if ($Data['Customization'] != 1 && $Data['Customization'] != 0) {

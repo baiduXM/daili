@@ -60,6 +60,8 @@
                                             <tr>
                                             <!--<th width="5%"><input type="checkbox"></th>-->
                                                 <th class="text-left">模板名称</th>
+                                                <th>模板旧编号</th>
+                                                <th>使用人数</th>
                                                 <th>模板网址</th>
                                                 <th>优惠价</th>
                                                 <th class="devname">开发人员</th>

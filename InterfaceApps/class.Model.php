@@ -272,8 +272,8 @@ class Model extends InterfaceVIEWS
         $search = '';
         $search_model = $search_package = array();
         if ($this->_GET['name'] != '' || $this->_GET['url'] != '' || $this->_GET['priceL'] != '' || $this->_GET['priceT'] != '') {
-            $this->_GET['name'] ? $search_model[] = 'NO LIKE \'%' . $this->_GET['name'] . '%\'' : '';
-            $this->_GET['name'] ? $search_package[] = 'PackagesNum LIKE \'%' . $this->_GET['name'] . '%\'' : '';
+            $this->_GET['name'] ? $search_model[] = '(NO LIKE \'%' . $this->_GET['name'] . '%\' or NO_bak LIKE \'%'. $this->_GET['name'] .'%\')' : '';
+            $this->_GET['name'] ? $search_package[] = '(PackagesNum LIKE \'%' . $this->_GET['name'] . '%\' or PackagesNum_bak LIKE \'%' . $this->_GET['name'] . '%\')' : '';
             $this->_GET['url'] ? $search_model[] = 'Url LIKE \'%' . $this->_GET['url'] . '%\'' : '';
             $this->_GET['url'] ? $search_package[] = '(PCUrl LIKE \'%' . $this->_GET['url'] . '%\' or PhoneUrl LIKE \'%' . $this->_GET['url'] . '%\')' : '';
             $this->_GET['priceL'] ? $search_model[] = 'Youhui>' . $this->_GET['priceL'] : '';
@@ -317,15 +317,31 @@ class Model extends InterfaceVIEWS
                 $data = false;
                 break;
         }
+        $cuspro = new CustProModule();
         foreach ($modelList as $k => $v) {
             $data[$k]['name'] = $v['NO'] ? $v['NO'] : $v['PackagesNum'];
+            $data[$k]['name_bak'] = $v['NO_bak'] ? $v['NO_bak'] : $v['PackagesNum_bak'];//旧编号
+            if( $data[$k]['name'] == $data[$k]['name_bak'] or !$data[$k]['name_bak']) {
+                //新旧编号相等或没有旧编号
+                $data[$k]['name_bak'] = '--';
+            }
             if ($type != 3) {
                 $data[$k]['url'][] = $v['Url'];
                 $data[$k]['url'][] = false;
+                //PC手机模板使用次数的条件语句
+                if($type == 1) {
+                    $MysqlWhere = ' where PC_model LIKE "%'. $data[$k]['name'] .'%" or PC_model LIKE "%'. $data[$k]['name_bak'] .'%"';
+                } elseif($type == 2) {
+                    $MysqlWhere = ' where Mobile_model LIKE "%'. $data[$k]['name'] .'%" or Mobile_model LIKE "%'. $data[$k]['name_bak'] .'%"';
+                }                
             } else {
                 $data[$k]['url'][] = $v['PCUrl'] ? $v['PCUrl'] : '--';
                 $data[$k]['url'][] = $v['PhoneUrl'] ? $v['PhoneUrl'] : '--';
+                //双站模板使用次数的条件语句
+                $MysqlWhere = ' where PK_model LIKE "%'. $data[$k]['name'] .'%" or PK_model LIKE "%'. $data[$k]['name_bak'] .'%"';
             }
+            $cusNum = $cuspro->GetListsNum($MysqlWhere);
+            $data[$k]['cusNum'] = $cusNum['Num'];//模板使用次数
             $data[$k]['youhui'] = $v['Youhui'];
             $data[$k]['price'] = $v['Price'];
             $data[$k]['tuijian'] = $v['TuiJian'];
@@ -349,8 +365,8 @@ class Model extends InterfaceVIEWS
         $search = '';
         $search_model = $search_package = array();
         if ($this->_GET['name'] != '' || $this->_GET['url'] != '' || $this->_GET['priceL'] != '' || $this->_GET['priceT'] != '') {
-            $this->_GET['name'] ? $search_model[] = 'NO LIKE \'%' . $this->_GET['name'] . '%\'' : '';
-            $this->_GET['name'] ? $search_package[] = 'PackagesNum LIKE \'%' . $this->_GET['name'] . '%\'' : '';
+            $this->_GET['name'] ? $search_model[] = '(NO LIKE \'%' . $this->_GET['name'] . '%\' or NO_bak LIKE \'%' . $this->_GET['name'] . '%\')' : '';
+            $this->_GET['name'] ? $search_package[] = '(PackagesNum LIKE \'%' . $this->_GET['name'] . '%\' or PackagesNum_bak LIKE \'%' . $this->_GET['name'] . '%\')' : '';
             $this->_GET['url'] ? $search_model[] = 'Url LIKE \'%' . $this->_GET['url'] . '%\'' : '';
             $this->_GET['url'] ? $search_package[] = '(PCUrl LIKE \'%' . $this->_GET['url'] . '%\' or PhoneUrl LIKE \'%' . $this->_GET['url'] . '%\')' : '';
             $this->_GET['priceL'] ? $search_model[] = 'Youhui>' . $this->_GET['priceL'] : '';
