@@ -909,7 +909,6 @@ class Gbaopen extends InterfaceVIEWS
                     $str .= '&gq_time=' . $cuspro_time['PC_EndTime'];
                     $str .= '&id=' . $cus_id;
                     $Coupons = curl_post($TuUrl , $str);
-                    file_put_contents('filename.html', $Coupons);
                 }
                 if($cuspro['CaseImageMobile'] && isset($cuspro_time['Mobile_EndTime'])) {
                     $str = '';//重新赋值
@@ -919,7 +918,6 @@ class Gbaopen extends InterfaceVIEWS
                     $str .= '&gq_time=' . $cuspro_time['Mobile_EndTime'];
                     $str .= '&id=' . $cus_id;
                     $Coupons = curl_post($TuUrl , $str);
-                    file_put_contents('filename1.html', $Coupons);
                 }
 
                 $CustProModule = new CustProModule();//可注释？
