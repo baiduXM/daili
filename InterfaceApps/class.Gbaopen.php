@@ -183,13 +183,19 @@ class Gbaopen extends InterfaceVIEWS
             $time = time() . getstr();
             /* 搜集需要删除的图片地址 */
             $del = array();
-            $caseimg = $cuspro->GetOneByWhere(array('CaseImagePC', 'CaseImageMobile', 'CustomersID', 'CPhone'), ' where CustomersID=' . $cus_id);
-            if ($area_id != 0) {
+            $caseimg = $cuspro->GetOneByWhere(' where CustomersID=' . $cus_id);
+            if ($area_id != 0) {//开启案例
                 if ($this->_POST['type']) {
                     $caseType = $this->_POST['type'] == 1 ? 'PC' : 'Mobile';
                 } else
                     $caseType = $caseimg['CPhone'] == 1 ? 'PC' : 'Mobile';
                 $caseType = 'CaseImage' . $caseType;
+                //对于官网，是否新增
+                if(!$caseimg[$caseType]) {
+                    $is_new = true;//新增
+                } else {
+                    $is_new = false;//修改
+                }
                 $caseimg[$caseType] = explode(',', $caseimg[$caseType]);
                 $count = count($caseimg[$caseType]);
                 $color = $this->_POST['color'];
@@ -217,7 +223,7 @@ class Gbaopen extends InterfaceVIEWS
                             $filetype = pathinfo($filename, PATHINFO_EXTENSION);
                             if (in_array($filetype, array('jpg', 'png', 'gif', 'jpeg', 'bmp'))) {
                                 $newname = $time . '_s.' . $filetype;
-                                $cuspro->UpdateArray(array('Cases' => $area_id . '-' . $areaName['AreaName'], $caseType => $newname), $cus_id);
+                                $cuspro->UpdateArray(array('Cases' => $area_id . '-' . $areaName['AreaName'], $caseType => $newname), $cus_id);//可注释？
                                 $result['data']['place'] = $areaName['AreaName'];
                                 $simg = 'cus_cases/' . $newname;
                                 $del['now'] = IMG_PICPUT . $simg;
@@ -235,7 +241,7 @@ class Gbaopen extends InterfaceVIEWS
                         if (!$needfile) {
                             $img = $caseimg[$caseType][$count - 1];
                         } else {
-                            $del['now'] ? @unlink($del['now']) : '';
+                            $del['now'] ? @unlink($del['now']) : '';//案例开启失败，删掉上传成功的缩略图，避免多余
                             $result["err"] = 1001;
                             $result["msg"] = '请上传网站截图';
                             return $result;
@@ -251,7 +257,7 @@ class Gbaopen extends InterfaceVIEWS
                             $filetype = pathinfo($filename, PATHINFO_EXTENSION);
                             if (in_array($filetype, array('jpg', 'png', 'gif', 'jpeg', 'bmp'))) {
                                 $newname = 'cus_cases/' . $time . '.' . $filetype;
-                                $cuspro->UpdateArray(array('Cases' => $area_id . '-' . $areaName['AreaName'], $caseType => $newname), $cus_id);
+                                $cuspro->UpdateArray(array('Cases' => $area_id . '-' . $areaName['AreaName'], $caseType => $newname), $cus_id);//可注释？
                                 $result['data']['place'] = $areaName['AreaName'];
                                 $img = IMG_PICPUT . $newname;
                                 $needfile ? '' : @unlink($caseimg[$caseType][$count - 1]);
@@ -266,14 +272,65 @@ class Gbaopen extends InterfaceVIEWS
                             }
                         }
                     }
-                    $cuspro->UpdateArray(array('Cases' => $area_id . '-' . $areaName['AreaName'], $caseType => $casedata . $simg . ',' . $img), $cus_id);
-                    $result['data']['place'] = $areaName['AreaName'];
-                    $result["msg"] = "文件上传成功";
+                    $str = '';//发送给官网的数据
+                    if($is_new) {
+                        $str .= 'res_Model=1';//新增
+                    } else {
+                        $str .= 'res_Model=2';//修改
+                    }                    
+                    $model = new ModelModule;
+                    if($caseType == 'CaseImagePC') {//PC案例                        
+                        $str .= '&url=' . $caseimg['PC_domain'];//案例地址
+                        $str .= '&gq_time=' . $caseimg['PC_EndTime'];//PC站过期时间
+                        $str .= '&pc_mobile=1';//类型-1-PC
+                        if (preg_match('/G\d{4}P(CN|EN|TW|JP)\d{2}/', $caseimg['PC_model'])) {
+                            $pc = $model->GetOneByWhere(array('ModelLan', 'Language'), 'where NO=\'' . $caseimg['PC_model'] . '\'');
+                            $str .= '&code=' . $caseimg['PC_model'];//模板编号
+                        } else {
+                            $pc = $model->GetOneByWhere(array('NO', 'ModelLan', 'Language'), 'where NO_bak=\'' . $caseimg['PC_model'] . '\'');
+                            $str .= '&code=' . $pc['NO'];//模板编号
+                        }
+                        $str .= '&lang=' . $pc['Language'];//编程语言
+                        $str .= '&type=' . $pc['ModelLan'];//中英文
+                    } elseif($caseType == 'CaseImageMobile') {//手机案例
+                        $str .= '&url=' . $caseimg['Mobile_domain'];//案例地址
+                        $str .= '&gq_time=' . $caseimg['Mobile_EndTime'];//PC站过期时间
+                        $str .= '&pc_mobile=2';//类型-2-手机
+                        if (preg_match('/G\d{4}M(CN|EN|TW|JP)\d{2}/', $caseimg['Mobile_model'])) {
+                            $mobile = $model->GetOneByWhere(array('ModelLan', 'Language'), 'where NO=\'' . $caseimg['Mobile_model'] . '\'');
+                            $str .= '&code=' . $caseimg['Mobile_model'];//模板编号
+                        } else {
+                            $mobile = $model->GetOneByWhere(array('NO', 'ModelLan', 'Language'), 'where NO_bak=\'' . $caseimg['Mobile_model'] . '\'');
+                            $str .= '&code=' . $mobile['NO'];//模板编号
+                        }
+                        $str .= '&lang=' . $mobile['Language'];//编程语言
+                        $str .= '&type=' . $mobile['ModelLan'];//中英文
+                    }
+                    $str .= '&area=' . $areaName['AreaName'];//地区
+                    $str .= '&img=' . IMG_DOMAIN . $img;//网站截图
+                    $str .= '&simg=' . IMG_DOMAIN . $simg;//网站缩略图
+                    $str .= '&color=' . $color;//颜色
+                    $str .= '&id=' . $cus_id;//用户ID
+                    $customer = new CustomersModule;
+                    $cus = $customer->GetOneByWhere(array('CompanyName'), ' where CustomersID=' . $cus_id);
+                    $str .= '&name=' . $cus['CompanyName'];//公司名
+
+                    $TuUrl = GUANWANG_DOMAIN . 'caseSQL.php';//官网接口文件
+                    $Coupons = curl_post($TuUrl, $str);
+                    
+                    if($Coupons == 1000) {
+                        $cuspro->UpdateArray(array('Cases' => $area_id . '-' . $areaName['AreaName'], $caseType => $casedata . $simg . ',' . $img), $cus_id);
+                        $result['data']['place'] = $areaName['AreaName'];
+                        $result["msg"] = "文件上传成功";
+                    } else {
+                        $result["err"] = $Coupons;
+                        $result["msg"] = '官网同步失败';
+                    }                    
                 } else {
                     $result["err"] = 1003;
                     $result["msg"] = '非法操作';
                 }
-            } else {
+            } else {//关闭案例
                 $caseType = $this->_POST['type'] != 0 ? $this->_POST['type'] == 1 ? 1 : 2 : 3;
                 $state = $this->_POST['type'] == 0 ? true : false;
                 $result['data']['state'] = $state;
@@ -297,12 +354,27 @@ class Gbaopen extends InterfaceVIEWS
                         }
                     }
                 }
-                if ($caseType & 1 && $caseType & 2) {
-                    $cuspro->UpdateArray(array('Cases' => 0, 'CaseImagePC' => 0, 'CaseImageMobile' => 0), $cus_id);
-                } elseif ($caseType & 1)
-                    $cuspro->UpdateArray(array('CaseImagePC' => 0), $cus_id);
-                else
-                    $cuspro->UpdateArray(array('CaseImageMobile' => 0), $cus_id);
+
+                //发送给官网的数据
+                $str = '';
+                $str .= 'res_Model=3'; 
+                $str .= '&pc_mobile=' . $caseType; 
+                $str .= '&id=' . $cus_id; 
+
+                $TuUrl = GUANWANG_DOMAIN . 'caseSQL.php';//官网接口文件
+                $Coupons = curl_post($TuUrl, $str);
+
+                if($Coupons == 1000) {
+                    if ($caseType & 1 && $caseType & 2) {
+                        $cuspro->UpdateArray(array('Cases' => 0, 'CaseImagePC' => 0, 'CaseImageMobile' => 0), $cus_id);
+                    } elseif ($caseType & 1)
+                        $cuspro->UpdateArray(array('CaseImagePC' => 0), $cus_id);
+                    else
+                        $cuspro->UpdateArray(array('CaseImageMobile' => 0), $cus_id);
+                } else {
+                    $result["err"] = $Coupons;
+                    $result["msg"] = '官网同步失败';
+                }                
             }
         } else {
             $result["err"] = 1003;
@@ -827,7 +899,30 @@ class Gbaopen extends InterfaceVIEWS
                     $this->LogsFunction->LogsCusRecord(115, 0, $cus_id, $result['msg']);
                     return $result;
                 }
-                $CustProModule = new CustProModule();
+                //案例站续费成功后将新的过期时间同步到官网
+                $TuUrl = GUANWANG_DOMAIN . 'caseSQL.php';//接口文件                
+                if($cuspro['CaseImagePC'] && isset($cuspro_time['PC_EndTime'])) {
+                    $str = '';//接口数据
+                    $str .= 'res_Model=2';
+                    $str .= '&pc_mobile=1';
+                    $str .= '&from=1';
+                    $str .= '&gq_time=' . $cuspro_time['PC_EndTime'];
+                    $str .= '&id=' . $cus_id;
+                    $Coupons = curl_post($TuUrl , $str);
+                    file_put_contents('filename.html', $Coupons);
+                }
+                if($cuspro['CaseImageMobile'] && isset($cuspro_time['Mobile_EndTime'])) {
+                    $str = '';//重新赋值
+                    $str .= 'res_Model=2';
+                    $str .= '&pc_mobile=2';
+                    $str .= '&from=1';
+                    $str .= '&gq_time=' . $cuspro_time['Mobile_EndTime'];
+                    $str .= '&id=' . $cus_id;
+                    $Coupons = curl_post($TuUrl , $str);
+                    file_put_contents('filename1.html', $Coupons);
+                }
+
+                $CustProModule = new CustProModule();//可注释？
                 $orderID = time() . rand(1000, 9999);
                 $order_data = array("OrderID" => $orderID, "OrderAmount" => $price, "CustomersID" => $cus_id, "CreateTime" => date('Y-m-d H:i:s', time()), "StillTime" => 1, "CPhone" => $cuspro["CPhone"], "PK_model" => $cuspro["PK_model"], "PC_model" => $cuspro["PC_model"], "Mobile_model" => $cuspro["Mobile_model"], "Capacity" => $cuspro["Capacity"]);
                 $ordermodule = new OrderModule();
@@ -911,6 +1006,28 @@ class Gbaopen extends InterfaceVIEWS
                     return $result;
                 }
                 if ($cusmodel->UpdateArray($data, $cus_id)) {
+                    //案例站修改信息成功后，同步到官网
+                    $cuspro = new CustProModule;
+                    $cusinfo = $cuspro->GetOneByWhere(array('Cases' , 'CaseImagePC' , 'CaseImageMobile') , ' where CustomersID=' . $cus_id);
+                    $TuUrl = GUANWANG_DOMAIN . 'caseSQL.php';//官网接口
+                    if($cusinfo['CaseImagePC']) {
+                        $str = '';//接口数据
+                        $str .= 'res_Model=2';
+                        $str .= '&pc_mobile=1';
+                        $str .= '&from=3';
+                        $str .= '&name=' . $data['CompanyName'];
+                        $str .= '&id=' . $cus_id;
+                        $Coupons = curl_post($TuUrl,$str);
+                    }
+                    if($cusinfo['CaseImageMobile']) {
+                        $str = '';//接口数据
+                        $str .= 'res_Model=2';
+                        $str .= '&pc_mobile=2';
+                        $str .= '&from=3';
+                        $str .= '&name=' . $data['CompanyName'];
+                        $str .= '&id=' . $cus_id;
+                        $Coupons = curl_post($TuUrl,$str);
+                    }
                     $this->LogsFunction->LogsCusRecord(112, 1, $cus_id);
                     $result['data']['name'] = $data['CompanyName'];
                 } else {
@@ -1434,6 +1551,46 @@ class Gbaopen extends InterfaceVIEWS
             $result['data']['name'] = '您选择的客户';
             $result['msg'] = '修改成功';
             $this->LogsFunction->LogsCusRecord(114, 5, $cus_id, $result['msg']);
+
+            //网站处理成功后，将新域名和模板同步到官网
+            $TuUrl = GUANWANG_DOMAIN . 'caseSQL.php';
+            $model = new ModelModule;
+            if($cuspro['CaseImagePC']) {
+                $str = '';//接口数据
+                if (preg_match('/G\d{4}P(CN|EN|TW|JP)\d{2}/', $Data['PC_model'])) {
+                    $pc = $model->GetOneByWhere(array('ModelLan', 'Language'), 'where NO=\'' . $Data['PC_model'] . '\'');
+                    $str .= 'code=' . $Data['PC_model'];
+                } else {
+                    $pc = $model->GetOneByWhere(array('NO', 'ModelLan', 'Language'), 'where NO_bak=\'' . $Data['PC_model']. '\'');
+                    $str .= 'code=' . $pc['NO'];
+                }                
+                $str .= '&type=' . $pc['ModelLan'];
+                $str .= '&url=' . $Data['PC_domain'];
+                $str .= '&id=' . $cus_id;
+                $str .= '&pc_mobile=1';
+                $str .= '&from=2';
+                $str .= '&res_Model=2';
+
+                $Coupons = curl_post($TuUrl,$str);
+            }
+            if($cuspro['CaseImageMobile']) {
+                $str = '';//接口数据
+                if (preg_match('/G\d{4}M(CN|EN|TW|JP)\d{2}/', $Data['Mobile_model'])) {
+                    $mobile = $model->GetOneByWhere(array('ModelLan', 'Language'), 'where NO=\'' . $Data['Mobile_model'] . '\'');
+                    $str .= 'code=' . $Data['PC_model'];
+                } else {
+                    $mobile = $model->GetOneByWhere(array('NO', 'ModelLan', 'Language'), 'where NO_bak=\'' . $Data['Mobile_model']. '\'');
+                    $str .= 'code=' . $mobile['NO'];
+                }                
+                $str .= '&type=' . $mobile['ModelLan'];
+                $str .= '&url=' . $Data['Mobile_domain'];
+                $str .= '&id=' . $cus_id;
+                $str .= '&pc_mobile=2';
+                $str .= '&from=2';
+                $str .= '&res_Model=2';
+
+                $Coupons = curl_post($TuUrl,$str);
+            }
 //            $order_data = array("OrderAmount" => $price, "CustomersID" => $cuspro['CustomersID'], "OrderStartDate" => date('Y-m-d H:i:s', time()), "OrderEndDate" => $cuspro["PC_EndTime"], "CPhone" => $Data["CPhone"], "PK_model" => $Data["PK_model"], "PC_model" => $Data["PC_model"], "Mobile_model" => $Data["Mobile_model"]);
 //            $ordermodule = new OrderModule();
 //            $orderID = $ordermodule->InsertArray($order_data);
