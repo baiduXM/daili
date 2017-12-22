@@ -1577,7 +1577,7 @@ class Gbaopen extends InterfaceVIEWS
                 $str = '';//接口数据
                 if (preg_match('/G\d{4}M(CN|EN|TW|JP)\d{2}/', $Data['Mobile_model'])) {
                     $mobile = $model->GetOneByWhere(array('ModelLan', 'Language'), 'where NO=\'' . $Data['Mobile_model'] . '\'');
-                    $str .= 'code=' . $Data['PC_model'];
+                    $str .= 'code=' . $Data['Mobile_model'];
                 } else {
                     $mobile = $model->GetOneByWhere(array('NO', 'ModelLan', 'Language'), 'where NO_bak=\'' . $Data['Mobile_model']. '\'');
                     $str .= 'code=' . $mobile['NO'];
