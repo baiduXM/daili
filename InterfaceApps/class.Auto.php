@@ -27,7 +27,7 @@ class Auto extends InterfaceVIEWS {
 		//当前时间
 		$now = date('Y-m-d H:i:s' , time());
 
-		$where = ' where (PC_EndTime<"' . $now . '" or Mobile_EndTime<"' . $now . '")  and Status>0 ';
+		$where = ' where (PC_EndTime<"' . $now . '" or Mobile_EndTime<"' . $now . '")  and Status=1 ';
 		$data = $cuspro->GetListsByWhere($lists , $where);
 
         foreach ($data as $k => $v) {
@@ -91,6 +91,7 @@ class Auto extends InterfaceVIEWS {
                 mkdir($root.'dl-log/delete');
             //日志记录
             $str = "[". $site[$k]['name'] ."]\r\n";
+            $str .= "删除类型：". $site[$k]['type'] .";\r\n";
             $str .= "返回码：" . $res['err'] . ";\r\n";
             $str .= "返回信息：" . $res['msg'] . ";\r\n";
             $str .= "cuspro表执行：" . $res1 . ";\r\n";
@@ -133,7 +134,7 @@ class Auto extends InterfaceVIEWS {
         );
 
         $ReturnString = curl_post($TuUrl, $post_data, 0);
-file_put_contents('filename.html', $ReturnString);
+
         $ReturnArray = json_decode($ReturnString, true);
 
         return $ReturnArray;
