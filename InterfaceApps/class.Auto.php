@@ -27,7 +27,7 @@ class Auto extends InterfaceVIEWS {
 		//当前时间
 		$now = date('Y-m-d H:i:s' , time());
 
-		$where = ' where (PC_EndTime<"' . $now . '" or Mobile_EndTime<"' . $now . '")  and Status=1 ';
+		$where = ' where (PC_EndTime<"' . $now . '" or Mobile_EndTime<"' . $now . '")  and status=1 ';
 		$data = $cuspro->GetListsByWhere($lists , $where);
 
         foreach ($data as $k => $v) {
