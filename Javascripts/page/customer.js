@@ -1306,7 +1306,6 @@ jQuery(document).ready(function () {
                                     combo = 0;\n\
                                 }else{\n\
                                     $(".userdata-content [name=\'e-combo\'][value=\'"+icombo+"\']").prop("checked", "checked");\n\
-                                    $(".userdata-content [name=\'e-combo\']:lt(\'"+icombo+"\')").prop("disabled", "disabled");\n\
                                     combo = $(".userdata-content [name=\'e-combo\'][value=\'"+icombo+"\']").data("money");\n\
                                 }\n\
                             }\n\
