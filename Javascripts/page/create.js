@@ -89,7 +89,7 @@ jQuery(document).ready(function() {
                             $('input[name=' + i + ']').val(v[1]);
                         }
                     })
-                    $('input[name=email]').attr("disabled", "true");
+                    // $('input[name=email]').attr("disabled", "true");
                     crelist.eq(1).hide('slow', function() {
                         crelist.eq(2).show('slow');
                         $('.Btn2').attr('value', '上一页');
@@ -228,7 +228,7 @@ jQuery(document).ready(function() {
                     return false;
                 }
             }
-            html += '<p><span>邮箱地址：</span><span class="major">' + $(".userdata-content input[name='email']").val() + '</span></p>\n';
+            // html += '<p><span>邮箱地址：</span><span class="major">' + $(".userdata-content input[name='email']").val() + '</span></p>\n';
             html += '<p><span>客户账号：</span><span class="major">' + $(".userdata-content input[name='account']").val() + '</span></p></div>';
             
             var data = {};
@@ -250,7 +250,7 @@ jQuery(document).ready(function() {
                     }
                 });
         } else if ($(this).attr('value') == '创建客户') {
-            html += '<p><span>邮箱地址：</span><span class="major">' + $(".userdata-content input[name='email']").val() + '</span></p>\n';
+            // html += '<p><span>邮箱地址：</span><span class="major">' + $(".userdata-content input[name='email']").val() + '</span></p>\n';
         } else {
             Msg(2, '非法请求');
             return false;
@@ -297,7 +297,7 @@ jQuery(document).ready(function() {
         if (!r_num.test(data['tel'])) {
             Msg(1, '您输入的电话号码不正确');
         } else {
-            if (data["name"] && data["companyname"] && data["email"] && data["tel"]) {
+            if (data["name"] && data["companyname"] && data["tel"]) {
                 Msg(1, '<span>正在处理，请稍等...</span><span class="flower-loader" style="opacity: 1;"></span>');
                 $.post("Apps?module=Gbaopen&action=NewCus", data, function(result) {
                     if (result.err == 0) {
@@ -307,7 +307,7 @@ jQuery(document).ready(function() {
                     }
                 });
             } else {
-                Msg(1, '公司名称,联系人姓名,联系电话,Email---是必填选项，请检查');
+                Msg(1, '公司名称,联系人姓名,联系电话---是必填选项，请检查');
             }
         }
         $('#dialog-box').toggle("slow",function(){

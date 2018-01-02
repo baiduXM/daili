@@ -863,7 +863,7 @@ jQuery(document).ready(function () {
                         else if (i == 'email') {
                             html += '<p>\
                                     <span class="content-l">' + v[0] + '</span>\
-                                    <span><input type="text" name="' + i + '" class="Input" value="' + v[1] + '" disabled="true"></span>\
+                                    <span><input type="text" name="' + i + '" class="Input" value="' + v[1] + '"></span>\
                                     <span class="as"></span>\
                                 </p>';
                         } else {

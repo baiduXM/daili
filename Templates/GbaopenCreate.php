@@ -33,7 +33,7 @@
                             <p>
                                 <span class="content-l">Email</span>
                                 <span>
-                                    <input type="text" name="email" class="Input" <?php if ($Data['cussel']) echo 'value="' . $Data['cussel']['Email'] . '" disabled="disabled"'; ?>></span>
+                                    <input type="text" name="email" class="Input" <?php if ($Data['cussel']) echo 'value="' . $Data['cussel']['Email']; ?>></span>
                                 <span class="content-l">公司名称</span>
                                 <span>
                                     <input type="text" name="companyname" class="Input" <?php if ($Data['cussel']) echo 'value="' . $Data['cussel']['CompanyName'] . '"'; ?>></span>

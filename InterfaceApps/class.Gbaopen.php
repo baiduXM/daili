@@ -976,6 +976,7 @@ class Gbaopen extends InterfaceVIEWS
             $data['Tel'] = $this->_POST['tel'];
             $data['Fax'] = $this->_POST['fax'];
             $data['Address'] = $this->_POST['address'];
+            $data['Email'] = $this->_POST['email'];
             $cusmodel = new CustomersModule;
             $cus = $cusmodel->GetOneByWhere(array('CompanyName', 'AgentID'), 'where CustomersID=' . $cus_id);
             if ($cus) {
@@ -1002,6 +1003,21 @@ class Gbaopen extends InterfaceVIEWS
                     $result['msg'] = '此用户资料不存在';
                     $this->LogsFunction->LogsCusRecord(115, 2, $cus_id, $result['msg']);
                     return $result;
+                }
+
+                //邮箱处理
+                $email_ptn = "/^([0-9A-Za-z\\-_\\.]+)@([0-9a-z]+\\.[a-z]{2,3}(\\.[a-z]{2})?)$/i";
+                if($data['Email']) {
+                    if (!preg_match($email_ptn, $data['Email'])) {
+                        $result['err'] = 1005;
+                        $result['msg'] = '邮箱格式错误';
+                        return $result;
+                    }
+                    if ($cusmodel->GetAllByWhere('where Email="' . $data ['Email'] . '"')) {
+                        $result['err'] = 1006;
+                        $result['msg'] = '修改客户信息失败,已存在使用此邮箱的客户';
+                        return $result;
+                    }
                 }
                 if ($cusmodel->UpdateArray($data, $cus_id)) {
                     //案例站修改信息成功后，同步到官网
@@ -2219,17 +2235,20 @@ class Gbaopen extends InterfaceVIEWS
         $crtdata ['AgentID'] = $agent_id;
         $crtdata ['AddTime'] = date('Y-m-d H:i:s', strtotime("-2 seconds", strtotime($crtdata ['UpdateTime'])));
         $email_ptn = "/^([0-9A-Za-z\\-_\\.]+)@([0-9a-z]+\\.[a-z]{2,3}(\\.[a-z]{2})?)$/i";
-        if (!preg_match($email_ptn, $crtdata['Email'])) {
-            $result['err'] = 1003;
-            $result['msg'] = '邮箱格式错误';
-            return $result;
+        if($crtdata['Email']) {
+            if (!preg_match($email_ptn, $crtdata['Email'])) {
+                $result['err'] = 1003;
+                $result['msg'] = '邮箱格式错误';
+                return $result;
+            }
+            if ($CustomersModule->GetAllByWhere('where Email="' . $crtdata ['Email'] . '"')) {
+                $result['err'] = 1004;
+                $result['msg'] = '创建客户失败,已存在使用此邮箱的客户';
+                $this->LogsFunction->LogsCusRecord(111, 2, 0, $result['msg']);
+                return $result;
+            }
         }
-        if ($CustomersModule->GetAllByWhere('where Email="' . $crtdata ['Email'] . '"')) {
-            $result['err'] = 1004;
-            $result['msg'] = '创建客户失败,已存在使用此邮箱的客户';
-            $this->LogsFunction->LogsCusRecord(111, 2, 0, $result['msg']);
-            return $result;
-        }
+        
         $cusID = $CustomersModule->InsertArray($crtdata, $returnID);
         if ($cusID) {
             $result['err'] = 0;
@@ -3511,6 +3530,13 @@ class Gbaopen extends InterfaceVIEWS
             $ins_info["Email"] = $cust_info["Email"];
             $ins_info["CustomersID"] = $post["num"];
             $ins_info["combo"] = $combo;
+            //如果没有邮箱
+            if(!$ins_info["Email"]) {
+                $result["err"] = 3;
+                $result["msg"] = "请填写邮箱再开通";
+                $this->LogsFunction->LogsCusRecord(123, 3, $cus_id, $result['msg']);
+                return $result;
+            }
             $ret = $gshow->InsertArray($ins_info);
             if ($ret) {
                 $ret = $this->toGshow($ins_info);
