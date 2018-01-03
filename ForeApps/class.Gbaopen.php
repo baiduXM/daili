@@ -131,6 +131,12 @@ class Gbaopen extends ForeVIEWS
             $cust_info = $cust->GetOneByWhere(array(), " where CustomersID = " . $CustomersID);
             $TuUrl = WEICD_DOMAIN . "index.php?c=user&a=autologinFromDaili";//$TuUrl = GBAOPEN_DOMAIN . 'api/loginuser';
 
+            //如果没有邮箱
+            if(!$cust_info ['Email']) {
+                echo "<script>alter('请填写邮箱')</script>";
+                exit();
+            }
+
             /* 组成G宝盆发送字符串并POST到G宝盆平台模拟登陆 */
 
             //随机文件名开始生成

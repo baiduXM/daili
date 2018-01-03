@@ -3503,6 +3503,12 @@ class Gbaopen extends InterfaceVIEWS
             $madify_info["UpdateTime"] = date('Y-m-d H:i:s', time());
             $madify_info["UpdateTime"] = date('Y-m-d H:i:s', time());
             $madify_info["combo"] = $combo;
+            //如果没有邮箱
+            if(!$madify_info["Email"]) {
+                $result["err"] = 3;
+                $result["msg"] = "请填写邮箱再更新";
+                return $result;
+            }
             $ret = $gshow->UpdateArray($madify_info, array("CustomersID" => $post["num"]));
             if ($ret) {
 //                $ret['code'] = 200;//$this->toGshow($madify_info);

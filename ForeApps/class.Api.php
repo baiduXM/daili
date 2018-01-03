@@ -724,6 +724,16 @@ class Api extends ForeVIEWS {
         $ins_info["Email"] = $cust_info["Email"];
         $ins_info["CustomersID"] = $cusprodata["CustomersID"];
         $ins_info["combo"] = 0;
+
+        //如果没有邮箱
+        if(!$ins_info["Email"]) {
+            $result["err"] = 3;
+            $result["msg"] = "请填写邮箱再开通";
+            $this->LogsFunction->LogsCusRecord(123, 3, $cus_id, $result['msg']);
+            echo $result;
+            exit();
+        }
+
         $gshow = new GshowModule();
         $ret = $gshow->InsertArray($ins_info);
         $LogsFunction = new LogsFunction;

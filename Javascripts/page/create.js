@@ -87,6 +87,11 @@ jQuery(document).ready(function() {
                             }
                         } else {
                             $('input[name=' + i + ']').val(v[1]);
+                            if(i == 'email') {
+                                if(v[1]) {
+                                    $('input[name=email]').attr("disabled", "true");
+                                }
+                            }
                         }
                     })
                     // $('input[name=email]').attr("disabled", "true");
@@ -229,6 +234,10 @@ jQuery(document).ready(function() {
                 }
             }
             // html += '<p><span>邮箱地址：</span><span class="major">' + $(".userdata-content input[name='email']").val() + '</span></p>\n';
+            var email = $(".userdata-content input[name='email']").val();
+            if(email) {
+                html += '<p><span>邮箱地址：</span><span class="major">' + email + '</span></p>\n';
+            }
             html += '<p><span>客户账号：</span><span class="major">' + $(".userdata-content input[name='account']").val() + '</span></p></div>';
             
             var data = {};
@@ -251,6 +260,10 @@ jQuery(document).ready(function() {
                 });
         } else if ($(this).attr('value') == '创建客户') {
             // html += '<p><span>邮箱地址：</span><span class="major">' + $(".userdata-content input[name='email']").val() + '</span></p>\n';
+            var email = $(".userdata-content input[name='email']").val();
+            if(email) {
+                html += '<p><span>邮箱地址：</span><span class="major">' + email + '</span></p>\n';
+            }
         } else {
             Msg(2, '非法请求');
             return false;

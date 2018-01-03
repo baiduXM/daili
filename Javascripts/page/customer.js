@@ -863,8 +863,8 @@ jQuery(document).ready(function () {
                         else if (i == 'email') {
                             html += '<p>\
                                     <span class="content-l">' + v[0] + '</span>\
-                                    <span><input type="text" name="' + i + '" class="Input" value="' + v[1] + '"></span>\
-                                    <span class="as"></span>\
+                                    <span><input type="text" name="' + i + '" class="Input" value="' + v[1] + '"' + (v[1] ? ' disabled="true"' : '') +'></span>\
+                                    <span class="as">' + (v[1] ? '' : '填写后不可更改') +'</span>\
                                 </p>';
                         } else {
                             html += '<p>\
