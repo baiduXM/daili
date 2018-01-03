@@ -978,7 +978,8 @@ class Gbaopen extends InterfaceVIEWS
             $data['Address'] = $this->_POST['address'];
             $data['Email'] = $this->_POST['email'];
             $cusmodel = new CustomersModule;
-            $cus = $cusmodel->GetOneByWhere(array('CompanyName', 'AgentID'), 'where CustomersID=' . $cus_id);
+            $cuspro = new CustProModule;
+            $cus = $cusmodel->GetOneByWhere(array('CompanyName', 'AgentID', 'Email'), 'where CustomersID=' . $cus_id);
             if ($cus) {
                 if ($level == 3) {
                     if ($cus['AgentID'] != $agent_id) {
@@ -1007,7 +1008,7 @@ class Gbaopen extends InterfaceVIEWS
 
                 //邮箱处理
                 $email_ptn = "/^([0-9A-Za-z\\-_\\.]+)@([0-9a-z]+\\.[a-z]{2,3}(\\.[a-z]{2})?)$/i";
-                if($data['Email']) {
+                if($data['Email'] && $data['Email'] != $cus['Email']) {
                     if (!preg_match($email_ptn, $data['Email'])) {
                         $result['err'] = 1005;
                         $result['msg'] = '邮箱格式错误';
@@ -1018,10 +1019,41 @@ class Gbaopen extends InterfaceVIEWS
                         $result['msg'] = '修改客户信息失败,已存在使用此邮箱的客户';
                         return $result;
                     }
+
+                    $cusname = $cuspro->GetOneByWhere(array('G_name') , ' where CustomersID=' . $cus_id);
+                    $eurl = GBAOPEN_DOMAIN . 'api/modifyemail';
+                    $ToString .= 'name=' . $cusname ['G_name'];
+                    $ToString .= '&email=' . $data ['Email'];
+                    //随机文件名开始生成
+                    $randomLock = getstr();
+                    $password = md5($randomLock);
+                    $password = md5($password);
+
+                    //生成握手密钥
+                    $text = getstr();
+
+                    //生成dll文件
+                    $myfile = @fopen('./token/' . $password . '.dll', "w+");
+                    if (!$myfile) {
+                        return 0;
+                    }
+                    fwrite($myfile, $text);
+                    fclose($myfile);
+
+                    $ToString .= '&timemap=' . $randomLock;
+                    $ToString .= '&taget=' . md5($text . $password);
+                    $ReturnString = curl_post($eurl, $ToString);
+                    $ReturnArray = json_decode($ReturnString, true);
+                    if($ReturnArray['err'] != 1000) {
+                        $result['err'] = 1005;
+                        $result['msg'] = '统一平台同步失败';
+                        $this->LogsFunction->LogsCusRecord(112, 6, $cus_id, $ReturnArray['msg']);
+                        return $result;
+                    }
                 }
                 if ($cusmodel->UpdateArray($data, $cus_id)) {
                     //案例站修改信息成功后，同步到官网
-                    $cuspro = new CustProModule;
+                    // $cuspro = new CustProModule;
                     $cusinfo = $cuspro->GetOneByWhere(array('Cases' , 'CaseImagePC' , 'CaseImageMobile') , ' where CustomersID=' . $cus_id);
                     $TuUrl = GUANWANG_DOMAIN . 'caseSQL.php';//官网接口
                     if($cusinfo['CaseImagePC']) {
