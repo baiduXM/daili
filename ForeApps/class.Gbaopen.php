@@ -133,7 +133,7 @@ class Gbaopen extends ForeVIEWS
 
             //如果没有邮箱
             if(!$cust_info ['Email']) {
-                echo "<script>alter('请填写邮箱')</script>";
+                echo "请填写邮箱";
                 exit();
             }
 

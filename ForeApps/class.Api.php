@@ -727,8 +727,7 @@ class Api extends ForeVIEWS {
 
         //如果没有邮箱
         if(!$ins_info["Email"]) {
-            $result["err"] = 3;
-            $result["msg"] = "请填写邮箱再开通";
+            $result = 3;
             $this->LogsFunction->LogsCusRecord(123, 3, $cus_id, $result['msg']);
             echo $result;
             exit();
