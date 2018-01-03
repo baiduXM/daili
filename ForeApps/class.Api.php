@@ -728,7 +728,7 @@ class Api extends ForeVIEWS {
         //如果没有邮箱
         if(!$ins_info["Email"]) {
             $result = 3;
-            $this->LogsFunction->LogsCusRecord(123, 3, $cus_id, $result['msg']);
+            $LogsFunction->LogsCusRecord(123, 3, $cusprodata["CustomersID"], '统一平台开通E推同步失败');
             echo $result;
             exit();
         }
