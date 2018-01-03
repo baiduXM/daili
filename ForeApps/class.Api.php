@@ -724,7 +724,8 @@ class Api extends ForeVIEWS {
         $ins_info["Email"] = $cust_info["Email"];
         $ins_info["CustomersID"] = $cusprodata["CustomersID"];
         $ins_info["combo"] = 0;
-
+        
+        $LogsFunction = new LogsFunction;
         //如果没有邮箱
         if(!$ins_info["Email"]) {
             $result = 3;
@@ -735,7 +736,7 @@ class Api extends ForeVIEWS {
 
         $gshow = new GshowModule();
         $ret = $gshow->InsertArray($ins_info);
-        $LogsFunction = new LogsFunction;
+        
         //E推接口
         if ($ret) {
             $ret = $this->toGshow($ins_info);
