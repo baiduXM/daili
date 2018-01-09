@@ -41,7 +41,8 @@ jQuery(document).ready(function() {
             data += '"tel":"' + $("input[name=tel]").val() + '",';
             data += '"email":"' + $("input[name=email]").val() + '",';
             data += '"address":"' + $("input[name=address]").val() + '",';
-            data += '"starttime":"' + $("input[name=starttime]").val() + '"';
+            data += '"num":"' + $("input[name=num]").val() + '",';
+            data += '"starttime":"' + $("input[name=starttime]").val() + '"';            
         } else {
             $('#dialog-box').toggle("slow",function(){
                 $("#dialog-overlay").slideUp("fast");
@@ -55,7 +56,7 @@ jQuery(document).ready(function() {
         if (!r_num.test(data['tel'])) {
             Msg(1, '您输入的电话号码不正确');
         } else {
-            if (data["username"] && data["companyname"] && data["email"] && data["tel"] && data["account"]) {
+            if (data["username"] && data["companyname"] && data["tel"] && data["account"]) {
                 Msg(1, '<span>正在处理，请稍等...</span><span class="flower-loader" style="opacity: 1;"></span>');
                 $.post("Apps?module=Gcard&action=NewCus", data, function(result) {
                     if (result.err == 0) {
@@ -65,7 +66,7 @@ jQuery(document).ready(function() {
                     }
                 });
             } else {
-                Msg(1, '公司账号,公司名称,联系人姓名,联系电话,Email---是必填选项，请检查');
+                Msg(1, '公司账号,公司名称,联系人姓名,联系电话---是必填选项，请检查');
             }
         }
         $('#dialog-box').toggle("slow",function(){

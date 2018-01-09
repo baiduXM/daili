@@ -162,6 +162,7 @@ jQuery(document).ready(function () {
         /*兼容客户管理列表,对列表数量控制的标签进行初始化*/
         this.msgSet = function () {
             var _this  = this;
+            _this.type = $(".pagebox").prev()[0].tagName.toLowerCase() == 'form' ? "tr" : "li";
             _this.onLoad();
             _this.response = $.get("Apps?module=Gcard&action=CusInit", function (result) {
                 var place = '<ul class="one"><span>▬▶</span>\n\
@@ -174,9 +175,9 @@ jQuery(document).ready(function () {
                         operation[1] += '<a href="javascript:;" class="renew"> 续费 </a>';
                     } else if (v2 == 'process') {
                         operation[1] += '<a href="javascript:;" class="modify"> 信息修改 </a>';
-                    } else if (v2 == 'transfer')
+                    } else if (v2 == 'transfer') {
                         operation[1] += '<a href="javascript:;" class="custransfer"> 客户转接 </a>';
-                    else if (v2 == 'manage') {
+                    } else if (v2 == 'manage') {
                         operation[1] += '<a href="javascript:;" class="g-manage"> G名片管理 </a>';
                     } else if (v2 == 'delete') {
                         operation[1] += '<a href="javascript:;" class="delete"> 删除 </a>';

@@ -131,7 +131,8 @@ class Agent extends InterfaceVIEWS
             $result['data'][] = $sev_id;
             if ($agent_id == $sev_msg['BossAgentID']) {
                 $cus_count = $this->GetAgentCusNum($sev_id);
-                if ($cus_count) {
+                $gcard_count = $this->GetAgentGcardNum($sev_id);
+                if ($cus_count or $gcard_count) {//只要该客户下有G宝盆或者G名片就需要转移
                     $agent = $usermodel->GetListByBossAgentID($agent_id, array('ContactName', 'AgentID'));
                     $Data[$agent_id] = '自己';
                     if ($agent) {
@@ -223,12 +224,16 @@ class Agent extends InterfaceVIEWS
         $result = array('err' => 1000, 'data' => '', 'msg' => '非法请求');
         if ($level == 2 && $del_sev_id) {
             $cus_count = $this->GetAgentCusNum($del_sev_id);
-            if ($cus_count) {
+            $gcard_count = $this->GetAgentGcardNum($del_sev_id);
+            if ($cus_count or $gcard_count) {
                 if ($tran_sev_id) {
                     $cusmodel = new CustomersModule;
                     $cuspromodel = new CustProModule;
+                    $gcardmodel = new GcardModule;
                     $cuspromodel->UpdateArray(array('AgentID' => $tran_sev_id), array('AgentID' => $del_sev_id));
                     $cusmodel->UpdateArray(array('AgentID' => $tran_sev_id), array('AgentID' => $del_sev_id));
+                    //G名片客户转移
+                    $gcardmodel->UpdateArray(array('agent_id' => $tran_sev_id), array('agent_id' => $del_sev_id));
                 } else {
                     $result['msg'] = '不存在转移对象';
                     return $result;
@@ -324,6 +329,22 @@ class Agent extends InterfaceVIEWS
             $agent = $db->Select($sql);
             foreach ($agent as $v) {
                 $result[$v['AgentID']] = $v['Num'];
+            }
+        }
+        return $result;
+    }
+
+    //获取相应客服的G名片数量
+    protected function GetAgentGcardNum($agent_arr = array())
+    {
+        $agent_str = is_array($agent_arr) ? implode(',', $agent_arr) : $agent_arr;
+        $result = array();
+        if ($agent_str) {
+            $db = new DB;
+            $sql = 'select agent_id,count(agent_id) as Num from tb_Gcard where agent_id in (' . $agent_str . ') group by agent_id';
+            $agent = $db->Select($sql);
+            foreach ($agent as $v) {
+                $result[$v['agent_id']] = $v['Num'];
             }
         }
         return $result;

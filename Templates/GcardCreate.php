@@ -46,7 +46,6 @@
                                 <span>
                                     <input type="text" name="email" class="Input" >
                                 </span>
-                                <span class="as">*</span>
                                 <span class="content-l">地址</span>
                                 <span>
                                     <input type="text" name="address" class="Input" >
@@ -57,6 +56,10 @@
                                 <span>
                                     <input type="text" name="starttime" class="Input" placeholder="格式:2016-5-1 16:00:00，不填默认当前时间">
                                 </span>
+                                <span class="content-l">员工人数限制</span>
+                                <span>
+                                    <input type="text" name="num" class="Input" value="10">
+                                </span> 
                             </p>
                         </div>
                         <div class="btnDD" style="text-align:center;">

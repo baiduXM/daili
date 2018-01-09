@@ -41,10 +41,11 @@ class Gcard extends InterfaceVIEWS
             $crtdata ['email'] = trim($post ['email']);
             $crtdata ['tel'] = trim($post ['tel']);
             $crtdata ['address'] = trim($post ['address']);
+            $crtdata ['num'] = trim($post ['num']) ? trim($post ['num']) : 10;
             //验证数据
-            if(!($crtdata ['account'] && $crtdata ['company'] && $crtdata ['name'] && $crtdata ['email'] && $crtdata ['tel'])) {
+            if(!($crtdata ['account'] && $crtdata ['company'] && $crtdata ['name'] && $crtdata ['tel'])) {
             	$result['err'] = 1002;
-                $result['msg'] = '公司账号，名称，联系人，电话，邮箱都不能为空';
+                $result['msg'] = '公司账号，名称，联系人，电话都不能为空';
                 return $result;
             }
             //验证格式
@@ -53,12 +54,15 @@ class Gcard extends InterfaceVIEWS
                 $result['msg'] = '公司账号只能由数字和字母构成';
                 return $result;
             }
-            $email_ptn = "/^([0-9A-Za-z\\-_\\.]+)@([0-9a-z]+\\.[a-z]{2,3}(\\.[a-z]{2})?)$/i";
-	        if (!preg_match($email_ptn, $crtdata['email'])) {
-	            $result['err'] = 1003;
-	            $result['msg'] = '邮箱格式错误';
-	            return $result;
-	        }
+            if($crtdata['email']) {
+                $email_ptn = "/^([0-9A-Za-z\\-_\\.]+)@([0-9a-z]+\\.[a-z]{2,3}(\\.[a-z]{2})?)$/i";
+                if (!preg_match($email_ptn, $crtdata['email'])) {
+                    $result['err'] = 1003;
+                    $result['msg'] = '邮箱格式错误';
+                    return $result;
+                }
+            }
+            
 	        //查看账号是否已存在
 	        $GnameNum = $Gcard->GetListsNum("where account='" . $crtdata ['account'] . "'");
             if ($GnameNum ['Num'] > 0) {
@@ -226,6 +230,7 @@ class Gcard extends InterfaceVIEWS
         }
 
         $ReturnString = curl_post($TuUrl, $data);
+        file_put_contents('filename.html', $ReturnString);
         $ReturnArray = json_decode($ReturnString, true);
         return $ReturnArray;
     }
