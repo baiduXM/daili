@@ -3249,7 +3249,7 @@ class Gbaopen extends InterfaceVIEWS
             fclose($myfile);
             $ToString .= '&timemap=' . $randomLock;
             $ToString .= '&taget=' . md5($text . $password);
-            $ReturnString = request_by_other($TuUrl, $ToString);
+            $ReturnString = curl_post($TuUrl, $ToString);
             $ReturnArray = json_decode($ReturnString, true);
             //判断迁移动作是否成功，如果不成功，将数据库还原，报错
             if ($ReturnArray[0]['err'] == 1000) {
