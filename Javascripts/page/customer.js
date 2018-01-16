@@ -242,6 +242,13 @@ jQuery(document).ready(function () {
                     var num = parseInt($('.tabList ul li').index(this));
                     $(this).addClass("cur").siblings().removeClass();
                     _this.listID = num;
+                    if(num == 3 || num == 4 || num ==5) {
+                        $('#exportExcel').show();
+                        $('#exportExcel').attr('href','Apps?module=Gbaopen&action=excel_data&type=' + num);
+                    } else {
+                        $('#exportExcel').hide();
+                        $('#exportExcel').attr('href','#');
+                    }
                     if (_this.search != "") {
                         _this.search = "";
                         $("#search1,#search2,#search3").val("");
@@ -351,6 +358,7 @@ jQuery(document).ready(function () {
                         result.data  = parseInt(result.data);
                         _this.listID = -1;
                         $(".tabList ul li").removeClass();
+                        $("#exportExcel").hide();
                         _this.allListNum = result.data > 0 ? result.data : 1;
                         _this.listNumLoad();
                         if (_this.listNum[$(".tonum a").index($(".tonum a.current"))] == undefined) {
@@ -864,7 +872,7 @@ jQuery(document).ready(function () {
                             html += '<p>\
                                     <span class="content-l">' + v[0] + '</span>\
                                     <span><input type="text" name="' + i + '" class="Input" value="' + v[1] + '"' + (v[1] ? ' disabled="true"' : '') +'></span>\
-                                    <span class="as">' + (v[1] ? '' : '填写后不可更改') +'</span>\
+                                    <span class="as">' + (v[1] ? '' : '邮箱填写后不可更改') +'</span>\
                                 </p>';
                         } else {
                             html += '<p>\

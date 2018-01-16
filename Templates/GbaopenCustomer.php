@@ -46,6 +46,9 @@
                                         <span>       
                                             <button type="submit" id="searchbox" class="searchbottom">查找</button>
                                         </span>
+                                        <span>       
+                                            <a id="exportExcel" class="btn btn-link" style='background: #0099FF;display: none;color: white;' href="#">导出Excel</a>
+                                        </span>
                                         <span class="flower-loader"></span>
                                     </div>
                                 </div>

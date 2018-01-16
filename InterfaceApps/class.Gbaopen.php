@@ -1007,7 +1007,8 @@ class Gbaopen extends InterfaceVIEWS
                 }
 
                 //邮箱处理
-                $email_ptn = "/^([0-9A-Za-z\\-_\\.]+)@([0-9a-z]+\\.[a-z]{2,3}(\\.[a-z]{2})?)$/i";
+                // $email_ptn = "/^([0-9A-Za-z\\-_\\.]+)@([0-9a-z]+\\.[a-z]{2,3}(\\.[a-z]{2})?)$/i";
+                $email_ptn = "/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,})$/";
                 if($data['Email'] && $data['Email'] != $cus['Email']) {
                     if (!preg_match($email_ptn, $data['Email'])) {
                         $result['err'] = 1005;
@@ -4092,6 +4093,158 @@ class Gbaopen extends InterfaceVIEWS
         $ReturnArray = json_decode($ReturnString, true);
         return $ReturnArray;
 
+    }
+
+    //导出过期的Excel
+    public function excel_data() {
+        $agent_id = $_SESSION ['AgentID'];
+        $level = $_SESSION ['Level'];        
+        $num = (int)$this->_GET['type'];//导出的列表类型
+        $now = date('Y-m-d H:i:s' , time());//当前时间
+        $DB = new DB;
+        switch ($num) {
+            case 3:
+                //已过期
+                $where = ' and ((a.PC_Endtime<"'.$now.'" and a.CPhone=1) or (a.Mobile_EndTime<"'.$now.'" and a.CPhone=2) or (a.PC_Endtime<"'.$now.'" and a.Mobile_EndTime<"'.$now.'" and (a.CPhone=3 or a.CPhone=4))) and (a.status=1 or b.status=1)';
+                break;
+            case 4:
+                //30天内过期
+                $after = $after = date("Y-m-d H:i:s", strtotime("+30 day"));
+                $where = ' and ((a.PC_Endtime>"'.$now.'" and a.PC_Endtime<"'.$after.'" and a.CPhone=1) or (a.Mobile_Endtime>"'.$now.'" and a.Mobile_Endtime<"'.$after.'" and a.CPhone=2) or (a.PC_Endtime>"'.$now.'" and a.PC_Endtime<"'.$after.'" and a.Mobile_Endtime>"'.$now.'" and a.Mobile_Endtime<"'.$after.'" and (a.CPhone=3 or a.CPhone=4))) and (a.status=1 or b.status=1)';
+                break;
+            case 5:
+                //75天内过期
+                $after = $after = date("Y-m-d H:i:s", strtotime("+75 day"));
+                $where = ' and ((a.PC_Endtime>"'.$now.'" and a.PC_Endtime<"'.$after.'" and a.CPhone=1) or (a.Mobile_Endtime>"'.$now.'" and a.Mobile_Endtime<"'.$after.'" and a.CPhone=2) or (a.PC_Endtime>"'.$now.'" and a.PC_Endtime<"'.$after.'" and a.Mobile_Endtime>"'.$now.'" and a.Mobile_Endtime<"'.$after.'" and (a.CPhone=3 or a.CPhone=4))) and (a.status=1 or b.status=1)';
+                break;
+            default:
+                return false;
+                break;
+        }
+
+        if($level == 1) {
+            $select = 'select a.G_name, a.PC_domain, a.Mobile_domain, a.G_Ftp_FwAdress, a.PC_EndTime, a.Mobile_EndTime, a.CPhone, b.CompanyName, c.UserName from tb_customers_project a left join tb_customers b on a.CustomersID=b.CustomersID left join tb_account c on a.AgentID=c.AgentID where 1=1 ' . $where;
+            file_put_contents('filename.html', $select);
+            $cus = $DB->Select($select);
+        } elseif($level == 2) {
+            $cond = ' and (a.AgentID = "' . $agent_id . '" or c.BossAgentID = "' . $agent_id . '") ';
+            $select = 'select a.G_name, a.PC_domain, a.Mobile_domain, a.G_Ftp_FwAdress, a.PC_EndTime, a.Mobile_EndTime, a.CPhone, b.CompanyName, c.UserName from tb_customers_project a left join tb_customers b on a.CustomersID=b.CustomersID left join tb_account c on a.AgentID=c.AgentID where 1=1 ' . $cond . $where;
+            $cus = $DB->Select($select);
+        } elseif($level == 3) {
+            $cond = ' and a.AgentID = "' . $agent_id . '" ';
+            $select = 'select a.G_name, a.PC_domain, a.Mobile_domain, a.G_Ftp_FwAdress, a.PC_EndTime, a.Mobile_EndTime, a.CPhone, b.CompanyName, c.UserName from tb_customers_project a left join tb_customers b on a.CustomersID=b.CustomersID left join tb_account c on a.AgentID=c.AgentID where 1=1 ' . $cond . $where;
+            $cus = $DB->Select($select);
+        } else {
+            return false;
+        }
+        //导出函数
+        $this->export($cus,$num);
+    }
+    
+    //导出Excel
+    public function export($cus,$num) {
+        set_time_limit(300);
+        include 'PHPExcel/PHPExcel.php';
+        include 'PHPExcel/PHPExcel/Writer/Excel2007.php';
+        switch ($num) {
+            case '3':
+                $title = '过期客户名单-' . date('Y-m-d');
+                $filename = '过期客户名单-' . date('Ymd-His');
+                break;
+
+            case '4':
+                $title = '30天内过期客户名单-' . date('Y-m-d');
+                $filename = '30天内过期客户名单-' . date('Ymd-His');
+                break;
+
+            case '5':
+                $title = '75天内过期客户名单-' . date('Y-m-d');
+                $filename = '75天内过期客户名单-' . date('Ymd-His');
+                break;
+            
+            default:
+                $title = '过期客户名单-' . date('Y-m-d');
+                $filename = '过期客户名单-' . date('Ymd-His');
+                break;
+        }
+        $objPHPExcel = new PHPExcel();
+        //设置文档基本属性
+        $objPHPExcel->getProperties()->setCreator("daili")->setLastModifiedBy("daili")->setTitle("过期客户")->setSubject("过期客户")->setDescription("过期客户")->setKeywords("过期客户")->setCategory("过期客户");
+        //设置单元格内容
+        $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A1', '公司名')->setCellValue('B1', '用户名')->setCellValue('C1', 'PC域名')->setCellValue('D1', '手机域名')->setCellValue('E1', '分布式服务器')->setCellValue('F1', 'PC到期时间')->setCellValue('G1', '手机到期时间')->setCellValue('H1', '网站类型')->setCellValue('I1', '客服人员');
+        //设置标题
+        $objPHPExcel->getActiveSheet()->setTitle($title);
+        //默认打开首张sheet
+        $objPHPExcel->setActiveSheetIndex(0);
+        //设置单元格默认高度
+        $objPHPExcel->getActiveSheet()->getDefaultRowDimension()->setRowHeight(15);//默认高度
+        $objPHPExcel->getActiveSheet()->getRowDimension('1')->setRowHeight(30);//第一列高度
+        //行宽度
+        $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(45);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(25);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(38);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(38);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(38);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('G')->setWidth(20);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('H')->setWidth(15);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('I')->setWidth(15);
+        //单元格水平居中
+        $objPHPExcel->getActiveSheet()->getStyle('A:I')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        //单元格垂直居中
+        $objPHPExcel->getActiveSheet()->getStyle('A:I')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        //第一行格式
+        $styleArray = array(
+            'font' => array(
+                'size'=>14,
+                'color'=>array(
+                    'rgb' => '#5900CCCC',
+                ),
+            ),
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+            ),
+        );
+        $objPHPExcel->getActiveSheet()->getStyle('A1:I1')->applyFromArray($styleArray);
+
+        $i = 2;
+        //遍历数据
+        foreach($cus as $cu){
+            switch ($cu['CPhone']) {
+                case '1':
+                    $CPhone = 'PC站';
+                    break;
+                case '2':
+                    $CPhone = '手机站';
+                    break;
+                case '3':
+
+                case '4':
+                    $CPhone = '双站';
+                    break;
+                default:
+                    $CPhone = $cu['CPhone'];
+                    break;
+            }
+            //设置单元格内容
+            $objPHPExcel->getActiveSheet()->setCellValue('A' . $i, $cu['CompanyName']);
+            $objPHPExcel->getActiveSheet()->setCellValue('B' . $i, $cu['G_name']);
+            $objPHPExcel->getActiveSheet()->setCellValue('C' . $i, str_replace('http://','',$cu['PC_domain']));
+            $objPHPExcel->getActiveSheet()->setCellValue('D' . $i, str_replace('http://','',$cu['Mobile_domain']));
+            $objPHPExcel->getActiveSheet()->setCellValue('E' . $i, str_replace('http://','',$cu['G_Ftp_FwAdress']));
+            $objPHPExcel->getActiveSheet()->setCellValue('F' . $i, $cu['PC_EndTime']);
+            $objPHPExcel->getActiveSheet()->setCellValue('G' . $i, $cu['Mobile_EndTime']);
+            $objPHPExcel->getActiveSheet()->setCellValue('H' . $i, $CPhone);
+            $objPHPExcel->getActiveSheet()->setCellValue('I' . $i, $cu['UserName']);
+            $i++ ;
+        }
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="'.$filename.'.xls"');
+        header('Cache-Control: max-age=0');
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+        $objWriter->save('php://output');
+        exit;
     }
 
 }
