@@ -4124,7 +4124,6 @@ class Gbaopen extends InterfaceVIEWS
 
         if($level == 1) {
             $select = 'select a.G_name, a.PC_domain, a.Mobile_domain, a.G_Ftp_FwAdress, a.PC_EndTime, a.Mobile_EndTime, a.CPhone, b.CompanyName, c.UserName from tb_customers_project a left join tb_customers b on a.CustomersID=b.CustomersID left join tb_account c on a.AgentID=c.AgentID where 1=1 ' . $where;
-            file_put_contents('filename.html', $select);
             $cus = $DB->Select($select);
         } elseif($level == 2) {
             $cond = ' and (a.AgentID = "' . $agent_id . '" or c.BossAgentID = "' . $agent_id . '") ';
