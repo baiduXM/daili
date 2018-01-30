@@ -230,7 +230,6 @@ class Gcard extends InterfaceVIEWS
         }
 
         $ReturnString = curl_post($TuUrl, $data);
-        file_put_contents('filename.html', $ReturnString);
         $ReturnArray = json_decode($ReturnString, true);
         return $ReturnArray;
     }
