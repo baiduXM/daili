@@ -710,7 +710,7 @@ class Model extends InterfaceVIEWS
                             }
                             if ($msg['colortag']) {
                                 $Data['Color'] = $msg['colortag'];
-                                $have = implode(',', $msg['colortag']);
+                                $have = explode(',', $msg['colortag']);
                                 $Data['ZhuSeDiao'] = $have[0];
                             } else {
                                 if ($Data['Color']) {
