@@ -4105,17 +4105,17 @@ class Gbaopen extends InterfaceVIEWS
         switch ($num) {
             case 3:
                 //已过期
-                $where = ' and ((a.PC_Endtime<"'.$now.'" and a.CPhone=1) or (a.Mobile_EndTime<"'.$now.'" and a.CPhone=2) or (a.PC_Endtime<"'.$now.'" and a.Mobile_EndTime<"'.$now.'" and (a.CPhone=3 or a.CPhone=4))) and (a.status=1 or b.status=1)';
+                $where = ' and ((a.PC_Endtime<"'.$now.'" and a.CPhone=1) or (a.Mobile_EndTime<"'.$now.'" and a.CPhone=2) or ((a.PC_Endtime<"'.$now.'" or a.Mobile_EndTime<"'.$now.'") and (a.CPhone=3 or a.CPhone=4))) and (a.status=1 or b.status=1)';
                 break;
             case 4:
                 //30天内过期
                 $after = $after = date("Y-m-d H:i:s", strtotime("+30 day"));
-                $where = ' and ((a.PC_Endtime>"'.$now.'" and a.PC_Endtime<"'.$after.'" and a.CPhone=1) or (a.Mobile_Endtime>"'.$now.'" and a.Mobile_Endtime<"'.$after.'" and a.CPhone=2) or (a.PC_Endtime>"'.$now.'" and a.PC_Endtime<"'.$after.'" and a.Mobile_Endtime>"'.$now.'" and a.Mobile_Endtime<"'.$after.'" and (a.CPhone=3 or a.CPhone=4))) and (a.status=1 or b.status=1)';
+                $where = ' and ((a.PC_Endtime>"'.$now.'" and a.PC_Endtime<"'.$after.'" and a.CPhone=1) or (a.Mobile_Endtime>"'.$now.'" and a.Mobile_Endtime<"'.$after.'" and a.CPhone=2) or (((a.PC_Endtime>"'.$now.'" and a.PC_Endtime<"'.$after.'") or (a.Mobile_Endtime>"'.$now.'" and a.Mobile_Endtime<"'.$after.'")) and (a.CPhone=3 or a.CPhone=4))) and (a.status=1 or b.status=1)';
                 break;
             case 5:
                 //75天内过期
                 $after = $after = date("Y-m-d H:i:s", strtotime("+75 day"));
-                $where = ' and ((a.PC_Endtime>"'.$now.'" and a.PC_Endtime<"'.$after.'" and a.CPhone=1) or (a.Mobile_Endtime>"'.$now.'" and a.Mobile_Endtime<"'.$after.'" and a.CPhone=2) or (a.PC_Endtime>"'.$now.'" and a.PC_Endtime<"'.$after.'" and a.Mobile_Endtime>"'.$now.'" and a.Mobile_Endtime<"'.$after.'" and (a.CPhone=3 or a.CPhone=4))) and (a.status=1 or b.status=1)';
+                $where = ' and ((a.PC_Endtime>"'.$now.'" and a.PC_Endtime<"'.$after.'" and a.CPhone=1) or (a.Mobile_Endtime>"'.$now.'" and a.Mobile_Endtime<"'.$after.'" and a.CPhone=2) or (((a.PC_Endtime>"'.$now.'" and a.PC_Endtime<"'.$after.'") or (a.Mobile_Endtime>"'.$now.'" and a.Mobile_Endtime<"'.$after.'")) and (a.CPhone=3 or a.CPhone=4))) and (a.status=1 or b.status=1)';
                 break;
             default:
                 return false;
