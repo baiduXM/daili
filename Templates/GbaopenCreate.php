@@ -177,7 +177,7 @@
                                 <span>
                                     <input type="text" value="" class="Input" name="vhostPwd">
                                 </span>
-                                <span class="as">同时包含大写和小写字母，数字以及特殊符号（~!@#$%^&*()），8到20位</span>
+                                <span class="as">同时包含大写和小写字母，数字以及特殊符号（~!@#$%^*()），8到20位</span>
                             </p>
                             <p>
                                 <span class="content-l">高级定制</span>
