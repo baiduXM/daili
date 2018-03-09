@@ -59,7 +59,9 @@ class Auto extends InterfaceVIEWS {
         		} else {
                     continue;
                 }
-        	}
+        	} else {
+                continue;
+            }
 
             $res = $this->delApi($site[$k]);
             if($res['err'] == 1000) {
@@ -83,6 +85,7 @@ class Auto extends InterfaceVIEWS {
                         $res1 = $cuspro->UpdateArray($arr, array("CustomersID" => $v['CustomersID']));
                         break;
                 }
+                unset($arr);
             }
             $root = DocumentRoot.'/../';
             if (!is_dir($root.'dl-log'))

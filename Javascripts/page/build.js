@@ -12,8 +12,8 @@ jQuery(document).ready(function() {
                 Msg(1, '账号不能为空或含有中文');
                 return false;
             }
-            if(/^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$/.test($(".userdata-content input[name='account']").val()) == false){
-                Msg(1, '账号只能由数字，字母，分隔号构成。首字符和尾字符只能是数字或字母');
+            if(/^[a-zA-Z0-9][a-zA-Z0-9]*[a-zA-Z0-9]$/.test($(".userdata-content input[name='account']").val()) == false){
+                Msg(1, '账号只能由数字，字母构成');
                 return false;
             }
 
