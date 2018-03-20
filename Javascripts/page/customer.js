@@ -938,6 +938,41 @@ jQuery(document).ready(function () {
                     domain_def     = domain_def.join('.');
                     domainfocus    = '<span class="notice">域名解析到：c' + domain_def + '</span>'
                 }
+                //换色模板片段
+                    //PC
+                var pc_html = '';
+                if(data.pc_is == 1 && data.pcoption) {
+                    pc_html += '<p id="pc_color"><span class="content-l">pc颜色</span>\n\
+                                <span class="Input">';
+                    $.each(data.pcoption,function(i1,v1){
+                        if(v1 == data.pccolor) {
+                            pc_html += '<input type="radio" name="pc_color" style="vertical-align:0;" value="'+v1+'" checked><span style="margin:5px 5px 0 2px;width:15px;height:15px;background-color:#'+v1+'"></span>';
+                        } else {
+                            pc_html += '<input type="radio" name="pc_color" style="vertical-align:0;" value="'+v1+'"><span style="margin:5px 5px 0 2px;width:15px;height:15px;background-color:#'+v1+'"></span>';
+                        }                        
+                    });
+                    pc_html += '</span></p>';
+                }
+                    //手机
+                var mobile_html = '';
+                if(data.mobile_is == 1 && data.mobileoption) {
+                    mobile_html += '<p id="mobile_color"><span class="content-l">手机颜色</span>\n\
+                                <span class="Input">';
+                    $.each(data.mobileoption,function(i2,v2){
+                        if(v2 == data.mobilecolor) {
+                            mobile_html += '<input type="radio" name="mobile_color" style="vertical-align:0;" value="'+v2+'" checked><span style="margin:5px 5px 0 2px;width:15px;height:15px;background-color:#'+v2+'"></span>';
+                        } else {
+                            mobile_html += '<input type="radio" name="mobile_color" style="vertical-align:0;" value="'+v2+'"><span style="margin:5px 5px 0 2px;width:15px;height:15px;background-color:#'+v2+'"></span>';
+                        }                        
+                    });
+                    mobile_html += '</span></p>';
+                }
+                    //双站
+                var pk_html = '';
+                if(data.pc_mobile == 4) {
+                    pk_html = pc_html + mobile_html;
+                }
+                var 
                 html          = '<div class="userdata-content"><p style="font-size:20px;">确定对' + data.name + '进行修改信息操作？</p>';
                 var starttime = data.pc_starttime ? '<p>\
                         <span class="content-l">PC上线时间</span>\
@@ -961,6 +996,11 @@ jQuery(document).ready(function () {
                            <input type="radio" name="pc_mobile" value="3">套餐\
                            <input type="radio" name="pc_mobile" value="4">双站</span>\
                     </p>\
+                    <p><span class="content-l">站点类型</span>\
+                       <span class="Input">\
+                           <input type="radio" name="is_demo" value="0">客户站\
+                           <input type="radio" name="is_demo" value="1">模板站\
+                    </p>\
                     <p><span class="content-l">栏目自定义</span>\
                        <span class="Input">\
                            <input type="radio" name="column_on" value="1">开启\
@@ -973,15 +1013,15 @@ jQuery(document).ready(function () {
                     <p class="modelchoose" id="pc" style="display:none;">\
                        <span class="content-l">pc模板</span>\
                        <span><input type="text" name="pcmodel" class="Input" value="' + data.pcmodel + '"></span>\
-                    </p>\
+                    </p>'+(data.pc_mobile != 4 ? pc_html : '')+'\
                     <p class="modelchoose" id="mobile" style="display:none;">\
                        <span class="content-l">手机模板</span>\
                        <span><input type="text" name="mobilemodel" class="Input" value="' + data.mobilemodel + '"></span>\
-                    </p>\
+                    </p>'+(data.pc_mobile != 4 ? mobile_html : '')+'\
                     <p class="modelchoose" id="pk" style="display:none;">\
                        <span class="content-l">双站模板</span>\
                        <span><input type="text" name="pkmodel" class="Input" value="' + data.pkmodel + '"></span>\
-                    </p>\
+                    </p>'+pk_html+'\
                     <p class="modelchoose" id="domain_pc" style="display:none;">\
                        <span class="content-l">PC域名</span>\
                        <span><input type="text" name="pcdomain" class="Input" value="' + data.pcdomain + '"></span>\n\
@@ -1015,8 +1055,9 @@ jQuery(document).ready(function () {
                         $("#dialog-message input[type=\'radio\'][name=\'senior\'][value=\'' + data.senior + '\']").attr("checked","true");\
                         $("#dialog-message input[type=\'radio\'][name=\'pc_mobile\'][value=\'' + data.pc_mobile + '\']").attr("checked","true");\
                         $("#dialog-message input[type=\'radio\'][name=\'column_on\'][value=\'' + data.column_on + '\']").attr("checked","true");\
-                        changetext(' + data.pc_mobile + ');\
-                        $("#dialog-message input[type=\'radio\'][name=\'pc_mobile\']").change(function(){changetext($(this).val())});\
+                        $("#dialog-message input[type=\'radio\'][name=\'is_demo\'][value=\'' + data.is_demo + '\']").attr("checked","true");\
+                        changetext(' + data.pc_mobile + ', 1);\
+                        $("#dialog-message input[type=\'radio\'][name=\'pc_mobile\']").change(function(){changetext($(this).val(), 2)});\
                         $("#dialog-message input[type=\'checkbox\']").click(function(){\
                             if($(this).is(":checked")) {\
                                 if($(this).attr("name")=="outpc_add")\
@@ -1520,6 +1561,20 @@ jQuery(document).ready(function () {
             data += '"pc_mobile":"' + $("input[type=\'radio\'][name=\'pc_mobile\']:checked").val() + '",';
             data += '"senior":"' + $("input[type=\'radio\'][name=\'senior\']:checked").val() + '",';
             data += '"column_on":"' + $("input[type=\'radio\'][name=\'column_on\']:checked").val() + '",';
+            data += '"is_demo":"' + $("input[type=\'radio\'][name=\'is_demo\']:checked").val() + '",';
+
+            //换色模板选色
+            if($('#pc_color').length > 0) {
+                data += '"pc_color":"' + $("input[type=\'radio\'][name=\'pc_color\']:checked").val() + '",';
+            } else {
+                data += '"pc_color":"",';
+            }
+            if($('#mobile_color').length > 0) {
+                data += '"mobile_color":"' + $("input[type=\'radio\'][name=\'mobile_color\']:checked").val() + '",';
+            } else {
+                data += '"mobile_color":"",';
+            }
+            
             data += '"outmobile_add":"' + $("input[type=\'checkbox\'][name=\'outmobile_add\']").is(':checked') + '",';
             data += '"outpc_add":"' + $("input[type=\'checkbox\'][name=\'outpc_add\']").is(':checked') + '",';
             data += '"num":' + number + '}';
@@ -1678,21 +1733,81 @@ jQuery(document).ready(function () {
         $('#dialog-message').html('');
         return false;
     });
+
+    //选择模板时检测是否是换色模板
+    $(document).on('input propertychange','.modelchoose',function(){
+        var type = $(this).attr('id');
+        if(type == 'pk' || type == 'pc' || type == 'mobile') {
+            var id = '#' + type;
+            var id_color = id + '_color';
+            var input = 'input[name=' + type + 'model]';
+            var model = $(input).val();
+            if(type != 'pk') {
+                $(id_color).remove();
+            } else {
+                $('#pc_color').remove();
+                $('#mobile_color').remove(); 
+            }            
+            if(model.length >= 10) {
+                $.get('Apps?module=Model&action=checkModel&type=' + type + '&model=' + model, function(result){
+                    if(result.err == 1000) {
+                        var res = result.data;
+                        var html = '';
+                        if(res.pc_is) {
+                            html += '<p id="pc_color"><span class="content-l">pc颜色</span>\n\
+                                    <span class="Input">';
+                            $.each(res.pc_color,function(i1,v1){
+                                if(i1 == 0) {
+                                    html += '<input type="radio" name="pc_color" style="vertical-align:0;" value="'+v1+'" checked><span style="margin:5px 5px 0 2px;width:15px;height:15px;background-color:#'+v1+'"></span>';
+                                } else {
+                                    html += '<input type="radio" name="pc_color" style="vertical-align:0;" value="'+v1+'"><span style="margin:5px 5px 0 2px;width:15px;height:15px;background-color:#'+v1+'"></span>';
+                                }                        
+                            });
+                            html += '</span></p>';
+                        }
+                        if(res.mobile_is) {
+                            html += '<p id="mobile_color"><span class="content-l">手机颜色</span>\n\
+                                    <span class="Input">';
+                            $.each(res.mobile_color,function(i2,v2){
+                                if(i2 == 0) {
+                                    html += '<input type="radio" name="mobile_color" style="vertical-align:0;" value="'+v2+'" checked><span style="margin:5px 5px 0 2px;width:15px;height:15px;background-color:#'+v2+'"></span>';
+                                } else {
+                                    html += '<input type="radio" name="mobile_color" style="vertical-align:0;" value="'+v2+'"><span style="margin:5px 5px 0 2px;width:15px;height:15px;background-color:#'+v2+'"></span>';
+                                }                        
+                            });
+                            html += '</span></p>';
+                        }
+                        $(id).after(html);
+                    } else {
+                        if(type != 'pk') {
+                            $(id_color).remove();
+                        } else {
+                            $('#pc_color').remove();
+                            $('#mobile_color').remove(); 
+                        } 
+                    }
+                });
+            }
+        }
+    });
+    
 });
 
 
-function changetext(num) {
+function changetext(num, type) {
     var m = $(".modelchoose");
     m.hide();
     if (num == 1) {
         $("#pc").show();
         $("#domain_pc").show();
         $("#domain_outmobile").show();
+        $('#mobile_color').remove();
     }
     else if (num == 2) {
         $("#mobile").show();
         $("#domain_mobile").show();
         $("#domain_outpc").show();
+        $('#pc_color').remove();
     }
     else if (num == 3) {
         $("#pc").show();
@@ -1704,6 +1819,11 @@ function changetext(num) {
         $("#pk").show();
         $("#domain_pc").show();
         $("#domain_mobile").show();
+        if(type == 2) {
+            $('#pc_color').remove();
+            $('#mobile_color').remove();
+        }
+        
     }
     ;
 }

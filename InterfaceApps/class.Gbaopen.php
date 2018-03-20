@@ -567,7 +567,8 @@ class Gbaopen extends InterfaceVIEWS
                     if ($this->Assess($power, $this->process)) {
                         $cuspromodel = new CustProModule;
                         $fuwuqi = new FuwuqiModule();
-                        $lists = array('G_name', 'CPhone', 'PK_model', 'PC_model', 'Mobile_model', 'Link_Cus', 'PC_AddTime', 'Mobile_AddTime', 'PC_StartTime', 'Mobile_StartTime', 'PC_domain', 'Mobile_domain', 'Customization', 'FuwuqiID' , 'column_on' , 'pc_out_domain' , 'mobile_out_domain' );
+                        $model = new ModelModule();
+                        $lists = array('G_name', 'CPhone', 'PK_model', 'PC_model', 'Mobile_model', 'Link_Cus', 'PC_AddTime', 'Mobile_AddTime', 'PC_StartTime', 'Mobile_StartTime', 'PC_domain', 'Mobile_domain', 'Customization', 'FuwuqiID' , 'column_on' , 'pc_out_domain' , 'mobile_out_domain' , 'pc_color' , 'mobile_color' , 'is_demo' );
                         $cuspro = $cuspromodel->GetOneByWhere($lists, 'where CustomersID=' . $cus_id);
                         if ($cuspro) {
                             if ($cuspro['FuwuqiID']) {
@@ -592,6 +593,34 @@ class Gbaopen extends InterfaceVIEWS
                               }
                              * 
                              */
+
+                            //旧编号无换色，不考虑用旧编号搜索
+                              //PC模板信息
+                            $pcInfo = $model->GetOneByWhere(array('isColorful' , 'color_style') , ' where NO="' . $cuspro['PC_model'] . '"');
+                            if(!$pcInfo or !$pcInfo['isColorful']) {
+                                $pc_is = 0;
+                                $cuspro['pc_color'] = '';
+                            } else {
+                                $pc_is = $pcInfo['isColorful'];
+                                $pc_str = str_replace('#', '', $pcInfo['color_style']);
+                                $pc_arr = explode(',', $pc_str);
+                                if(!$cuspro['pc_color']) {                                    
+                                    $cuspro['pc_color'] = $pc_arr['0'];
+                                }
+                            }
+                              //手机模板信息
+                            $mobileInfo = $model->GetOneByWhere(array('isColorful' , 'color_style') , ' where NO="' . $cuspro['Mobile_model'] . '"');
+                            if(!$mobileInfo or !$mobileInfo['isColorful']) {
+                                $mobile_is = 0;
+                                $cuspro['mobile_color'] = '';
+                            } else {
+                                $mobile_is = $mobileInfo['isColorful'];
+                                $mobile_str = str_replace('#', '', $mobileInfo['color_style']);
+                                $mobile_arr = explode(',', $mobile_str);
+                                if(!$cuspro['mobile_color']) {                                    
+                                    $cuspro['mobile_color'] = $mobile_arr['0'];
+                                }
+                            }
                             $cuspro['PC_StartTime'] = false;
                             $cuspro['Mobile_StartTime'] = false;
                             $cuspro['Link_Cus'] = $cuspro['Link_Cus'] ? $cuspro['Link_Cus'] : '';
@@ -601,13 +630,20 @@ class Gbaopen extends InterfaceVIEWS
                                           'pc_mobile'        => $cuspro['CPhone'],
                                           'pkmodel'          => $cuspro['PK_model'],
                                           'pcmodel'          => $cuspro['PC_model'],
+                                          'pcoption'         => $pc_arr,
+                                          'pccolor'          => $cuspro['pc_color'],
+                                          'pc_is'            => $pc_is,
                                           'mobilemodel'      => $cuspro['Mobile_model'],
+                                          'mobileoption'     => $mobile_arr,
+                                          'mobilecolor'      => $cuspro['mobile_color'],
+                                          'mobile_is'        => $mobile_is,
                                           'pc_starttime'     => $cuspro['PC_StartTime'],
                                           'mobile_starttime' => $cuspro['Mobile_StartTime'],
                                           'pcdomain'         => $cuspro['PC_domain'] ? $cuspro['PC_domain'] : '',
                                           'mobiledomain'     => $cuspro['Mobile_domain'] ? $cuspro['Mobile_domain'] : '',
                                           'senior'           => $cuspro['Customization'],
                                           'column_on'        => $cuspro['column_on'],
+                                          'is_demo'        => $cuspro['is_demo'],
                                           'pc_out_domain'    => $cuspro['pc_out_domain'],
                                           'mobile_out_domain' => $cuspro['mobile_out_domain'],
                                           'othercus'         => $cuspro['Link_Cus']);
@@ -1254,6 +1290,8 @@ class Gbaopen extends InterfaceVIEWS
             $Data['Link_Cus'] = $linkcus ? $cuspromodel->GetOneByWhere('where G_name=\'' . $linkcus . '\'') ? $linkcus : 0 : 0;
             //是否允许客户自定义栏目
             $Data['column_on'] = $post['column_on'];
+            //是客户站还是模板站
+            $Data['is_demo'] = $post['is_demo'] ? $post['is_demo'] : 0;
             //模板号域名处理
             $Model = new ModelModule();
             $Data['CPhone'] = $post['pc_mobile'];
@@ -1424,6 +1462,28 @@ class Gbaopen extends InterfaceVIEWS
                 //套餐站外域名
                 $Data['pc_out_domain'] = '';
                 $Data['mobile_out_domain'] = '';
+            }
+
+            //换色模板的选色
+                //PC
+            if(isset($post['pc_color'])) {
+                if($post['pc_color']) {
+                    $Data['pc_color'] = $post['pc_color'];
+                } else {
+                    $Data['pc_color'] = '';
+                }
+            } else {
+                $Data['pc_color'] = '';
+            }
+                //手机
+            if(isset($post['mobile_color'])) {
+                if($post['mobile_color']) {
+                    $Data['mobile_color'] = $post['mobile_color'];
+                } else {
+                    $Data['mobile_color'] = '';
+                }
+            } else {
+                $Data['mobile_color'] = '';
             }
 //            $ordermodule = new OrderModule();
 //            $order_data = $ordermodule->GetOneInfoByKeyID($cuspro["OrderID"]);
@@ -1677,11 +1737,16 @@ class Gbaopen extends InterfaceVIEWS
             $crtdata ['Remark'] = addslashes($post ['remark']);
             $crtdata ['UpdateTime'] = date('Y-m-d H:i:s', time());
             $crtdata ['Experience'] = trim(isset($post['experience']) && $level == 2 && $agentinfo["ExperienceCount"] > 0 ? $post['experience'] : 0);
+            //换色模板选色
+            $Data['pc_color'] = trim(isset($post['pc_color']) ? $post['pc_color'] : '');
+            $Data['mobile_color'] = trim(isset($post['mobile_color']) ? $post['mobile_color'] : '');
             if (!($crtdata ['CompanyName'] && $crtdata ['CustomersName'] && $crtdata ['Tel'])) {
                 $result['err'] = 1004;
                 $result['msg'] = '公司名称，联系人，电话都不能为空';
                 return $result;
             }
+            //是否是模板demo站
+            $Data['is_demo'] = trim($post['is_demo'] ? $post['is_demo'] : 0);
             //客户创建和开通
             if ($post['type'] == 'cus') {
                 $crtdata['Email'] = trim($post['email']);
@@ -2358,6 +2423,9 @@ class Gbaopen extends InterfaceVIEWS
         $ToString .= '&pc_out_domain=' . $CustProInfo ['pc_out_domain'];//手机站PC外域名
         $ToString .= '&mobile_out_domain=' . $CustProInfo ['mobile_out_domain'];//PC站手机外域名
         $ToString .= '&mobile_other=' . $this->mobile_domain;
+        $ToString .= '&pc_color=' . $CustProInfo ['pc_color'];
+        $ToString .= '&mobile_color=' . $CustProInfo ['mobile_color'];
+        $ToString .= '&is_demo=' . ($CustProInfo ['is_demo'] ? $CustProInfo ['is_demo'] : 0);
         if (isset($_POST["password"]) && !empty($_POST["password"])) {
             $ToString .= '&password=' . $_POST["password"];
         }

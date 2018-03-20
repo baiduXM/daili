@@ -98,6 +98,13 @@
                                 <!--</span>-->
                             </p>
                             <p>
+                                <span class="content-l">站点类型</span>
+                                <span class="Input">
+                                    <input type="radio" name="is_demo" value="0" checked>客户站
+                                    <input type="radio" name="is_demo" value="1">模板站
+                                </span>
+                            </p>
+                            <p>
                                 <span class="content-l">FTP</span>
                                 <span class="Input">
                                     <input type="radio" name="ftp_c" value="1" checked>公司FTP

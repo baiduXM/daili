@@ -106,7 +106,7 @@ jQuery(function () {
         //上传数量
         threads: 1,
         //单个文件大小限制
-        fileSingleSizeLimit: 8388608, // 8*1024*1024
+        fileSingleSizeLimit: 20971520, // 8*1024*1024
         //文件个数限制
         fileNumLimit: 4,
         //只允许选择文件，可选。
@@ -268,8 +268,8 @@ jQuery(function () {
         if (file.ext != 'zip' && file.ext != 'csv') {
             err = file.name + '：上传文件只能是zip或csv文件；'
         }
-        if (file.size > 8388608) {
-            err = file.name + '：上传文件大小不能够大于8M；'
+        if (file.size > 20971520) {
+            err = file.name + '：上传文件大小不能够大于20M；'
         }
         if (err) {
             Msg(1, err);

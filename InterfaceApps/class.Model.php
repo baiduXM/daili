@@ -51,12 +51,12 @@ class Model extends InterfaceVIEWS
             $Data['PhoneUrl'] = trim($post['mobile_url']);
             $Data['Price'] = trim($post['price']);
             $Data['Youhui'] = trim($post['youhui']);
-            // $PCModel = $ModelModule->GetOneByWhere('where NO="' . $Data['PCNum'] . '"');
-            // $PhoneModel = $ModelModule->GetOneByWhere('where NO="' . $Data['PhoneNum'] . '"');
-            $pc_sql = 'select * from tb_model where NO="' . $Data['PCNum'] . '"';
-            $mobile_sql = 'select * from tb_model where NO="' . $Data['PhoneNum'] . '"';
-            $PCModel = $ModelModule->modelQuery($pc_sql);
-            $PhoneModel = $ModelModule->modelQuery($mobile_sql);
+            $PCModel = $ModelModule->GetOneByWhere('where NO="' . $Data['PCNum'] . '"');
+            $PhoneModel = $ModelModule->GetOneByWhere('where NO="' . $Data['PhoneNum'] . '"');
+            // $pc_sql = 'select * from tb_model where NO="' . $Data['PCNum'] . '"';
+            // $mobile_sql = 'select * from tb_model where NO="' . $Data['PhoneNum'] . '"';
+            // $PCModel = $ModelModule->modelQuery($pc_sql);
+            // $PhoneModel = $ModelModule->modelQuery($mobile_sql);
             if (!$PCModel || !$PhoneModel) {
                 $result['err'] = 1000;
                 // $result['msg'] = $PCMsg ? '手机模板不存在' : 'PC模板不存在';
@@ -130,6 +130,17 @@ class Model extends InterfaceVIEWS
             $Data['Language'] = 'PHP';
             $Data['ModelClassID'] = trim($PCModel['ModelClassID'], ',') . ',' . trim($PhoneModel['ModelClassID'], ',');
             $Data['AddTime'] = date("Y-m-d H:i:s", time());
+            //换色模板
+            if($PCModel['isColorful'] == 1) {
+                $Data['pc_color'] = $PCModel['color_style'];
+            } else {
+                $Data['pc_color'] = '';
+            }
+            if($PhoneModel['isColorful'] == 1) {
+                $Data['mobile_color'] = $PhoneModel['color_style'];
+            } else {
+                $Data['mobile_color'] = '';
+            }
             if ($PackModule->InsertArray($Data, true)) {
                 $this->updateModel(array("PackagesNum" => $Data['PackagesNum']), "model_packages");
                 $result['err'] = 0;
@@ -663,6 +674,8 @@ class Model extends InterfaceVIEWS
                             $Data['Type'] = $config_arr['Config']['Type'] ? $config_arr['Config']['Type'] : '';
                             $Data['Keyword'] = $config_arr['Config']['Tags'] ? $config_arr['Config']['Tags'] : '';
                             $Data['Color'] = $config_arr['Config']['StyleColors'] ? str_replace(' ', '', $config_arr['Config']['StyleColors']) : '';
+                            $Data['isColorful'] = isset($config_arr['Config']['ColorOption']) ? ( $config_arr['Config']['ColorOption'] ? 1 : 0 ) : 0;
+                            $Data['color_style'] = isset($config_arr['Config']['ColorOption']) ? $config_arr['Config']['ColorOption'] : '';
                             $Data['DeveloperSN'] = $config_arr['Developer']['SN'] ? $config_arr['Developer']['SN'] : '';
                             $Data['DeveloperName'] = $config_arr['Developer']['Name'] ? $config_arr['Developer']['Name'] : '';
                             $Data['DeveloperHi'] = $config_arr['Developer']['Hi'] ? $config_arr['Developer']['Hi'] : '';
@@ -1065,6 +1078,8 @@ class Model extends InterfaceVIEWS
             } else {
                 if ($data["Type"] == "PC") {
                     $data['EWM'] = 'http://s.jiathis.com/qrcode.php?url=' . $data['Url'];
+                    $data['pc_color'] = $data['color_style'];
+                    $data['mobile_color'] = '';
                 } else {
                     // if(strpos($data["Url"], 'http://GM')===false){
                     if (strpos($data["Url"], 'MCN') === false or strpos($data["Url"], 'MEN') === false) {
@@ -1074,6 +1089,8 @@ class Model extends InterfaceVIEWS
                         $data['Url'] = str_replace('http://G', 'http://m.G', $data['Url']);
                         $data['EWM'] = 'http://s.jiathis.com/qrcode.php?url=' . $data['Url'];
                     }
+                    $data['mobile_color'] = $data['color_style'];
+                    $data['pc_color'] = '';
                 }
             }
             $data["PCNum"] = "";
@@ -1168,10 +1185,94 @@ class Model extends InterfaceVIEWS
         $String.='&canSu7='.$data["PhoneNum"] ;//双站的手机模板编号
         $String.='&canSu8='.$data["ModelLan"] ;//中英文
         $String.='&canSu9='.$data["ModelClassID"] ;//分类id
+        $String.='&pc_color='.$data["pc_color"] ;//PC可换颜色
+        $String.='&mobile_color='.$data["mobile_color"] ;//手机可换颜色
 
         $url = GUANWANG_DOMAIN . 'fgkSQL.php';
         $Coupons = request_by_other($url, $String);
         //返回值：1000-成功；1001-修改记录失败；1002-新建记录失败；1003-未接收到post数据
         return $Coupons;
+    }
+
+    //检测模板是否是换色模板
+    public function checkModel() {
+        $result = array('err' => 0, 'data' => '');
+        $model = $this->_GET['model'];
+        $type = $this->_GET['type'];
+        
+        if($type == 'pk') {
+            $mdb = new ModelPackageModule();
+            $find = array('pc_color','mobile_color');
+            $select = ' where PackagesNum="' . $model .'"';
+            $data = $mdb->GetOneByWhere($find , $select);
+            if($data) {
+                //PC
+                if($data['pc_color']) {
+                    $color_pc = str_replace('#', '',$data['pc_color']);
+                    $res['pc_color'] = explode(',', $color_pc);
+                    $res['pc_is'] = 1;
+                } else {
+                    $res['pc_color'] = '';
+                    $res['pc_is'] = 0;
+                }
+                //手机
+                if($data['mobile_color']) {
+                    $color_mobile = str_replace('#', '',$data['mobile_color']);
+                    $res['mobile_color'] = explode(',', $color_mobile);
+                    $res['mobile_is'] = 1;
+                } else {
+                    $res['mobile_color'] = '';
+                    $res['mobile_is'] = 0;
+                }
+                $result = array('err' => 1000, 'data' => $res, 'msg'=>'双站数据');
+            } else {
+                $result = array('err' => 1001, 'data' => '', 'msg'=>'查无数据');
+            }
+        } else {
+            switch ($type) {
+                case 'pc':
+                    $op = 'PC';
+                    break;
+                case 'mobile':
+                    $op = '手机';
+                    break;
+                default:
+                    $op = 'pkmodel';
+                    break;
+            }
+            $mdb = new ModelModule();
+            $find = array('isColorful','color_style');
+            $select = ' where Type="' . $op . '" and NO="' . $model .'"';
+            $data = $mdb->GetOneByWhere($find , $select);
+            $color_style = str_replace('#', '',$data['color_style']);
+            $color = explode(',', $color_style);
+            if($data) {                
+                if($data['isColorful'] == 1) {
+                    if($type == 'pc') {
+                        $res['pc_is'] = 1;
+                        $res['mobile_is'] = 0;
+                        $res['mobile_color'] = '';
+                        $res['pc_color'] = $color;
+                    } elseif($type == 'mobile') {
+                        $res['pc_is'] = 0;
+                        $res['mobile_is'] = 1;
+                        $res['mobile_color'] = $color;
+                        $res['pc_color'] = '';
+                    } else {
+                        $res['pc_is'] = 0;
+                        $res['mobile_is'] = 0;
+                        $res['mobile_color'] = '';
+                        $res['pc_color'] = '';
+                    }
+                    $result = array('err' => 1000, 'data' => $res, 'msg'=>'换色模板');
+                } else {
+                    $result = array('err' => 0, 'data' => '', 'msg'=>'非换色模板');
+                }
+            } else {
+                $result = array('err' => 1001, 'data' => '', 'msg'=>'查无数据');
+            }
+        }
+        
+        return $result;
     }
 }

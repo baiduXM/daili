@@ -328,6 +328,63 @@ jQuery(document).ready(function() {
         });
         $('#dialog-message').html('');
     });
+
+    //选择模板时检测是否是换色模板
+    $('.modelchoose').on('input propertychange',function(){
+        var type = $(this).attr('id');
+        if(type == 'pk' || type == 'pc' || type == 'mobile') {
+            var id = '#' + type;     
+            var id_color = id + '_color';       
+            var input = 'input[name=' + type + 'model]';
+            var model = $(input).val();
+            if(type != 'pk') {
+                $(id_color).remove();
+            } else {
+                $('#pc_color').remove();
+                $('#mobile_color').remove(); 
+            }
+            if(model.length >= 10) {
+                $.get('Apps?module=Model&action=checkModel&type=' + type + '&model=' + model, function(result){
+                    if(result.err == 1000) {
+                        var res = result.data;
+                        var html = '';
+                        if(res.pc_is) {
+                            html += '<p id="pc_color"><span class="content-l">pc颜色</span>\n\
+                                    <span class="Input">';
+                            $.each(res.pc_color,function(i1,v1){
+                                if(i1 == 0) {
+                                    html += '<input type="radio" name="pc_color" style="vertical-align:0;" value="'+v1+'" checked><span style="margin:5px 5px 0 2px;width:15px;height:15px;background-color:#'+v1+'"></span>';
+                                } else {
+                                    html += '<input type="radio" name="pc_color" style="vertical-align:0;" value="'+v1+'"><span style="margin:5px 5px 0 2px;width:15px;height:15px;background-color:#'+v1+'"></span>';
+                                }                        
+                            });
+                            html += '</span></p>';
+                        }
+                        if(res.mobile_is) {
+                            html += '<p id="mobile_color"><span class="content-l">手机颜色</span>\n\
+                                    <span class="Input">';
+                            $.each(res.mobile_color,function(i2,v2){
+                                if(i2 == 0) {
+                                    html += '<input type="radio" name="mobile_color" style="vertical-align:0;" value="'+v2+'" checked><span style="margin:5px 5px 0 2px;width:15px;height:15px;background-color:#'+v2+'"></span>';
+                                } else {
+                                    html += '<input type="radio" name="mobile_color" style="vertical-align:0;" value="'+v2+'"><span style="margin:5px 5px 0 2px;width:15px;height:15px;background-color:#'+v2+'"></span>';
+                                }                        
+                            });
+                            html += '</span></p>';
+                        }
+                        $(id).after(html);
+                    } else {
+                        if(type != 'pk') {
+                            $(id_color).remove();
+                        } else {
+                            $('#pc_color').remove();
+                            $('#mobile_color').remove(); 
+                        }
+                    }
+                });
+            }
+        }
+    });
 });
 
 //类型选择 相应文本框展示
@@ -339,11 +396,13 @@ function changetype(num) {
         $("#domain_outmobile").show();
         $("#pc").find("span").eq(0).show();
         $("#pc").find("span").eq(1).show();
+        $('#mobile_color').remove();
     } else if (num == 2) {
         $("#mobile").show();
         $("#domain_outpc").show();
         $("#mobile").find("span").eq(0).show();
         $("#mobile").find("span").eq(1).show();
+        $('#pc_color').remove();
     } else if (num == 3) {
         $("#pc").show();
         $("#mobile").show();
@@ -357,6 +416,8 @@ function changetype(num) {
         $("#pc").find("span").eq(1).hide();
         $("#mobile").show().find("span").eq(0).hide();
         $("#mobile").find("span").eq(1).hide();
+        $('#pc_color').remove();
+        $('#mobile_color').remove();
     }
 }
 ;
