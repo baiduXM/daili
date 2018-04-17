@@ -31,6 +31,96 @@ class Gbaopen extends InterfaceVIEWS
         $this->mobile_domain;
     }
 
+    /**
+     * 小程序打包
+     */
+    public function SmallProgramPackage(){
+        $g_name = htmlentities($_GET['g_name']);
+        $DB = new DB();
+        $select = "select G_name, is_applets, AppId, AppSecret, AppletDomainName from tb_customers_project  WHERE `G_name`='$g_name'";
+        $data = $DB->Select($select);
+
+        if($data[0]['is_applets'] != 1){
+            return '1004';
+        }
+        else{
+            $wx = 'wx';
+            $package = 'xcx';
+            //project.config.json
+            $myfile = fopen($wx."/project.config.json", "w") or die("Unable to open file!");
+            $txt= '{
+                "description": "项目配置文件。",
+                "setting": {
+                    "urlCheck": true,
+                    "es6": true,
+                    "postcss": true,
+                    "minified": true,
+                    "newFeature": true
+                },
+                "compileType": "miniprogram",
+                "libVersion": "1",
+                "appid": "'.$data[0]["AppId"].'",
+                "projectname": "gbpen",
+                "condition": {
+                    "search": {
+                        "current": -1,
+                        "list": []
+                    },
+                    "conversation": {
+                        "current": -1,
+                        "list": []
+                    },
+                    "miniprogram": {
+                        "current": -1,
+                        "list": []
+                    }
+                }
+            }';
+            fwrite($myfile, $txt);
+            fclose($myfile);
+
+            //index.wxml
+            $myfile = fopen($wx."/pages/index/index.wxml", "w") or die("Unable to open file!");
+            $txt= '<web-view src="https://xcx.5067.org/'.$g_name.'/"></web-view>';
+            fwrite($myfile, $txt);
+            fclose($myfile);
+
+
+            $filename = $package.'/'.$g_name.'-'.time().'.zip'; //最终生成的文件名，路径
+
+            $zip=new \ZipArchive();
+            if($zip->open("$filename", \ZipArchive::CREATE)=== TRUE){
+                $this->addFileToZip($wx."/", $zip); //调用方法，对要打包的根目录进行操作，并将ZipArchive的对象传递给方法
+                $zip->close(); //关闭处理的zip文件
+            }
+            $host = 'http://'.$_SERVER['HTTP_HOST'].'/';
+            $zip_url = $host.$filename;
+            if($zip_url){
+                return $zip_url;
+            }
+           unlink($filename);
+
+        }
+
+
+    }
+
+    /*文件夹打包*/
+    function addFileToZip($path,$zip){
+        $handler=opendir($path); //打开当前文件夹由$path指定。
+        while(($filename=readdir($handler))!==false){
+            if($filename != "." && $filename != ".."){//文件夹文件名字为'.'和‘..'，不要对他们进行操作
+                if(is_dir($path."/".$filename)){// 如果读取的某个对象是文件夹，则递归
+                    $this->addFileToZip($path."/".$filename, $zip);
+                }else{ //将文件加入zip对象
+                    $zip->addFile($path."/".$filename);
+                }
+            }
+        }
+        @closedir($path);
+    }
+
+
     //客户列表页面初始化
     public function CusInit()
     {
@@ -568,7 +658,7 @@ class Gbaopen extends InterfaceVIEWS
                         $cuspromodel = new CustProModule;
                         $fuwuqi = new FuwuqiModule();
                         $model = new ModelModule();
-                        $lists = array('G_name', 'CPhone', 'PK_model', 'PC_model', 'Mobile_model', 'Link_Cus', 'PC_AddTime', 'Mobile_AddTime', 'PC_StartTime', 'Mobile_StartTime', 'PC_domain', 'Mobile_domain', 'Customization', 'FuwuqiID' , 'column_on' , 'pc_out_domain' , 'mobile_out_domain' , 'pc_color' , 'mobile_color' , 'is_demo' );
+                        $lists = array('G_name', 'CPhone', 'PK_model', 'PC_model', 'Mobile_model', 'Link_Cus', 'PC_AddTime', 'Mobile_AddTime', 'PC_StartTime', 'Mobile_StartTime', 'PC_domain', 'Mobile_domain', 'Customization', 'FuwuqiID' , 'column_on' , 'pc_out_domain' , 'mobile_out_domain' , 'pc_color' , 'mobile_color' , 'is_demo', 'is_applets', 'AppId', 'AppSecret', 'AppletDomainName' );
                         $cuspro = $cuspromodel->GetOneByWhere($lists, 'where CustomersID=' . $cus_id);
                         if ($cuspro) {
                             if ($cuspro['FuwuqiID']) {
@@ -646,7 +736,11 @@ class Gbaopen extends InterfaceVIEWS
                                           'is_demo'        => $cuspro['is_demo'],
                                           'pc_out_domain'    => $cuspro['pc_out_domain'],
                                           'mobile_out_domain' => $cuspro['mobile_out_domain'],
-                                          'othercus'         => $cuspro['Link_Cus']);
+                                          'othercus'         => $cuspro['Link_Cus'],
+                                          'is_applets'         => $cuspro['is_applets'],
+                                          'AppId'              => $cuspro['AppId'],
+                                          'AppSecret'          => $cuspro['AppSecret'],
+                                          'AppletDomainName'   => $cuspro['AppletDomainName']);
                             $result['data'] = $data;
                         } else {
                             $result['err'] = 1003;
@@ -1485,6 +1579,24 @@ class Gbaopen extends InterfaceVIEWS
             } else {
                 $Data['mobile_color'] = '';
             }
+
+            //是否开通小程序
+            $Data['is_applets'] = $post['is_applets'];
+            if($Data['is_applets'] == 1){
+                if($post['AppId'] == null || $post['AppSecret'] == null/* || $post['AppletDomainName'] == null*/ ){
+                    $result['err'] = 1002;
+                    $result['msg'] = '小程序ID或小程序秘钥不能为空';
+                    return $result;
+                }
+                $Data['AppId']            = trim($post['AppId']);
+                $Data['AppSecret']        = trim($post['AppSecret']);
+                //$Data['AppletDomainName'] = trim($post['AppletDomainName']);
+
+            }else{
+                $Data['AppId']            = "";
+                $Data['AppSecret']        = "";
+                //$Data['AppletDomainName'] = "";
+            }
 //            $ordermodule = new OrderModule();
 //            $order_data = $ordermodule->GetOneInfoByKeyID($cuspro["OrderID"]);
 //            $ordermodule->UpdateArray(array("OrderEndDate"=> date("Y-m-d H:i:s",time())),array("OrderID"=>$order_data["OrderID"]));
@@ -1747,6 +1859,7 @@ class Gbaopen extends InterfaceVIEWS
             }
             //是否是模板demo站
             $Data['is_demo'] = trim($post['is_demo'] ? $post['is_demo'] : 0);
+
             //客户创建和开通
             if ($post['type'] == 'cus') {
                 $crtdata['Email'] = trim($post['email']);
@@ -2236,6 +2349,21 @@ class Gbaopen extends InterfaceVIEWS
                 }
                 $Data['UpdateTime'] = $nowtime;
                 $Data['ProjectID'] = 1;
+
+                //是否开通小程序
+                 $is_applets = $post['is_applets'] ;
+                 switch ($is_applets){
+                     case 'true':
+                         $Data['is_applets'] = 1;
+                         $Data['AppId'] = trim($post['AppId'] ? $post['AppId'] : '');
+                         $Data['AppSecret'] = trim($post['AppSecret'] ? $post['AppSecret'] : '');
+                         $Data['AppletDomainName'] = trim($post['AppletDomainName'] ? $post['AppletDomainName'] : '');
+                         break;
+                     case 'false':
+                         $Data['is_applets'] = 0;
+                         break;
+                 }
+
                 //新建G宝盆信息，并同步统一平台
                 $GnameNum = $CustProModule->GetListsNum("where G_name='" . $Data['G_name'] . "'");
                 if ($GnameNum ['Num'] > 0) {
@@ -2426,6 +2554,10 @@ class Gbaopen extends InterfaceVIEWS
         $ToString .= '&pc_color=' . $CustProInfo ['pc_color'];
         $ToString .= '&mobile_color=' . $CustProInfo ['mobile_color'];
         $ToString .= '&is_demo=' . ($CustProInfo ['is_demo'] ? $CustProInfo ['is_demo'] : 0);
+        //是否开启小程序
+        $ToString .= '&is_applets=' . ($CustProInfo ['is_applets'] ? $CustProInfo ['is_applets'] : 0);
+        $ToString .= '&AppId=' . $CustProInfo ['AppId'];//小程序ID
+        $ToString .= '&AppSecret=' . $CustProInfo ['AppSecret'];//小程序密钥
         if (isset($_POST["password"]) && !empty($_POST["password"])) {
             $ToString .= '&password=' . $_POST["password"];
         }
@@ -2454,7 +2586,7 @@ class Gbaopen extends InterfaceVIEWS
 
         $ToString .= '&timemap=' . $randomLock;
         $ToString .= '&taget=' . md5($text . $password);
-        $ReturnString = request_by_other($TuUrl, $ToString);
+        $ReturnString = curl_post($TuUrl, $ToString, 0);
         $ReturnArray = json_decode($ReturnString, true);
         return $ReturnArray;
     }
@@ -4313,5 +4445,6 @@ class Gbaopen extends InterfaceVIEWS
         $objWriter->save('php://output');
         exit;
     }
+
 
 }

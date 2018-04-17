@@ -170,7 +170,7 @@ jQuery(document).ready(function() {
     });
     
     //外域勾选
-    $(".crelist input[type='checkbox']").click(function() {
+    $(".crelist .domain input[type='checkbox']").click(function() {
         var _this = $(this);
         if (_this.is(":checked")) {
             if (_this.attr("name") == "outpc_add")
@@ -182,8 +182,20 @@ jQuery(document).ready(function() {
             _this.siblings("textarea.info").hide();
             _this.siblings("span.as").text("");
         }
-    })
-    
+    });
+
+    //小程序勾选
+    $(".crelist #applets input[type='checkbox']").on('click', function () {
+        var _this = $(this);
+        if(_this.is(":checked")){
+            $("#app_info").show();
+            $("#app_info span").show();
+        }else {
+            $("#app_info").hide();
+            $("#app_info input").val('');
+        }
+    });
+
     //上下页页面切换
     $('.Btn2').click(function() {
         if ($(this).attr('value') == '下一页') {
@@ -206,6 +218,26 @@ jQuery(document).ready(function() {
     $('.Btn3').click(function() {
         var html = '<div class="userdata-content"><p style="font-size:20px;color:red;">请确认下面的信息，一旦创建，不可修改！！！！</p>\n';
         if ($(this).attr('value') == '创建并开通') {
+
+            var applets = $(".crelist #applets input[type='checkbox']");
+            var is_checked = applets.is(":checked");
+            if(is_checked){
+                var AppId = $(".crelist #app_info input[name='AppId']").val();
+                var AppSecret = $(".crelist #app_info input[name='AppSecret']").val();
+                //var AppletDomainName = $(".crelist #app_info input[name='AppletDomainName']").val();
+                if ( AppId == '' ){
+                    Msg(1, 'AppId(小程序ID)不能为空');
+                    return false;
+                }else if (AppSecret == ''){
+                    Msg(1, 'AppSecret(小程序秘钥)不能为空');
+                    return false;
+                }
+                /*else if(AppletDomainName == ''){
+                    Msg(1, '服务器配置不能为空');
+                    return false;
+                }*/
+            }
+
             var password=$("input[name='password']").val();
             if(password!=""){
                 if(!(/^\w+$/.test(password))){
@@ -288,6 +320,20 @@ jQuery(document).ready(function() {
                 else
                     data += '"' + v.name + '":"' + v.value + '",';
             });
+
+            var applets = $(".crelist #applets input[type='checkbox']");
+            var is_checked = applets.is(":checked");
+            if (is_checked == true){
+                console.log(is_checked+' 是');
+                data['is_applets'] = '1';
+                data['AppId'] = $(".crelist #app_info input[name='AppId']").val();
+                data['AppSecret'] = $(".crelist #app_info input[name='AppSecret']").val();
+                //data['AppletDomainName'] = $(".crelist #app_info input[name='AppletDomainName']").val();
+            }else {
+                console.log(is_checked+' 否');
+                data['is_applets'] = '0';
+            }
+
             data += '"type":"cuspro","cus":"' + cus + '","ftp":' + ftp + ',';
         } else if($('.Btn3').val() == '创建客户'){
             input = $(".crelist .userdata-content").eq(1).find("input");
@@ -402,6 +448,9 @@ function changetype(num) {
         $("#domain_outpc").show();
         $("#mobile").find("span").eq(0).show();
         $("#mobile").find("span").eq(1).show();
+        $("#applets").show();
+        $("#applets").find("span").eq(0).show();
+        $("#applets").find("span").eq(1).show();
         $('#pc_color').remove();
     } else if (num == 3) {
         $("#pc").show();
@@ -410,12 +459,18 @@ function changetype(num) {
         $("#pc").find("span").eq(1).show();
         $("#mobile").find("span").eq(0).show();
         $("#mobile").find("span").eq(1).show();
+        $("#applets").show();
+        $("#applets").find("span").eq(0).show();
+        $("#applets").find("span").eq(1).show();
     } else {
         $("#pk").show();
         $("#pc").show().find("span").eq(0).hide();
         $("#pc").find("span").eq(1).hide();
         $("#mobile").show().find("span").eq(0).hide();
         $("#mobile").find("span").eq(1).hide();
+        $("#applets").show();
+        $("#applets").find("span").eq(0).show();
+        $("#applets").find("span").eq(1).show();
         $('#pc_color').remove();
         $('#mobile_color').remove();
     }

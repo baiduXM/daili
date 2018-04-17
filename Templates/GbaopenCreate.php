@@ -220,7 +220,7 @@
                                 <span><input type="text" name="mobiledomain" class="Input"></span>
                                 <span class="as 35ftp" style="display:none;">多个域名请用英文半角逗号分开， PC站和手机站共计不超过9个域名，且必须使用已备案的域名</span>
                             </p>
-                            <p class="modelchoose" id="domain_outpc" style="display:none;">
+                            <p class="modelchoose domain" id="domain_outpc" style="display:none;">
                                 <input name="outpc_add" type="checkbox">
                                 <span class="content-l">外域PC域名</span>
                                 <span><input type="text" name="outpcdomain" class="Input" value="http://"></span>
@@ -229,7 +229,7 @@
                                 <span class="as">
                                 </span>
                             </p>
-                            <p class="modelchoose" id="domain_outmobile">
+                            <p class="modelchoose domain" id="domain_outmobile">
                                 <input name="outmobile_add" type="checkbox">
                                 <span class="content-l">外域手机域名</span>
                                 <span><input type="text" name="outmobiledomain" class="Input" value="http://"></span>
@@ -237,6 +237,33 @@
                                 <textarea readonly="readonly" class="infoblnd" style="display:none;">&lt;script type="text/javascript"&gt; var system ={ win : false, mac : false, xll : false };  var p = navigator.platform; system.win = p.indexOf("Win") == 0; system.mac = p.indexOf("Mac") == 0; system.x11 = (p == "X11") || (p.indexOf("Linux") == 0); if(system.win||system.mac||system.xll){      window.location.href="$$"; }else{ } &lt;/script&gt;</textarea>
                                 <span class="as">
                                 </span>
+                            </p>
+
+                            <p class="modelchoose" id="applets" style="display: none;">
+                                <input type="checkbox" id="is_applets" name="is_applets" value="1">
+                                <span class="content-l"><label for="is_applets">是否开通小程序</label></span>
+                            </p>
+                            <style>
+                                #app_info{display: none;}
+                                #app_info .app_css{width: 140px;}
+                                #app_info .app_css em{color: #ff0000;}
+                                #app_info span.pz{color: #ff0000;}
+                                #app_info span.pz span{color: #B4BAC9;}
+                                #app_info span.zc a{color: #4A8BDD;}
+                            </style>
+                            <p class="modelchoose" id="app_info">
+                                <span class="content-l app_css"><em>*</em> AppId(小程序ID)</span>
+                                <span><input type="text" name="AppId" class="Input" value=""></span>
+                                <br>
+                                <span class="content-l app_css"><em>*</em> AppSecret(小程序秘钥)</span>
+                                <span><input type="text" name="AppSecret" class="Input" value=""></span>
+                                <br>
+                                <span class="content-l app_css"><em>*</em> 服务器配置</span>
+                                <!--<span><input type="text" name="AppletDomainName" class="Input" value=""></span>-->
+                                <!--<span class="pz">小程序域名配置</span>-->
+                                <span class="pz"><span>小程序域名配置</span>( 请配置为 https://xcx.5067.org )</span>
+                                <br>
+                                <span class="zc"><b>我还没有注册微信小程序</b>&nbsp;<a href="https://mp.weixin.qq.com/" target="_blank">去注册>>></a></span>
                             </p>
                             <span style="padding-left: 25px;color: red;">注:默认年限为1年并赠送1个月,除体验用户，体验用户默认为一个月试用期;默认空间为100M</span>
                         </div>

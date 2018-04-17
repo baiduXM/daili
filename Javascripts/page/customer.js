@@ -176,7 +176,7 @@ jQuery(document).ready(function () {
                                 timeList = v.PCTimeStart ? '<td>PC：' + v.PCTimeStart + '</td><td>PC：' + v.PCTimeEnd + '</td>' : v.MobileTimeStart ? '<td>手机:' + v.MobileTimeStart + '</td><td>手机：' + v.MobileTimeEnd + '</td>' : '<td>--</td><td>--</td>';
                             }
                             if (v.agent) {
-                                nameList = '<td class="poptip">' + v.name + '<div class="popfrm">\
+                                nameList = '<td class="poptip">' + v.name  + '<div class="popfrm">\
                                                                 <b class="phpicn">◆</b>\
                                                                 <p>所属人员：' + v.agent + '</p>\
                                                             </div></td>';
@@ -428,6 +428,7 @@ jQuery(document).ready(function () {
                         operation[0] += '<a href="javascript:;" class="g-show"> E推 </a>';
                         operation[0] += '<a href="javascript:;" class="g-show-manage"> E推管理 </a>';
                         operation[0] += '<a href="javascript:;" class="g-manage"> 平台管理 </a>';
+                        operation[0] += '<a href="javascript:;" class="g-applets"> 小程序打包 </a>';
                     } else if (v2 == 'create')
                         operation[1] = '<a href="javascript:;" class="g-create"> 开通 </a>';
                     else if (v2 == 'delete') {
@@ -470,6 +471,35 @@ jQuery(document).ready(function () {
         };
         this.init();
     }();
+
+    /**
+     * 小程序打包
+     * */
+    $(".leftbox ul,#listtbody").on('click', ".g-applets", function (){
+        var html = $(this).parent().siblings('.poptip').html();
+        var g_name = html.substring(0, html.indexOf('<div')); //截取某个字符前的字符串
+        //console.log(g_name);
+        var url = 'Apps?module=Gbaopen&action=SmallProgramPackage';
+        $.ajax({
+            url: url,
+            type: 'GET',
+            async: false,
+            data: {g_name:g_name},
+            success: function (data) {
+                console.log(data);
+                if (data == 1004 ){
+                    Msg(1, '此账号未开通小程序');
+                    return false;
+                }else {
+                    // $(this).attr('href', data);
+                    var con=  confirm('确定打包下载？');
+                   if (con == true){
+                       window.location.href = data;
+                   }
+                }
+            }
+        });
+    });
 
     //文本框点击复制事件
     $('#dialog-message').on('click', ".info", function () {
@@ -930,6 +960,7 @@ jQuery(document).ready(function () {
             if (!result.err) {
                 $(".dialog-content a.dia-ok").addClass('goprocessing');
                 var data        = result.data, html, option = '';
+                console.log(data);
                 var domainfocus = '';
                 if (data.domain_def) {
                     var domain_def = encodeURIComponent(data.domain_def);
@@ -1032,7 +1063,7 @@ jQuery(document).ready(function () {
                        <span><input type="text" name="mobiledomain" class="Input" value="' + data.mobiledomain + '"></span>\
                        ' + (domain_def ? data.pcdomain.indexOf(domain_def) == -1 ? '' : domainfocus : '') + '\
                     </p>\
-                    <p class="modelchoose" id="domain_outpc">\
+                    <p class="modelchoose domain" id="domain_outpc">\
                        <input name="outpc_add" type="checkbox"' + (data.pcdomain != 'http://' ? ' checked' : '') + '>\
                        <span class="content-l">外域PC域名</span>\
                        <span><input type="text" name="outpcdomain" class="Input" value="' + (data.pc_out_domain ? data.pc_out_domain : data.pcdomain ?  data.pcdomain : 'http://') + '"></span>\
@@ -1040,7 +1071,7 @@ jQuery(document).ready(function () {
                         <textarea readonly="readonly" class="infoblnd" style="display:none;"><script type="text/javascript">var system ={win : false,mac : false,xll : false,ipad:false};var p = navigator.platform;system.win = p.indexOf("Win") == 0;system.mac = p.indexOf("Mac") == 0;system.x11 = (p == "X11") || (p.indexOf("Linux") == 0);system.ipad = (navigator.userAgent.match(/iPad/i) != null)?true:false;if(system.win||system.mac||system.xll||system.ipad){}else{top.location.href="$$";}<\/script></textarea>\
                         <span class="as"></span>\
                     </p>\
-                    <p class="modelchoose" id="domain_outmobile">\
+                    <p class="modelchoose domain" id="domain_outmobile">\
                        <input name="outmobile_add" type="checkbox"' + (data.mobiledomain != 'http://' ? ' checked' : '') + '>\
                        <span class="content-l">外域手机域名</span>\
                        <span><input type="text" name="outmobiledomain" class="Input" value="' + (data.mobile_out_domain ? data.mobile_out_domain : data.mobiledomain ? data.mobiledomain : 'http://') + '"></span>\
@@ -1048,7 +1079,34 @@ jQuery(document).ready(function () {
                        <textarea readonly="readonly" class="infoblnd" style="display:none;"><script type="text/javascript"> var system ={ win : false, mac : false, xll : false };  var p = navigator.platform; system.win = p.indexOf("Win") == 0; system.mac = p.indexOf("Mac") == 0; system.x11 = (p == "X11") || (p.indexOf("Linux") == 0); if(system.win||system.mac||system.xll){      top.location.href="$$"; }else{ } <\/script></textarea>\
                        <span class="as">\
                        </span>\
+                    </p>\
+                    <style>\
+                        #app_info .app_css{width: 140px;}\
+                        #app_info .app_css em{color: #ff0000;}\
+                        #app_info span.pz{color: #ff0000;}\
+                        #app_info span.pz span{color: #B4BAC9;}\
+                        #app_info span.zc a{color: #4A8BDD;}\
+                    </style>\
+                     <p class="modelchoose1" id="applets">\
+                        <input type="checkbox" id="is_applets"  '+(data.is_applets != 1 ? '' : 'checked')+' >\
+                        <span class="content-l"><label for="is_applets">是否开通小程序</label></span>\
+                        <input type="text" id="is_app" name="is_applets" value="'+(data.is_applets != 1 ? '0' : '1')+'" style="display:none;">\
+                        <input type="text" id="is_app_old" name="is_app_old" value="'+(data.is_applets != 1 ? '0' : '1')+'" style="display:none;">\
+                    </p>\
+                    <p class="modelchoose1" id="app_info" style="display:'+(data.is_applets != 1 ? 'none' : 'block')+';">\
+                        <span class="content-l app_css"><em>*</em> AppId(小程序ID)</span>\
+                        <span><input type="text" name="AppId" class="Input" value="'+(data.AppId ? data.AppId : '' )+'"></span>\
+                        <br>\
+                        <span class="content-l app_css"><em>*</em> AppSecret(小程序秘钥)</span>\
+                        <span><input type="text" name="AppSecret" class="Input" value="'+(data.AppSecret ? data.AppSecret : '' )+'"></span>\
+                        <br>\
+                        <span class="content-l app_css"><em>*</em> 服务器配置</span>\
+                        <span class="pz"><span>小程序域名配置</span>( 请配置为 https://xcx.5067.org )</span>\
+                        <br>\
+                        <span class="zc"><b>我还没有注册微信小程序</b>&nbsp;<a href="https://mp.weixin.qq.com/" target="_blank">去注册>>></a></span>\
                     </p>';
+                /*<span><input type="text" name="AppletDomainName" class="Input" value="'+(data.AppletDomainName ? data.AppletDomainName : '' )+'"></span>\
+                 <span class="pz">小程序域名配置</span>\*/
                 html += '<input type="hidden" class="Input" value="' + cus + '"></div>\
                     <script type="text/javascript">\
                         var dialogscr = function(){\
@@ -1058,7 +1116,7 @@ jQuery(document).ready(function () {
                         $("#dialog-message input[type=\'radio\'][name=\'is_demo\'][value=\'' + data.is_demo + '\']").attr("checked","true");\
                         changetext(' + data.pc_mobile + ', 1);\
                         $("#dialog-message input[type=\'radio\'][name=\'pc_mobile\']").change(function(){changetext($(this).val(), 2)});\
-                        $("#dialog-message input[type=\'checkbox\']").click(function(){\
+                        $("#dialog-message .domain input[type=\'checkbox\']").click(function(){\
                             if($(this).is(":checked")) {\
                                 if($(this).attr("name")=="outpc_add")\
                                         $(this).siblings("textarea.info").val($(this).siblings("textarea.infoblnd").val().replace("$$",$("input[name=\'mobiledomain\']").val()));\
@@ -1067,6 +1125,19 @@ jQuery(document).ready(function () {
                                 $(this).siblings("textarea.info").show();$(this).siblings(".as").text("外域域名需要插入左方文本框内的脚本");\
                             } else {$(this).siblings("textarea.info").hide();$(this).siblings(".as").text("")}\
                         })}();\
+                        \
+                        $("#dialog-message #applets input[type=\'checkbox\']").on(\'click\', function () {\
+                            var _this = $(this);\
+                            if(_this.is(":checked")){\
+                                $("#app_info").show();\
+                                $("#app_info span").show();\
+                                $("#is_app").val("1");\
+                            }else {\
+                                $("#app_info").hide();\
+                                $("#app_info input").val("");\
+                                $("#is_app").val("0");\
+                            }\
+                        });\
                     </script>';
                 popup(html);
             } else {
@@ -1074,6 +1145,7 @@ jQuery(document).ready(function () {
             }
         });
     });
+
 
     /*开通模块*/
     $('.leftbox ul,#listtbody').on('click', ".g-create", function () {
@@ -1579,6 +1651,9 @@ jQuery(document).ready(function () {
             data += '"outpc_add":"' + $("input[type=\'checkbox\'][name=\'outpc_add\']").is(':checked') + '",';
             data += '"num":' + number + '}';
             data = $.parseJSON(data);
+            if($("input[name=\'is_applets\']").val() == 1 && $("input[name=\'is_app_old\']").val() == 0) {
+                Msg(1, '<span>开启小程序需要等待一定的时间，请稍等...</span><span class="flower-loader" style="opacity: 1;"></span>');
+            }
             $.post("Apps?module=Gbaopen&action=Processing", data, function (result) {
                 if (!result.err) {
                     Msg(3, result.data.name + "的网站信息已成功修改");
@@ -1792,7 +1867,6 @@ jQuery(document).ready(function () {
     });
     
 });
-
 
 function changetext(num, type) {
     var m = $(".modelchoose");
