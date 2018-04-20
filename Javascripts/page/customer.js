@@ -1087,8 +1087,8 @@ jQuery(document).ready(function () {
                         #app_info span.pz span{color: #B4BAC9;}\
                         #app_info span.zc a{color: #4A8BDD;}\
                     </style>\
-                     <p class="modelchoose1" id="applets">\
-                        <input type="checkbox" id="is_applets"  '+(data.is_applets != 1 ? '' : 'checked')+' >\
+                     <p class="modelchoose1" id="applets" style="display: '+(data.pc_mobile !=1 ? '' : 'none')+'">\
+                        <input type="checkbox" id="is_applets" '+ (data.is_applets != 1 ? '' : 'checked')+' >\
                         <span class="content-l"><label for="is_applets">是否开通小程序</label></span>\
                         <input type="text" id="is_app" name="is_applets" value="'+(data.is_applets != 1 ? '0' : '1')+'" style="display:none;">\
                         <input type="text" id="is_app_old" name="is_app_old" value="'+(data.is_applets != 1 ? '0' : '1')+'" style="display:none;">\
@@ -1138,6 +1138,17 @@ jQuery(document).ready(function () {
                                 $("#is_app").val("0");\
                             }\
                         });\
+                        $("#dialog-message input[type=\'radio\'][name=\'pc_mobile\']").on(\'click\', function() { \
+                            var val = $(this).val();\
+                            if(val == "1"){\
+                                $("#applets").hide();\
+                                $("#app_info").hide();\
+                                $("#app_info input").val("");\
+                                $("#is_app").val("0");\
+                            }else {\
+                                $("#applets").show();\
+                            }\
+                         })\
                     </script>';
                 popup(html);
             } else {

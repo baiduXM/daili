@@ -697,8 +697,13 @@ function deldir($dir) {
 function sendStreamFile($url, $file) {
     if (file_exists($file)) {
         $ch = curl_init();
-        //加@符号curl就会把它当成是文件上传处理
-        $data = array('file' => '@' . realpath($file));
+        //加@符号curl就会把它当成是文件上传处理(php5.5以下)
+        // $data = array('file' => '@' . realpath($file));
+        if(class_exists('CURLFile')){
+            $data = array('file' => new CURLFile( realpath($file) ) );
+        }else{
+            $data = array('file' => '@' . realpath($file));
+        }
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);

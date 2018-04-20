@@ -12,6 +12,12 @@
             <span>客户管理</span>
           </a>
         </li>-->
+        <li <?PHP if ($MyModule == 'Expired' && $MyAction == 'EList') { ?>class="on"<?php } ?>>
+            <a href="<?php echo UrlRewriteSimple('Expired', 'EList', true); ?>">
+                <i class="fa fa-data"></i>
+                <span>E推过期数据</span>
+            </a>
+        </li>
         <li <?PHP if ($MyModule == 'Gbaopen' && $MyAction == 'Customer') { ?>class="on"<?php } ?>>
             <a href="<?php echo UrlRewriteSimple('Gbaopen', 'Customer', true); ?>">
                 <i class="fa fa-similarproduct"></i>
